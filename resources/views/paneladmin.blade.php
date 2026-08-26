@@ -17,6 +17,10 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
+    <!-- Quill.js Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
     <style>
         /* ===== Reset & Base ===== */
         * {
@@ -659,6 +663,139 @@
         #adminPanel.show {
             display: flex !important;
         }
+
+        /* ===== Blog post thumbnail ===== */
+        .blog-thumbnail {
+            width: 60px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+        [data-theme="light"] .blog-thumbnail {
+            border-color: #e5e7eb;
+        }
+        .blog-tag-item {
+            display: inline-block;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 2px 2px 2px 0;
+        }
+
+        /* ===== Quill Editor Styles ===== */
+        .ql-container {
+            font-family: 'Vazirmatn', sans-serif !important;
+            min-height: 200px;
+            border-radius: 0 0 8px 8px !important;
+            background: var(--bg-card) !important;
+            color: var(--text) !important;
+        }
+        .ql-toolbar {
+            border-radius: 8px 8px 0 0 !important;
+            background: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+        }
+        .ql-toolbar .ql-picker-label {
+            color: var(--text-muted) !important;
+        }
+        .ql-toolbar .ql-picker-options {
+            background: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+        }
+        .ql-toolbar .ql-picker-item {
+            color: var(--text) !important;
+        }
+        .ql-toolbar .ql-picker-item:hover {
+            background: var(--bg-color) !important;
+        }
+        .ql-toolbar button .ql-stroke {
+            stroke: var(--text-muted) !important;
+        }
+        .ql-toolbar button .ql-fill {
+            fill: var(--text-muted) !important;
+        }
+        .ql-toolbar button:hover .ql-stroke {
+            stroke: var(--primary-color) !important;
+        }
+        .ql-toolbar button:hover .ql-fill {
+            fill: var(--primary-color) !important;
+        }
+        .ql-toolbar button.ql-active .ql-stroke {
+            stroke: var(--primary-color) !important;
+        }
+        .ql-toolbar button.ql-active .ql-fill {
+            fill: var(--primary-color) !important;
+        }
+        .ql-editor {
+            min-height: 220px;
+            font-size: 15px;
+            line-height: 1.9;
+            color: var(--text) !important;
+            background: var(--bg-card) !important;
+        }
+        .ql-editor strong { color: var(--text) !important; }
+        .ql-editor em { color: var(--text) !important; }
+        .ql-editor a { color: var(--primary-color) !important; }
+        .ql-editor blockquote {
+            border-right: 3px solid var(--primary-color);
+            padding-right: 12px;
+            color: var(--text-muted);
+        }
+        .ql-editor code {
+            background: var(--bg-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .ql-editor pre {
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .ql-editor ul, .ql-editor ol {
+            padding-right: 20px;
+        }
+        .ql-editor ul li, .ql-editor ol li {
+            margin-bottom: 4px;
+        }
+        [data-theme="light"] .ql-editor blockquote {
+            border-right-color: var(--primary-color);
+        }
+        [data-theme="light"] .ql-editor code {
+            background: #f1f5f9;
+        }
+        [data-theme="light"] .ql-editor pre {
+            background: #f1f5f9;
+        }
+        [data-theme="light"] .ql-toolbar .ql-picker-label {
+            color: #374151 !important;
+        }
+        [data-theme="light"] .ql-toolbar button .ql-stroke {
+            stroke: #6b7280 !important;
+        }
+        [data-theme="light"] .ql-toolbar button .ql-fill {
+            fill: #6b7280 !important;
+        }
+        [data-theme="light"] .ql-toolbar button:hover .ql-stroke {
+            stroke: var(--primary-color) !important;
+        }
+        [data-theme="light"] .ql-toolbar button:hover .ql-fill {
+            fill: var(--primary-color) !important;
+        }
+        [data-theme="light"] .ql-toolbar button.ql-active .ql-stroke {
+            stroke: var(--primary-color) !important;
+        }
+        [data-theme="light"] .ql-toolbar button.ql-active .ql-fill {
+            fill: var(--primary-color) !important;
+        }
+        [data-theme="light"] .ql-picker-options {
+            background: #ffffff !important;
+        }
     </style>
 
 <style id="grafioum-runtime-safety">
@@ -666,7 +803,7 @@
   #sidebar{transform:translateX(0)!important;visibility:visible!important}
 }
 @media (max-width:767px){
-  #sidebar{transition:transform.25s ease}
+  #sidebar{transition:transform .25s ease}
 }
 </style>
 
@@ -758,6 +895,11 @@
                     <span>کاربران</span>
                     <span class="badge">90</span>
                 </a>
+                <a href="#" class="nav-item" data-page="admins">
+                    <i data-lucide="shield"></i>
+                    <span>مدیران</span>
+                    <span class="badge">3</span>
+                </a>
                 <a href="#" class="nav-item" data-page="reviews">
                     <i data-lucide="star"></i>
                     <span>نظرات</span>
@@ -809,6 +951,15 @@
                 <a href="#" class="nav-item" data-page="ai">
                     <i data-lucide="bot"></i>
                     <span>هوش مصنوعی</span>
+                </a>
+
+                <div class="sidebar-divider"></div>
+
+                <div class="nav-section">محتوا</div>
+                <a href="#" class="nav-item" data-page="blog">
+                    <i data-lucide="newspaper"></i>
+                    <span>مدیریت بلاگ</span>
+                    <span class="badge" id="blogCountBadge">12</span>
                 </a>
             </nav>
 
@@ -1226,6 +1377,128 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- ===== ADMINS ===== -->
+            <div id="admins-page" class="page-content">
+                <div class="table-card bg-[#1e293b] rounded-xl shadow-sm border border-gray-700 overflow-hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-700">
+                        <h3 class="font-semibold text-gray-100 flex items-center gap-2">
+                            <i data-lucide="shield" class="w-5 h-5 text-blue-500"></i>
+                            مدیریت مدیران
+                        </h3>
+                        <button id="showAddAdmin" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition duration-300 transform hover:scale-105">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i> افزودن مدیر
+                        </button>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-800 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3 text-right">شناسه</th>
+                                    <th class="px-4 py-3 text-right">نام مدیر</th>
+                                    <th class="px-4 py-3 text-right">ایمیل</th>
+                                    <th class="px-4 py-3 text-right">دسترسی‌ها</th>
+                                    <th class="px-4 py-3 text-right">وضعیت</th>
+                                    <th class="px-4 py-3 text-right">تاریخ ثبت</th>
+                                    <th class="px-4 py-3 text-right">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminsTableBody" class="divide-y divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="adminFormContainer" class="mt-6 bg-[#1e293b] rounded-xl shadow-sm border border-gray-700 p-6 transition-all duration-300" style="display:none;">
+                    <h3 class="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+                        <i data-lucide="shield-plus" class="w-5 h-5 text-blue-500"></i>
+                        <span id="adminFormTitle">افزودن مدیر جدید</span>
+                    </h3>
+                    <form id="adminForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">نام کامل</label>
+                                <input type="text" id="adminName" class="form-input" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">ایمیل</label>
+                                <input type="email" id="adminEmail" class="form-input" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">رمز عبور</label>
+                                <input type="password" id="adminPass" class="form-input" placeholder="برای ویرایش خالی بگذارید">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">وضعیت</label>
+                                <select id="adminStatus" class="form-input">
+                                    <option value="active">فعال</option>
+                                    <option value="inactive">غیرفعال</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">دسترسی‌ها</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="products" checked> محصولات
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="categories" checked> دسته‌بندی‌ها
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="orders" checked> سفارشات
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="users" checked> کاربران
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="admins" checked> مدیران
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="reviews" checked> نظرات
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="coupons" checked> تخفیف‌ها
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="banners" checked> بنرها
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="reports" checked> گزارشات
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="analytics" checked> تحلیل‌ها
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="sliders" checked> اسلایدر
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="admin-permission" value="settings" checked> تنظیمات
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 justify-end">
+                            <button type="button" id="cancelAdmin" class="px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 transition duration-300">انصراف</button>
+                            <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition duration-300 flex items-center gap-1 transform hover:scale-105">
+                                <i data-lucide="save" class="w-4 h-4"></i> <span id="adminSubmitText">ذخیره مدیر</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div id="permissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden" onclick="if(event.target===this) closePermissionModal()">
+                    <div class="bg-[#1e293b] rounded-xl border border-gray-700 p-6 w-full max-w-md shadow-2xl animate-[fadeScaleIn_0.3s_ease]">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+                            <i data-lucide="shield" class="w-5 h-5 text-blue-500"></i>
+                            تغییر دسترسی‌ها - <span id="permAdminName" class="text-blue-400">مدیر</span>
+                        </h3>
+                        <div id="permCheckboxes" class="grid grid-cols-2 gap-2 mb-4"></div>
+                        <div class="flex gap-3 justify-end">
+                            <button onclick="closePermissionModal()" class="px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 transition duration-300">بستن</button>
+                            <button id="savePermissionsBtn" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition duration-300 flex items-center gap-1 transform hover:scale-105">
+                                <i data-lucide="save" class="w-4 h-4"></i> ذخیره دسترسی‌ها
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1708,13 +1981,9 @@
                         </div>
                     </div>
 
-                    <div class="chat-container" id="chatContainer">
-                        <!-- پیام‌ها توسط JS ساخته می‌شوند -->
-                    </div>
+                    <div class="chat-container" id="chatContainer"></div>
 
-                    <div class="flex flex-wrap gap-2 mt-4" id="quickActions">
-                        <!-- دکمه‌های سریع توسط JS ساخته می‌شوند -->
-                    </div>
+                    <div class="flex flex-wrap gap-2 mt-4" id="quickActions"></div>
                 </div>
             </div>
 
@@ -1773,6 +2042,112 @@
                 </div>
             </div>
 
+            <!-- ===== BLOG MANAGEMENT با ویرایشگر ===== -->
+            <div id="blog-page" class="page-content">
+                <div class="table-card bg-[#1e293b] rounded-xl shadow-sm border border-gray-700 overflow-hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-700">
+                        <h3 class="font-semibold text-gray-100 flex items-center gap-2">
+                            <i data-lucide="newspaper" class="w-5 h-5 text-blue-500"></i>
+                            مدیریت مقالات بلاگ
+                        </h3>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div class="relative">
+                                <i data-lucide="search" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+                                <input type="text" id="blogSearch" placeholder="جستجوی عنوان..." class="pr-9 pl-3 py-1.5 border border-gray-600 rounded-lg text-sm bg-[#1e293b] text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-300 w-40 md:w-56">
+                            </div>
+                            <select id="blogStatusFilter" class="form-input w-auto py-1.5 text-sm">
+                                <option value="all">همه</option>
+                                <option value="active">فعال</option>
+                                <option value="inactive">غیرفعال</option>
+                            </select>
+                            <button id="showAddBlog" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition duration-300 transform hover:scale-105 hover:shadow-lg">
+                                <i data-lucide="plus" class="w-4 h-4"></i> افزودن مقاله
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-800 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3 text-right">شناسه</th>
+                                    <th class="px-4 py-3 text-right">تصویر</th>
+                                    <th class="px-4 py-3 text-right">عنوان</th>
+                                    <th class="px-4 py-3 text-right">دسته</th>
+                                    <th class="px-4 py-3 text-right">تاریخ</th>
+                                    <th class="px-4 py-3 text-right">تگ‌ها</th>
+                                    <th class="px-4 py-3 text-right">وضعیت</th>
+                                    <th class="px-4 py-3 text-right">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blogTableBody" class="divide-y divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-gray-700">
+                        <div class="text-sm text-gray-400" id="blogTableInfo">نمایش ۱ تا ۱۲ از ۱۲ مقاله</div>
+                        <div class="dataTable-pagination" id="blogPagination"></div>
+                    </div>
+                </div>
+
+                <!-- فرم افزودن/ویرایش مقاله با ویرایشگر -->
+                <div id="blogFormContainer" class="mt-6 bg-[#1e293b] rounded-xl shadow-sm border border-gray-700 p-6 transition-all duration-300" style="display:none;">
+                    <h3 class="text-lg font-semibold text-gray-100 mb-4 flex items-center gap-2">
+                        <i data-lucide="pen-tool" class="w-5 h-5 text-blue-500"></i>
+                        <span id="blogFormTitle">افزودن مقاله جدید</span>
+                    </h3>
+                    <form id="blogForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">عنوان مقاله</label>
+                                <input type="text" id="blogTitle" class="form-input" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">دسته‌بندی (برچسب)</label>
+                                <input type="text" id="blogBadge" class="form-input" placeholder="مثلاً: آموزش، فتوشاپ، طراحی" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">تاریخ انتشار</label>
+                                <input type="text" id="blogDate" class="form-input" placeholder="۱۴۰۵/۰۵/۱۸" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">وضعیت</label>
+                                <select id="blogStatus" class="form-input">
+                                    <option value="active">فعال</option>
+                                    <option value="inactive">غیرفعال</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">آدرس تصویر (URL)</label>
+                                <input type="url" id="blogImage" class="form-input" placeholder="https://images.unsplash.com/..." required>
+                                <div class="mt-2">
+                                    <img id="blogImagePreview" src="" alt="پیش‌نمایش" class="blog-thumbnail hidden" style="width:120px;height:80px;object-fit:cover;border-radius:8px;">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">تگ‌ها (با کاما جدا کنید)</label>
+                                <input type="text" id="blogTags" class="form-input" placeholder="فتوشاپ، آموزش، طراحی" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">خلاصه مقاله</label>
+                            <textarea id="blogExcerpt" rows="2" class="form-input" placeholder="خلاصه کوتاه از مقاله..." required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">متن کامل مقاله</label>
+                            <div id="blogEditorContainer">
+                                <div id="blogEditor"></div>
+                            </div>
+                            <input type="hidden" id="blogContent" value="">
+                        </div>
+                        <div class="flex gap-3 justify-end">
+                            <button type="button" id="cancelBlog" class="px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 transition duration-300">انصراف</button>
+                            <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition duration-300 flex items-center gap-1 transform hover:scale-105">
+                                <i data-lucide="save" class="w-4 h-4"></i> <span id="blogSubmitText">ذخیره مقاله</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -1781,7 +2156,7 @@
     <!-- ============================================================ -->
     <script>
         // ============================================================
-        // FIX: All code runs after DOM is ready
+        // DOM Ready
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM Ready - Initializing...');
@@ -1928,6 +2303,144 @@
                 return banners;
             }
 
+            // ===== BLOG DATA =====
+            let blogPosts = [
+                {
+                    id: 1,
+                    title: "آموزش جامع فتوشاپ از صفر تا صد",
+                    excerpt: "در این مقاله تمام ابزارهای فتوشاپ را قدم‌به‌قدم یاد می‌گیرید.",
+                    content: "فتوشاپ نرم‌افزاری قدرتمند برای ویرایش تصاویر است. در این آموزش فتوشاپ، ابتدا با محیط کار فتوشاپ آشنا می‌شوید، سپس لایه‌ها، ماسک‌ها، فیلترها و تنظیمات رنگ را فرا می‌گیرید. فتوشاپ برای طراحان گرافیک، عکاسان و هنرمندان دیجیتال ضروری است. اگر می‌خواهید فتوشاپ را به‌صورت حرفه‌ای یاد بگیرید، این مقاله بهترین نقطه شروع است.",
+                    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop",
+                    badge: "آموزش",
+                    date: "۱۴۰۵/۰۵/۱۸",
+                    tags: ["فتوشاپ", "آموزش", "طراحی", "گرافیک"],
+                    status: "active"
+                },
+                {
+                    id: 2,
+                    title: "روتوش حرفه‌ای پرتره در فتوشاپ",
+                    excerpt: "یاد بگیرید چگونه پوست صورت را نرم کنید، رنگ‌ها را متعادل کنید و جزئیات را حفظ کنید.",
+                    content: "روتوش پرتره یکی از مهم‌ترین مهارت‌های فتوشاپ است. در این مقاله با ابزارهای فتوشاپ مانند Healing Brush، Clone Stamp و Frequency Separation آشنا می‌شوید. روتوش حرفه‌ای فتوشاپ یعنی حذف لک‌ها بدون از بین بردن بافت طبیعی پوست.",
+                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop",
+                    badge: "فتوشاپ",
+                    date: "۱۴۰۵/۰۵/۱۷",
+                    tags: ["فتوشاپ", "روتوش", "پرتره", "آموزش"],
+                    status: "active"
+                },
+                {
+                    id: 3,
+                    title: "نکات طلایی طراحی لوگو",
+                    excerpt: "طراحی لوگو از ایده تا اجرا. نکات کاربردی برای طراحی لوگوی ماندگار و حرفه‌ای.",
+                    content: "طراحی لوگو یک فرآیند خلاقانه است. یک لوگوی خوب باید ساده، منحصربه‌فرد و به‌یادماندنی باشد. در این مقاله طراحی لوگو را از تحقیقات اولیه شروع می‌کنیم و با اصول انتخاب رنگ، تایپوگرافی و فرم لوگو ادامه می‌دهیم.",
+                    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
+                    badge: "طراحی",
+                    date: "۱۴۰۵/۰۵/۱۶",
+                    tags: ["لوگو", "طراحی", "گرافیک", "برند"],
+                    status: "active"
+                },
+                {
+                    id: 4,
+                    title: "ایلوستریتور برای طراحان گرافیک",
+                    excerpt: "هر آنچه برای شروع کار با ایلوستریتور نیاز دارید. از ابزارهای پایه تا طراحی وکتور حرفه‌ای.",
+                    content: "ایلوستریتور نرم‌افزار استاندارد طراحی وکتور است. در این مقاله با محیط کار ایلوستریتور، ابزار Pen، شکل‌ها و رنگ‌ها آشنا می‌شوید. ایلوستریتور برای طراحی لوگو، آیکون و تصویرسازی استفاده می‌شود.",
+                    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
+                    badge: "آموزش",
+                    date: "۱۴۰۵/۰۵/۱۵",
+                    tags: ["ایلوستریتور", "طراحی", "وکتور", "گرافیک"],
+                    status: "active"
+                },
+                {
+                    id: 5,
+                    title: "موشن گرافیک با افترافکت",
+                    excerpt: "با افترافکت به طرح‌های خود جان بدهید. آموزش ساخت انیمیشن‌های حرفه‌ای موشن گرافیک.",
+                    content: "موشن گرافیک ترکیبی از طراحی گرافیک و انیمیشن است. افترافکت نرم‌افزار اصلی موشن گرافیک است. در این مقاله با کی‌فریم‌ها، افکت‌ها و خروجی گرفتن از افترافکت آشنا می‌شوید.",
+                    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop",
+                    badge: "ویدیو",
+                    date: "۱۴۰۵/۰۵/۱۴",
+                    tags: ["موشن گرافیک", "افترافکت", "انیمیشن", "ویدیو"],
+                    status: "active"
+                },
+                {
+                    id: 6,
+                    title: "عکاسی پرتره در استودیو GRAFIUM",
+                    excerpt: "با تجهیزات حرفه‌ای استودیو GRAFIUM، عکاسی پرتره را به سطح جدیدی ببرید.",
+                    content: "استودیو GRAFIUM مجهز به نورپردازی حرفه‌ای و پس‌زمینه‌های متنوع است. عکاسی پرتره نیازمند شناخت نور، لنز و ژست‌دهی است. در این مقاله با اصول عکاسی پرتره در استودیو آشنا می‌شوید.",
+                    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=400&fit=crop",
+                    badge: "عکاسی",
+                    date: "۱۴۰۵/۰۵/۱۳",
+                    tags: ["عکاسی", "استودیو", "پرتره", "نورپردازی"],
+                    status: "active"
+                },
+                {
+                    id: 7,
+                    title: "بهترین سیستم‌های گرافیکی برای طراحان",
+                    excerpt: "راهنمای انتخاب سیستم مناسب برای کارهای گرافیکی سنگین. از پردازنده تا کارت گرافیک.",
+                    content: "انتخاب سیستم مناسب برای کار گرافیکی اهمیت زیادی دارد. پردازنده‌های i9 و کارت‌های گرافیک RTX از محبوب‌ترین انتخاب‌ها هستند. در این مقاله نکات مهم انتخاب سیستم گرافیکی را بررسی می‌کنیم.",
+                    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
+                    badge: "سخت‌افزار",
+                    date: "۱۴۰۵/۰۵/۱۲",
+                    tags: ["سیستم", "سخت‌افزار", "گرافیک", "طراحی"],
+                    status: "inactive"
+                },
+                {
+                    id: 8,
+                    title: "راهنمای رزرو میز در GRAFIUM",
+                    excerpt: "چگونه میز یا سیستم مورد نظر خود را به‌صورت آنلاین رزرو کنید. راهنمای گام‌به‌گام.",
+                    content: "رزرو میز در GRAFIUM بسیار ساده است. وارد صفحه خدمات شوید، میز مورد نظر را انتخاب کنید، روز و شیفت دلخواه را بزنید و پرداخت کنید. با این راهنما تمام مراحل رزرو میز را یاد می‌گیرید.",
+                    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop",
+                    badge: "راهنما",
+                    date: "۱۴۰۵/۰۵/۱۱",
+                    tags: ["رزرو", "میز", "خدمات", "راهنما"],
+                    status: "active"
+                },
+                {
+                    id: 9,
+                    title: "۱۰ ترفند افزایش سرعت اینترنت و دانلود",
+                    excerpt: "با این ترفندها سرعت اینترنت خود را در GRAFIUM به حداکثر برسانید و بدون قطعی کار کنید.",
+                    content: "اینترنت پرسرعت و پایدار برای طراحان گرافیک حیاتی است. در GRAFIUM زیرساخت اینترنت فیبر نوری فراهم شده است. در این مقاله ۱۰ ترفند ساده برای بهینه‌سازی سرعت اینترنت و دانلود فایل‌های سنگین را یاد می‌گیرید.",
+                    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop",
+                    badge: "ترفند",
+                    date: "۱۴۰۵/۰۵/۱۰",
+                    tags: ["اینترنت", "سرعت", "ترفند", "دانلود"],
+                    status: "active"
+                },
+                {
+                    id: 10,
+                    title: "کارگاه‌های آموزشی GRAFIUM",
+                    excerpt: "از کارگاه‌های تخصصی فتوشاپ، ایلوستریتور و موشن گرافیک دیدن کنید.",
+                    content: "GRAFIUM به‌طور منظم کارگاه‌های آموزشی برگزار می‌کند. در این کارگاه‌ها به‌صورت حضوری و آنلاین فتوشاپ، ایلوستریتور، افترافکت و عکاسی آموزش داده می‌شود.",
+                    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
+                    badge: "رویداد",
+                    date: "۱۴۰۵/۰۵/۰۹",
+                    tags: ["کارگاه", "آموزش", "رویداد", "گرافیک"],
+                    status: "active"
+                },
+                {
+                    id: 11,
+                    title: "چاپ و صحافی در GRAFIUM",
+                    excerpt: "خدمات چاپ با کیفیت بالا، صحافی حرفه‌ای و تحویل سریع برای پروژه‌های شما.",
+                    content: "در GRAFIUM خدمات چاپ دیجیتال، چاپ لارج فرمت و صحافی ارائه می‌شود. اگر پروژه گرافیکی شما نیاز به خروجی فیزیکی دارد، می‌توانید از خدمات چاپ GRAFIUM استفاده کنید.",
+                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop",
+                    badge: "چاپ",
+                    date: "۱۴۰۵/۰۵/۰۸",
+                    tags: ["چاپ", "صحافی", "خدمات", "چاپ دیجیتال"],
+                    status: "active"
+                },
+                {
+                    id: 12,
+                    title: "ساخت نمونه کار حرفه‌ای برای طراحان",
+                    excerpt: "نمونه کار قوی اولین قدم برای جذب مشتری است. با این راهنما پورتفولیو بسازید.",
+                    content: "یک نمونه کار حرفه‌ای باید پروژه‌های شما را به بهترین شکل نمایش دهد. در این مقاله مراحل ساخت نمونه کار آنلاین و چاپی را یاد می‌گیرید.",
+                    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop",
+                    badge: "طراحی",
+                    date: "۱۴۰۵/۰۵/۰۷",
+                    tags: ["نمونه کار", "پورتفولیو", "طراحی", "گرافیک"],
+                    status: "inactive"
+                }
+            ];
+
+            let nextBlogId = 13;
+
             // ===== Initialize Data =====
             const usersData = generateUsers(90);
             const productsData = generateProducts(50);
@@ -1936,6 +2449,38 @@
             const reviewsData = generateReviews(40, usersData, productsData);
             const couponsData = generateCoupons(15);
             const bannersData = generateBanners(8);
+
+            // ===== DATA FOR ADMINS =====
+            let adminsData = [
+                {
+                    id: 1,
+                    name: 'مدیر سیستم',
+                    email: 'admin@grafioum.com',
+                    status: 'active',
+                    date: '۱۴۰۲/۰۱/۰۱',
+                    isMain: true,
+                    permissions: ['products', 'categories', 'orders', 'users', 'admins', 'reviews', 'coupons', 'banners', 'reports', 'analytics', 'sliders', 'settings', 'blog']
+                },
+                {
+                    id: 2,
+                    name: 'رضا احمدی',
+                    email: 'reza@grafioum.com',
+                    status: 'active',
+                    date: '۱۴۰۲/۰۵/۱۲',
+                    isMain: false,
+                    permissions: ['products', 'categories', 'orders', 'users', 'reviews', 'blog']
+                },
+                {
+                    id: 3,
+                    name: 'سارا حسینی',
+                    email: 'sara@grafioum.com',
+                    status: 'active',
+                    date: '۱۴۰۲/۰۸/۲۰',
+                    isMain: false,
+                    permissions: ['orders', 'users', 'coupons', 'reports', 'analytics', 'blog']
+                }
+            ];
+            let nextAdminId = 4;
 
             // ============================================================
             // 2. STATE
@@ -1947,8 +2492,11 @@
             let editingCouponId = null;
             let editingBannerId = null;
             let editingSliderId = null;
+            let editingAdminId = null;
+            let editingBlogId = null;
             let isDarkTheme = true;
             let currentColor = '#2563eb';
+            let quillEditor = null;
 
             // Slider data
             let slidersData = [
@@ -1997,7 +2545,58 @@
             const themeToggle = $('themeToggle');
 
             // ============================================================
-            // 4. AUTH
+            // 4. QUILL EDITOR
+            // ============================================================
+            const toolbarOptions = [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['link', 'image'],
+                ['clean']
+            ];
+
+            function initQuillEditor() {
+                if (quillEditor) {
+                    quillEditor.destroy();
+                    quillEditor = null;
+                }
+                const container = document.getElementById('blogEditor');
+                if (!container) return;
+
+                quillEditor = new Quill('#blogEditor', {
+                    modules: {
+                        toolbar: toolbarOptions
+                    },
+                    placeholder: 'متن کامل مقاله را در اینجا بنویسید...',
+                    theme: 'snow',
+                    direction: 'rtl'
+                });
+
+                quillEditor.on('text-change', function() {
+                    const content = quillEditor.root.innerHTML;
+                    document.getElementById('blogContent').value = content;
+                });
+            }
+
+            function destroyQuillEditor() {
+                if (quillEditor) {
+                    quillEditor.destroy();
+                    quillEditor = null;
+                }
+                const container = document.getElementById('blogEditor');
+                if (container) {
+                    container.innerHTML = '';
+                }
+            }
+
+            // ============================================================
+            // 5. AUTH
             // ============================================================
             if (loginForm) {
                 loginForm.addEventListener('submit', function(e) {
@@ -2013,9 +2612,10 @@
                         adminPanel.style.display = 'flex';
                         console.log('Login successful - showing admin panel');
 
-                        // Initialize everything
                         initAll();
                         renderAll();
+                        renderAdmins();
+                        renderBlogPosts();
                         setTimeout(initCharts, 200);
                         setTimeout(renderCalendar, 300);
                         setTimeout(renderDataTable, 400);
@@ -2045,7 +2645,7 @@
             }
 
             // ============================================================
-            // 5. PROFILE DROPDOWN
+            // 6. PROFILE DROPDOWN
             // ============================================================
             if (profileBtn) {
                 profileBtn.addEventListener('click', function(e) {
@@ -2070,7 +2670,7 @@
             }
 
             // ============================================================
-            // 6. THEME TOGGLE
+            // 7. THEME TOGGLE
             // ============================================================
             if (themeToggle) {
                 themeToggle.addEventListener('click', function() {
@@ -2090,7 +2690,7 @@
             }
 
             // ============================================================
-            // 7. COLOR THEME
+            // 8. COLOR THEME
             // ============================================================
             window.changeThemeColor = function(color, el) {
                 currentColor = color;
@@ -2119,7 +2719,7 @@
             };
 
             // ============================================================
-            // 8. NAVIGATION
+            // 9. NAVIGATION
             // ============================================================
             const navLinks = document.querySelectorAll('.nav-item[data-page]');
             const pageTitles = {
@@ -2128,6 +2728,7 @@
                 categories: 'دسته‌بندی‌ها',
                 orders: 'مدیریت سفارشات',
                 users: 'مدیریت کاربران',
+                admins: 'مدیریت مدیران',
                 reviews: 'مدیریت نظرات',
                 coupons: 'کدهای تخفیف',
                 banners: 'بنرها',
@@ -2137,7 +2738,8 @@
                 calendar: 'تقویم',
                 datatable: 'جدول داده',
                 ai: 'هوش مصنوعی',
-                settings: 'تنظیمات'
+                settings: 'تنظیمات',
+                blog: 'مدیریت بلاگ'
             };
 
             navLinks.forEach(link => {
@@ -2169,6 +2771,12 @@
                     if (page === 'sliders') {
                         renderSliders();
                     }
+                    if (page === 'admins') {
+                        renderAdmins();
+                    }
+                    if (page === 'blog') {
+                        renderBlogPosts();
+                    }
                 }
                 pageTitle.innerHTML = (pageTitles[page] || page) + ' <span class="text-blue-500">مدیریت</span>';
                 navLinks.forEach(l => l.classList.remove('active'));
@@ -2181,7 +2789,7 @@
             }
 
             // ============================================================
-            // 9. RENDER FUNCTIONS
+            // 10. RENDER FUNCTIONS (بخش‌های قبلی)
             // ============================================================
             function renderAll() {
                 renderProducts();
@@ -2193,12 +2801,15 @@
                 renderCoupons();
                 renderBanners();
                 renderReportsTable();
+                renderAdmins();
+                renderBlogPosts();
                 updateDashboardStats();
                 populateCategorySelect();
                 renderSliders();
                 if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
             }
 
+            // --- PRODUCTS ---
             function renderProducts() {
                 const tbody = $('productsTableBody');
                 if (!tbody) return;
@@ -2293,6 +2904,7 @@
                 updateDashboardStats();
             });
 
+            // --- CATEGORIES ---
             function renderCategories() {
                 const tbody = $('categoriesTableBody');
                 if (!tbody) return;
@@ -2368,6 +2980,7 @@
                 populateCategorySelect();
             });
 
+            // --- ORDERS ---
             function renderOrdersFull() {
                 const tbody = $('ordersFullTableBody');
                 if (!tbody) return;
@@ -2437,6 +3050,7 @@
                             `).join('');
             }
 
+            // --- USERS ---
             function renderUsers() {
                 const tbody = $('usersTableBody');
                 if (!tbody) return;
@@ -2543,6 +3157,7 @@
                 renderUsers();
             });
 
+            // --- REVIEWS ---
             function renderReviews() {
                 const tbody = $('reviewsTableBody');
                 if (!tbody) return;
@@ -2581,6 +3196,7 @@
 
             $('reviewFilter')?.addEventListener('change', function() { renderReviews(); });
 
+            // --- COUPONS ---
             function renderCoupons() {
                 const tbody = $('couponsTableBody');
                 if (!tbody) return;
@@ -2675,6 +3291,7 @@
                 renderCoupons();
             });
 
+            // --- BANNERS ---
             function renderBanners() {
                 const tbody = $('bannersTableBody');
                 if (!tbody) return;
@@ -2814,7 +3431,421 @@
             }
 
             // ============================================================
-            // 10. SLIDERS CRUD
+            // 11. BLOG MANAGEMENT WITH QUILL EDITOR
+            // ============================================================
+            function renderBlogPosts() {
+                const tbody = $('blogTableBody');
+                if (!tbody) return;
+
+                const searchTerm = $('blogSearch')?.value.toLowerCase() || '';
+                const statusFilter = $('blogStatusFilter')?.value || 'all';
+
+                let filtered = blogPosts.filter(post => {
+                    const matchSearch = post.title.toLowerCase().includes(searchTerm) ||
+                        post.excerpt.toLowerCase().includes(searchTerm) ||
+                        post.badge.toLowerCase().includes(searchTerm);
+                    const matchStatus = statusFilter === 'all' || post.status === statusFilter;
+                    return matchSearch && matchStatus;
+                });
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="px-4 py-8 text-center text-gray-400">
+                                <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-gray-500"></i>
+                                <p>هیچ مقاله‌ای یافت نشد.</p>
+                            </td>
+                        </tr>
+                    `;
+                    if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map(post => `
+                                <tr>
+                                    <td class="px-4 py-3">${post.id}</td>
+                                    <td class="px-4 py-3">
+                                        <img src="${post.image}" alt="${post.title}" class="blog-thumbnail" onerror="this.src='https://via.placeholder.com/60x45/1e293b/94a3b8?text=No+Image'">
+                                    </td>
+                                    <td class="px-4 py-3 font-medium text-gray-100 max-w-xs truncate">${post.title}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="badge-${post.badge === 'آموزش' ? 'success' : post.badge === 'طراحی' ? 'shipped' : post.badge === 'فتوشاپ' ? 'pending' : 'active'} badge text-xs px-3 py-1 rounded-full">${post.badge}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-400">${post.date}</td>
+                                    <td class="px-4 py-3">
+                                        ${post.tags.map(tag => `<span class="blog-tag-item">${tag}</span>`).join('')}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="badge-${post.status} badge text-xs px-3 py-1 rounded-full">${post.status === 'active' ? 'فعال' : 'غیرفعال'}</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex gap-1 flex-wrap">
+                                            <a href="/blog?id=${post.id}" target="_blank" class="p-1.5 rounded bg-green-900/40 text-green-400 hover:bg-green-800 transition duration-200 hover:scale-110" title="مشاهده در سایت">
+                                                <i data-lucide="eye" class="w-4 h-4"></i>
+                                            </a>
+                                            <button class="p-1.5 rounded bg-blue-900/40 text-blue-400 hover:bg-blue-800 transition duration-200 hover:scale-110" onclick="editBlogPost(${post.id})" title="ویرایش">
+                                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                                            </button>
+                                            <button class="p-1.5 rounded bg-red-900/40 text-red-400 hover:bg-red-800 transition duration-200 hover:scale-110" onclick="deleteBlogPost(${post.id})" title="حذف">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('');
+
+                if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+
+                const info = $('blogTableInfo');
+                if (info) {
+                    info.textContent = `نمایش ${filtered.length} از ${blogPosts.length} مقاله`;
+                }
+
+                const badge = document.querySelector('.nav-item[data-page="blog"] .badge');
+                if (badge) {
+                    const activeCount = blogPosts.filter(p => p.status === 'active').length;
+                    badge.textContent = activeCount;
+                }
+            }
+
+            window.deleteBlogPost = function(id) {
+                const post = blogPosts.find(p => p.id === id);
+                if (!post) return;
+                if (confirm(`آیا از حذف مقاله "${post.title}" اطمینان دارید؟`)) {
+                    const index = blogPosts.findIndex(p => p.id === id);
+                    if (index !== -1) {
+                        blogPosts.splice(index, 1);
+                        renderBlogPosts();
+                        alert('مقاله با موفقیت حذف شد!');
+                    }
+                }
+            };
+
+            window.editBlogPost = function(id) {
+                const post = blogPosts.find(p => p.id === id);
+                if (!post) return;
+                editingBlogId = id;
+                $('blogFormTitle').textContent = 'ویرایش مقاله';
+                $('blogSubmitText').textContent = 'به‌روزرسانی مقاله';
+                $('blogTitle').value = post.title;
+                $('blogBadge').value = post.badge;
+                $('blogDate').value = post.date;
+                $('blogStatus').value = post.status;
+                $('blogImage').value = post.image;
+                $('blogTags').value = post.tags.join('، ');
+                $('blogExcerpt').value = post.excerpt;
+
+                const preview = $('blogImagePreview');
+                if (post.image) {
+                    preview.src = post.image;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+
+                // نمایش فرم و راه‌اندازی ویرایشگر
+                $('blogFormContainer').style.display = 'block';
+                setTimeout(() => {
+                    destroyQuillEditor();
+                    initQuillEditor();
+                    if (quillEditor && post.content) {
+                        quillEditor.root.innerHTML = post.content;
+                        document.getElementById('blogContent').value = post.content;
+                    }
+                }, 150);
+
+                window.scrollTo({ top: $('blogFormContainer').offsetTop - 100, behavior: 'smooth' });
+            };
+
+            $('showAddBlog').addEventListener('click', function() {
+                editingBlogId = null;
+                $('blogFormTitle').textContent = 'افزودن مقاله جدید';
+                $('blogSubmitText').textContent = 'ذخیره مقاله';
+                $('blogForm').reset();
+                $('blogImagePreview').classList.add('hidden');
+                document.getElementById('blogContent').value = '';
+                $('blogFormContainer').style.display = 'block';
+
+                setTimeout(() => {
+                    destroyQuillEditor();
+                    initQuillEditor();
+                }, 150);
+
+                window.scrollTo({ top: $('blogFormContainer').offsetTop - 100, behavior: 'smooth' });
+            });
+
+            $('cancelBlog').addEventListener('click', function() {
+                $('blogFormContainer').style.display = 'none';
+                destroyQuillEditor();
+            });
+
+            $('blogImage').addEventListener('input', function() {
+                const preview = $('blogImagePreview');
+                if (this.value) {
+                    preview.src = this.value;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+            });
+
+            $('blogForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // گرفتن محتوا از ویرایشگر
+                const content = document.getElementById('blogContent').value;
+
+                const title = $('blogTitle').value.trim();
+                const badge = $('blogBadge').value.trim();
+                const date = $('blogDate').value.trim();
+                const status = $('blogStatus').value;
+                const image = $('blogImage').value.trim();
+                const tagsRaw = $('blogTags').value.trim();
+                const excerpt = $('blogExcerpt').value.trim();
+
+                if (!title || !badge || !date || !image || !excerpt || !content) {
+                    return alert('لطفاً تمام فیلدهای ضروری را پر کنید!');
+                }
+
+                const tags = tagsRaw.split(/[،,،\s]+/).filter(t => t.length > 0);
+
+                if (editingBlogId) {
+                    const post = blogPosts.find(p => p.id === editingBlogId);
+                    if (post) {
+                        post.title = title;
+                        post.badge = badge;
+                        post.date = date;
+                        post.status = status;
+                        post.image = image;
+                        post.tags = tags;
+                        post.excerpt = excerpt;
+                        post.content = content;
+                        alert('مقاله با موفقیت به‌روزرسانی شد!');
+                    }
+                    editingBlogId = null;
+                } else {
+                    blogPosts.push({
+                        id: nextBlogId++,
+                        title,
+                        excerpt,
+                        content,
+                        image,
+                        badge,
+                        date,
+                        tags,
+                        status
+                    });
+                    alert('مقاله جدید با موفقیت اضافه شد!');
+                }
+
+                $('blogFormContainer').style.display = 'none';
+                destroyQuillEditor();
+                renderBlogPosts();
+            });
+
+            $('blogSearch').addEventListener('input', function() {
+                renderBlogPosts();
+            });
+            $('blogStatusFilter').addEventListener('change', function() {
+                renderBlogPosts();
+            });
+
+            // ============================================================
+            // 12. ADMINS
+            // ============================================================
+            function renderAdmins() {
+                const tbody = $('adminsTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = adminsData.map(a => {
+                    const permCount = a.permissions ? a.permissions.length : 0;
+                    const isMainBadge = a.isMain ? '<span class="badge-success badge text-xs px-2 py-0.5 mr-1">اصلی</span>' : '';
+                    return `
+                                <tr>
+                                    <td class="px-4 py-3">${a.id}</td>
+                                    <td class="px-4 py-3 font-medium text-gray-100">${a.name} ${isMainBadge}</td>
+                                    <td class="px-4 py-3 text-gray-400">${a.email}</td>
+                                    <td class="px-4 py-3 text-gray-300">${permCount} مورد</td>
+                                    <td class="px-4 py-3"><span class="badge-${a.status} badge text-xs px-3 py-1 rounded-full">${a.status === 'active' ? 'فعال' : 'غیرفعال'}</span></td>
+                                    <td class="px-4 py-3 text-gray-400">${a.date}</td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex gap-1 flex-wrap">
+                                            <button class="p-1.5 rounded bg-blue-900/40 text-blue-400 hover:bg-blue-800 transition duration-200 hover:scale-110" onclick="editAdmin(${a.id})" ${a.isMain ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                                            </button>
+                                            <button class="p-1.5 rounded bg-purple-900/40 text-purple-400 hover:bg-purple-800 transition duration-200 hover:scale-110" onclick="openPermissionModal(${a.id})" ${a.isMain ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                                                <i data-lucide="shield" class="w-4 h-4"></i>
+                                            </button>
+                                            <button class="p-1.5 rounded bg-red-900/40 text-red-400 hover:bg-red-800 transition duration-200 hover:scale-110" onclick="deleteAdmin(${a.id})" ${a.isMain ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                }).join('');
+                if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+            }
+
+            window.deleteAdmin = function(id) {
+                const admin = adminsData.find(a => a.id === id);
+                if (!admin) return;
+                if (admin.isMain) {
+                    alert('اکانت اصلی قابل حذف نیست!');
+                    return;
+                }
+                if (confirm(`آیا از برکناری "${admin.name}" اطمینان دارید؟`)) {
+                    const index = adminsData.findIndex(a => a.id === id);
+                    if (index !== -1) {
+                        adminsData.splice(index, 1);
+                        renderAdmins();
+                        updateAdminBadge();
+                        alert(`مدیر "${admin.name}" با موفقیت برکنار شد!`);
+                    }
+                }
+            };
+
+            window.editAdmin = function(id) {
+                const admin = adminsData.find(a => a.id === id);
+                if (!admin) return;
+                if (admin.isMain) {
+                    alert('اکانت اصلی قابل ویرایش نیست!');
+                    return;
+                }
+                editingAdminId = id;
+                $('adminFormTitle').textContent = 'ویرایش مدیر';
+                $('adminSubmitText').textContent = 'به‌روزرسانی مدیر';
+                $('adminName').value = admin.name;
+                $('adminEmail').value = admin.email;
+                $('adminPass').value = '';
+                $('adminStatus').value = admin.status;
+                document.querySelectorAll('.admin-permission').forEach(cb => {
+                    cb.checked = admin.permissions && admin.permissions.includes(cb.value);
+                });
+                $('adminFormContainer').style.display = 'block';
+                window.scrollTo({ top: $('adminFormContainer').offsetTop - 100, behavior: 'smooth' });
+            };
+
+            $('showAddAdmin').addEventListener('click', function() {
+                editingAdminId = null;
+                $('adminFormTitle').textContent = 'افزودن مدیر جدید';
+                $('adminSubmitText').textContent = 'ذخیره مدیر';
+                $('adminForm').reset();
+                document.querySelectorAll('.admin-permission').forEach(cb => cb.checked = true);
+                $('adminFormContainer').style.display = 'block';
+                window.scrollTo({ top: $('adminFormContainer').offsetTop - 100, behavior: 'smooth' });
+            });
+
+            $('cancelAdmin').addEventListener('click', function() {
+                $('adminFormContainer').style.display = 'none';
+            });
+
+            $('adminForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = $('adminName').value.trim();
+                const email = $('adminEmail').value.trim();
+                const pass = $('adminPass').value;
+                const status = $('adminStatus').value;
+                const permissions = [];
+                document.querySelectorAll('.admin-permission:checked').forEach(cb => permissions.push(cb.value));
+
+                if (!name || !email) return alert('لطفاً نام و ایمیل را وارد کنید!');
+                if (!editingAdminId && !pass) return alert('برای مدیر جدید رمز عبور وارد کنید!');
+
+                if (editingAdminId) {
+                    const a = adminsData.find(a => a.id === editingAdminId);
+                    if (a) {
+                        a.name = name;
+                        a.email = email;
+                        if (pass) a.password = pass;
+                        a.status = status;
+                        a.permissions = permissions;
+                        alert('مدیر با موفقیت به‌روزرسانی شد!');
+                    }
+                    editingAdminId = null;
+                } else {
+                    adminsData.push({
+                        id: nextAdminId++,
+                        name: name,
+                        email: email,
+                        status: status,
+                        date: new Date().toLocaleDateString('fa-IR'),
+                        isMain: false,
+                        permissions: permissions,
+                        password: pass,
+                    });
+                    alert('مدیر جدید با موفقیت اضافه شد!');
+                }
+                $('adminFormContainer').style.display = 'none';
+                renderAdmins();
+                updateAdminBadge();
+            });
+
+            let currentPermAdminId = null;
+
+            window.openPermissionModal = function(id) {
+                const admin = adminsData.find(a => a.id === id);
+                if (!admin) return;
+                if (admin.isMain) {
+                    alert('اکانت اصلی دسترسی کامل دارد و قابل تغییر نیست!');
+                    return;
+                }
+                currentPermAdminId = id;
+                $('permAdminName').textContent = admin.name;
+
+                const container = $('permCheckboxes');
+                const allPerms = ['products', 'categories', 'orders', 'users', 'admins', 'reviews', 'coupons', 'banners', 'reports', 'analytics', 'sliders', 'settings', 'blog'];
+                const permLabels = {
+                    products: 'محصولات',
+                    categories: 'دسته‌بندی‌ها',
+                    orders: 'سفارشات',
+                    users: 'کاربران',
+                    admins: 'مدیران',
+                    reviews: 'نظرات',
+                    coupons: 'تخفیف‌ها',
+                    banners: 'بنرها',
+                    reports: 'گزارشات',
+                    analytics: 'تحلیل‌ها',
+                    sliders: 'اسلایدر',
+                    settings: 'تنظیمات',
+                    blog: 'بلاگ'
+                };
+                container.innerHTML = allPerms.map(p => `
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" class="perm-checkbox" value="${p}" ${admin.permissions && admin.permissions.includes(p) ? 'checked' : ''}>
+                                    ${permLabels[p] || p}
+                                </label>
+                            `).join('');
+
+                $('permissionModal').classList.remove('hidden');
+                if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
+            };
+
+            window.closePermissionModal = function() {
+                $('permissionModal').classList.add('hidden');
+                currentPermAdminId = null;
+            };
+
+            $('savePermissionsBtn').addEventListener('click', function() {
+                if (currentPermAdminId === null) return;
+                const admin = adminsData.find(a => a.id === currentPermAdminId);
+                if (!admin) return;
+                const permissions = [];
+                document.querySelectorAll('.perm-checkbox:checked').forEach(cb => permissions.push(cb.value));
+                admin.permissions = permissions;
+                closePermissionModal();
+                renderAdmins();
+                alert('دسترسی‌ها با موفقیت به‌روزرسانی شدند!');
+            });
+
+            function updateAdminBadge() {
+                const badge = document.querySelector('.nav-item[data-page="admins"] .badge');
+                if (badge) {
+                    badge.textContent = adminsData.length;
+                }
+            }
+
+            // ============================================================
+            // 13. SLIDERS
             // ============================================================
             function renderSliders() {
                 const tbody = $('slidersTableBody');
@@ -2937,7 +3968,7 @@
             });
 
             // ============================================================
-            // 11. CALENDAR
+            // 14. CALENDAR
             // ============================================================
             let calendarDate = new Date();
             let selectedDate = new Date();
@@ -3047,7 +4078,7 @@
             });
 
             // ============================================================
-            // 12. DATA TABLE
+            // 15. DATA TABLE
             // ============================================================
             function renderDataTable() {
                 const searchTerm = $('dataTableSearch')?.value.toLowerCase() || '';
@@ -3167,7 +4198,7 @@
             });
 
             // ============================================================
-            // 13. CHARTS
+            // 16. CHARTS
             // ============================================================
             let salesChartInstance, productsChartInstance, reportsChart1Instance, reportsChart2Instance,
             analyticsChartInstance;
@@ -3280,7 +4311,7 @@
             }
 
             // ============================================================
-            // 14. AI CHAT (با تایپ تیکه‌تیکه)
+            // 17. AI CHAT
             // ============================================================
             const chatData = {
                 initial: {
@@ -3520,7 +4551,7 @@
             }
 
             // ============================================================
-            // 15. MOBILE MENU
+            // 18. MOBILE MENU
             // ============================================================
             function openMobileMenu() {
                 if (window.innerWidth < 768) {
@@ -3544,7 +4575,7 @@
             mobileOverlay.addEventListener('click', closeMobileMenu);
 
             // ============================================================
-            // 16. SEARCH
+            // 19. SEARCH
             // ============================================================
             globalSearch.addEventListener('input', function() {
                 const query = this.value.trim().toLowerCase();
@@ -3577,14 +4608,14 @@
             });
 
             // ============================================================
-            // 17. INIT
+            // 20. INIT
             // ============================================================
             function initAll() {
                 renderAll();
                 updateDashboardStats();
                 populateCategorySelect();
                 ['productFormContainer', 'categoryFormContainer', 'userFormContainer', 'couponFormContainer',
-                    'bannerFormContainer', 'sliderFormContainer'
+                    'bannerFormContainer', 'sliderFormContainer', 'adminFormContainer', 'blogFormContainer'
                 ].forEach(id => {
                     const el = $(id);
                     if (el) el.style.display = 'none';
@@ -3612,6 +4643,9 @@
                     chatHistory.push({ role: 'assistant', content: initialMsg });
                     currentChatNode = 'initial';
                 }
+
+                updateAdminBadge();
+                renderBlogPosts();
             }
 
             window.addEventListener('resize', function() {
@@ -3628,11 +4662,8 @@
 
             if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
             console.log('Grafioum admin panel loaded successfully.');
-            console.log('Slider, calendar, data table and AI typing features initialized.');
+            console.log('Blog management with Quill editor, slider, calendar, data table, AI typing and Admins management features initialized.');
 
-            // ============================================================
-            // END OF DOMContentLoaded
-            // ============================================================
         }); // end DOMContentLoaded
     </script>
 </body>
