@@ -1,0 +1,314 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Admin;
+use App\Models\Desk;
+use App\Models\Reservation;
+use App\Models\Invoice;
+use Illuminate\Support\Facades\Hash;
+
+class AdminController extends Controller
+{
+    /**
+     * نمایش صفحه اصلی پنل ادمین (داشبورد)
+     */
+    public function index()
+    {
+        // دریافت آمار از دیتابیس
+        $stats = [
+            'total_users' => User::count(),
+            'total_admins' => Admin::count(),
+            'total_reservations' => Reservation::count(),
+            'total_invoices' => Invoice::count(),
+            'total_desks' => Desk::count(),
+            'active_reservations' => Reservation::where('status', 'active')->count(),
+            'pending_reservations' => Reservation::where('status', 'pending')->count(),
+            'cancelled_reservations' => Reservation::where('status', 'cancelled')->count(),
+            'paid_invoices' => Invoice::where('status', 'paid')->count(),
+            'pending_invoices' => Invoice::where('status', 'pending')->count(),
+            'recent_reservations' => Reservation::with(['user', 'desk'])
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get(),
+        ];
+        
+        // دریافت لیست کاربران و مدیران برای تب‌ها
+        $users = User::all();
+        $admins = Admin::all();
+        
+        return view('admin.panel', compact('stats', 'users', 'admins'));
+    }
+
+    /**
+     * نمایش لیست مدیران
+     */
+    public function adminsList()
+    {
+        $admins = Admin::all();
+        return view('admin.admins', compact('admins'));
+    }
+
+    /**
+     * نمایش فرم ایجاد مدیر جدید
+     */
+    public function create()
+    {
+        return view('admin.admins');
+    }
+
+    /**
+     * ذخیره مدیر جدید در دیتابیس
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:admins,email',
+            'password' => 'required|min:8',
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|in:super_admin,manager,support',
+        ]);
+
+        Admin::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'role' => $request->role,
+            'is_active' => 1,
+        ]);
+
+        return redirect()->route('admin.admins.index')
+            ->with('success', 'مدیر جدید با موفقیت ایجاد شد.');
+    }
+
+    /**
+     * نمایش اطلاعات یک مدیر
+     */
+    public function show($id)
+    {
+        $admin = Admin::findOrFail($id);
+        return view('admin.admins', compact('admin'));
+    }
+
+    /**
+     * نمایش فرم ویرایش مدیر
+     */
+    public function edit($id)
+    {
+        $admin = Admin::findOrFail($id);
+        return view('admin.admins', compact('admin'));
+    }
+
+    /**
+     * به‌روزرسانی مدیر
+     */
+    public function update(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:admins,email,' . $id,
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|in:super_admin,manager,support',
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $admin->update($data);
+
+        return redirect()->route('admin.admins.index')
+            ->with('success', 'مدیر با موفقیت به‌روزرسانی شد.');
+    }
+
+    /**
+     * حذف مدیر
+     */
+    public function destroy($id)
+    {
+        $admin = Admin::findOrFail($id);
+        
+        if (Admin::count() <= 1) {
+            return back()->with('error', 'حداقل یک ادمین باید در سیستم وجود داشته باشد.');
+        }
+
+        $admin->delete();
+        return redirect()->route('admin.admins.index')
+            ->with('success', 'مدیر با موفقیت حذف شد.');
+    }
+
+    // ============================================================
+    // مدیریت کاربران عادی
+    // ============================================================
+
+    public function users()
+    {
+        $users = User::all();
+        return view('admin.panel', compact('users'));
+    }
+
+    public function userShow($id)
+    {
+        $user = User::findOrFail($id);
+        $reservations = $user->reservations;
+        $invoices = $user->invoices;
+        return view('admin.panel', compact('user', 'reservations', 'invoices'));
+    }
+
+    public function blockUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['status' => 'blocked']);
+        return back()->with('success', 'کاربر با موفقیت مسدود شد.');
+    }
+
+    public function unblockUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['status' => 'active']);
+        return back()->with('success', 'کاربر با موفقیت فعال شد.');
+    }
+
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'کاربر با موفقیت حذف شد.');
+    }
+
+    // ============================================================
+    // مدیریت میزها
+    // ============================================================
+
+    public function desks()
+    {
+        $desks = Desk::all();
+        return view('admin.panel', compact('desks'));
+    }
+
+    public function deskCreate()
+    {
+        return view('admin.panel');
+    }
+
+    public function deskStore(Request $request)
+    {
+        $request->validate([
+            'desk_number' => 'required|integer|unique:desks',
+            'name' => 'required|string|max:100',
+            'floor' => 'required|string|max:50',
+            'capacity' => 'required|integer|min:1',
+            'price_per_shift' => 'required|numeric|min:0',
+            'has_monitor' => 'boolean',
+            'has_printer' => 'boolean',
+            'is_available' => 'boolean',
+        ]);
+
+        Desk::create($request->all());
+        return redirect()->route('admin.desks.index')->with('success', 'میز با موفقیت ایجاد شد.');
+    }
+
+    public function deskEdit($id)
+    {
+        $desk = Desk::findOrFail($id);
+        return view('admin.panel', compact('desk'));
+    }
+
+    public function deskUpdate(Request $request, $id)
+    {
+        $desk = Desk::findOrFail($id);
+        
+        $request->validate([
+            'desk_number' => 'required|integer|unique:desks,desk_number,' . $id,
+            'name' => 'required|string|max:100',
+            'floor' => 'required|string|max:50',
+            'capacity' => 'required|integer|min:1',
+            'price_per_shift' => 'required|numeric|min:0',
+            'has_monitor' => 'boolean',
+            'has_printer' => 'boolean',
+            'is_available' => 'boolean',
+        ]);
+
+        $desk->update($request->all());
+        return redirect()->route('admin.desks.index')->with('success', 'میز با موفقیت به‌روزرسانی شد.');
+    }
+
+    public function deskDestroy($id)
+    {
+        $desk = Desk::findOrFail($id);
+        $desk->delete();
+        return redirect()->route('admin.desks.index')->with('success', 'میز با موفقیت حذف شد.');
+    }
+
+    // ============================================================
+    // مدیریت رزروها
+    // ============================================================
+
+    public function reservations()
+    {
+        $reservations = Reservation::with(['user', 'desk'])->get();
+        return view('admin.panel', compact('reservations'));
+    }
+
+    public function updateReservationStatus(Request $request, $id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        
+        $request->validate([
+            'status' => 'required|in:pending,active,completed,cancelled,expired',
+        ]);
+
+        $reservation->update(['status' => $request->status]);
+        return back()->with('success', 'وضعیت رزرو با موفقیت به‌روزرسانی شد.');
+    }
+
+    public function deleteReservation($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->delete();
+        return redirect()->route('admin.reservations.index')->with('success', 'رزرو با موفقیت حذف شد.');
+    }
+
+    // ============================================================
+    // مدیریت فاکتورها
+    // ============================================================
+
+    public function invoices()
+    {
+        $invoices = Invoice::with('user')->get();
+        return view('admin.panel', compact('invoices'));
+    }
+
+    public function updateInvoiceStatus(Request $request, $id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        
+        $request->validate([
+            'status' => 'required|in:pending,paid,cancelled,refunded',
+        ]);
+
+        $invoice->update(['status' => $request->status]);
+        return back()->with('success', 'وضعیت فاکتور با موفقیت به‌روزرسانی شد.');
+    }
+
+    public function deleteInvoice($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->delete();
+        return redirect()->route('admin.invoices.index')->with('success', 'فاکتور با موفقیت حذف شد.');
+    }
+}

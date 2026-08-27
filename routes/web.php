@@ -2,9 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ProfileController;
 
 // ============================================================
-// صفحات عمومی (HTML های شما به صورت Blade)
+// 📌 صفحات عمومی (HTML های شما به صورت Blade)
 // ============================================================
 
 Route::get('/', function () {
@@ -36,7 +42,7 @@ Route::get('/invoice', function () {
 })->name('invoice');
 
 // ============================================================
-// لاگین و احراز هویت
+// 🔐 لاگین و احراز هویت (ورود کاربران عادی)
 // ============================================================
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -44,30 +50,101 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // ============================================================
-// داشبورد (نیاز به لاگین)
+// 👤 پنل کاربری عادی (نیاز به لاگین)
 // ============================================================
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('reservations')->name('reservations.')->group(function () {
+        Route::get('/', [ReservationController::class, 'index'])->name('index');
+        Route::get('/create', [ReservationController::class, 'create'])->name('create');
+        Route::post('/store', [ReservationController::class, 'store'])->name('store');
+        Route::get('/{id}', [ReservationController::class, 'show'])->name('show');
+        Route::put('/{id}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+        Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', [InvoiceController::class, 'index'])->name('index');
+        Route::get('/{id}', [InvoiceController::class, 'show'])->name('show');
+        Route::get('/{id}/download', [InvoiceController::class, 'download'])->name('download');
+        Route::post('/{id}/pay', [InvoiceController::class, 'pay'])->name('pay');
+    });
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [ProfileController::class, 'update'])->name('update');
+        Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
+    });
+
+});
 
 // ============================================================
-// پنل ادمین (نیاز به لاگین + ادمین بودن)
+// 🔐 لاگین ادمین
 // ============================================================
 
-Route::get('/admin', function () {
-    return view('paneladmin,logi');
-})->middleware('auth')->name('admin');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AdminLoginController::class, 'login']);
+    Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
+});
 
 // ============================================================
-// API رزرو (اختیاری)
+// 🛡️ پنل ادمین
 // ============================================================
 
-Route::post('/reserve', function () {
-    // منطق رزرو میز
-    return response()->json(['message' => 'رزرو با موفقیت انجام شد']);
-})->middleware('auth')->name('reserve');
-// ===== پنل ادمین (نیاز به لاگین + ادمین بودن) =====
-Route::get('/admin', function () {
-    return view('paneladmin');
-})->middleware(['auth'])->name('admin');
+Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(function () {
+
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
+
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+
+    // مدیریت مدیران
+    Route::prefix('admins')->name('admins.')->group(function () {
+        Route::get('/', [AdminController::class, 'adminsList'])->name('index');
+        Route::get('/create', [AdminController::class, 'create'])->name('create');
+        Route::post('/', [AdminController::class, 'store'])->name('store');
+        Route::get('/{id}', [AdminController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
+    });
+
+    // مدیریت کاربران
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [AdminController::class, 'users'])->name('index');
+        Route::get('/{id}', [AdminController::class, 'userShow'])->name('show');
+        Route::put('/{id}/block', [AdminController::class, 'blockUser'])->name('block');
+        Route::put('/{id}/unblock', [AdminController::class, 'unblockUser'])->name('unblock');
+        Route::delete('/{id}', [AdminController::class, 'deleteUser'])->name('destroy');
+    });
+
+    // مدیریت میزها
+    Route::prefix('desks')->name('desks.')->group(function () {
+        Route::get('/', [AdminController::class, 'desks'])->name('index');
+        Route::get('/create', [AdminController::class, 'deskCreate'])->name('create');
+        Route::post('/store', [AdminController::class, 'deskStore'])->name('store');
+        Route::get('/{id}/edit', [AdminController::class, 'deskEdit'])->name('edit');
+        Route::put('/{id}', [AdminController::class, 'deskUpdate'])->name('update');
+        Route::delete('/{id}', [AdminController::class, 'deskDestroy'])->name('destroy');
+    });
+
+    // مدیریت رزروها
+    Route::prefix('reservations')->name('reservations.')->group(function () {
+        Route::get('/', [AdminController::class, 'reservations'])->name('index');
+        Route::put('/{id}/status', [AdminController::class, 'updateReservationStatus'])->name('status');
+        Route::delete('/{id}', [AdminController::class, 'deleteReservation'])->name('destroy');
+    });
+
+    // مدیریت فاکتورها
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', [AdminController::class, 'invoices'])->name('index');
+        Route::put('/{id}/status', [AdminController::class, 'updateInvoiceStatus'])->name('status');
+        Route::delete('/{id}', [AdminController::class, 'deleteInvoice'])->name('destroy');
+    });
+
+});
