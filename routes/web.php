@@ -4,13 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 
 // ============================================================
-// 📌 صفحات عمومی (HTML های شما به صورت Blade)
+// 📌 صفحات عمومی
 // ============================================================
 
 Route::get('/', function () {
@@ -42,7 +43,7 @@ Route::get('/invoice', function () {
 })->name('invoice');
 
 // ============================================================
-// 🔐 لاگین و احراز هویت (ورود کاربران عادی)
+// 🔐 لاگین کاربران عادی
 // ============================================================
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -50,7 +51,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // ============================================================
-// 👤 پنل کاربری عادی (نیاز به لاگین)
+// 👤 پنل کاربری عادی
 // ============================================================
 
 Route::middleware(['auth'])->group(function () {
@@ -97,13 +98,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(function () {
 
+    // ===== اصلی =====
     Route::get('/', function () {
         return redirect()->route('admin.dashboard');
     });
 
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
-    // مدیریت مدیران
+    // ===== مدیریت مدیران =====
     Route::prefix('admins')->name('admins.')->group(function () {
         Route::get('/', [AdminController::class, 'adminsList'])->name('index');
         Route::get('/create', [AdminController::class, 'create'])->name('create');
@@ -114,7 +116,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
     });
 
-    // مدیریت کاربران
+    // ===== مدیریت کاربران =====
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [AdminController::class, 'users'])->name('index');
         Route::get('/{id}', [AdminController::class, 'userShow'])->name('show');
@@ -123,7 +125,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::delete('/{id}', [AdminController::class, 'deleteUser'])->name('destroy');
     });
 
-    // مدیریت میزها
+    // ===== مدیریت میزها =====
     Route::prefix('desks')->name('desks.')->group(function () {
         Route::get('/', [AdminController::class, 'desks'])->name('index');
         Route::get('/create', [AdminController::class, 'deskCreate'])->name('create');
@@ -133,18 +135,62 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::delete('/{id}', [AdminController::class, 'deskDestroy'])->name('destroy');
     });
 
-    // مدیریت رزروها
+    // ===== مدیریت رزروها =====
     Route::prefix('reservations')->name('reservations.')->group(function () {
         Route::get('/', [AdminController::class, 'reservations'])->name('index');
         Route::put('/{id}/status', [AdminController::class, 'updateReservationStatus'])->name('status');
         Route::delete('/{id}', [AdminController::class, 'deleteReservation'])->name('destroy');
     });
 
-    // مدیریت فاکتورها
+    // ===== مدیریت فاکتورها =====
     Route::prefix('invoices')->name('invoices.')->group(function () {
         Route::get('/', [AdminController::class, 'invoices'])->name('index');
         Route::put('/{id}/status', [AdminController::class, 'updateInvoiceStatus'])->name('status');
         Route::delete('/{id}', [AdminController::class, 'deleteInvoice'])->name('destroy');
     });
 
+    // ============================================================
+    // 🗓️ تقویم (Calendar)
+    // ============================================================
+    Route::prefix('calendar')->name('calendar.')->group(function () {
+
+        // صفحه اصلی تقویم
+        Route::get('/', [CalendarController::class, 'index'])->name('index');
+
+        // API دریافت رویدادهای ماه
+        Route::get('/api/month', [CalendarController::class, 'getMonthEvents'])->name('api.month');
+
+        // API دریافت رویدادهای روز
+        Route::get('/api/day', [CalendarController::class, 'getDayEvents'])->name('api.day');
+
+        // CRUD رویدادها
+        Route::post('/store', [CalendarController::class, 'store'])->name('store');
+
+        // افزودن ماه کامل
+        Route::post('/store-month', [CalendarController::class, 'storeMonth'])->name('store-month');
+
+        // ویرایش
+        Route::get('/{id}/edit', [CalendarController::class, 'edit'])->name('edit');
+
+        // به‌روزرسانی
+        Route::put('/{id}', [CalendarController::class, 'update'])->name('update');
+
+        // حذف (تبدیل به عادی)
+        Route::delete('/{id}', [CalendarController::class, 'destroy'])->name('destroy');
+
+        // حذف فیزیکی
+        Route::delete('/{id}/force', [CalendarController::class, 'forceDelete'])->name('force-delete');
+
+        // تغییر وضعیت تعطیلی
+        Route::post('/{id}/toggle-holiday', [CalendarController::class, 'toggleHoliday'])->name('toggle-holiday');
+
+    });
+
 });
+
+// ============================================================
+// مسیر جایگزین برای تقویم
+// ============================================================
+Route::get('/admin/calendar', [CalendarController::class, 'index'])
+    ->name('admin.calendar')
+    ->middleware(['auth:admin']);

@@ -9,38 +9,66 @@ use App\Models\Admin;
 use App\Models\Desk;
 use App\Models\Reservation;
 use App\Models\Invoice;
-use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
     /**
      * نمایش صفحه اصلی پنل ادمین (داشبورد)
+     * داده‌ها به صورت یکجا و ترکیبی ارسال می‌شوند
      */
     public function index()
     {
-        // دریافت آمار از دیتابیس
-        $stats = [
-            'total_users' => User::count(),
-            'total_admins' => Admin::count(),
-            'total_reservations' => Reservation::count(),
-            'total_invoices' => Invoice::count(),
-            'total_desks' => Desk::count(),
-            'active_reservations' => Reservation::where('status', 'active')->count(),
-            'pending_reservations' => Reservation::where('status', 'pending')->count(),
-            'cancelled_reservations' => Reservation::where('status', 'cancelled')->count(),
-            'paid_invoices' => Invoice::where('status', 'paid')->count(),
-            'pending_invoices' => Invoice::where('status', 'pending')->count(),
+        // ============================================================
+        // همه داده‌های مورد نیاز را یکجا جمع کن
+        // ============================================================
+        $data = [
+            // ===== 1. کاربران با صفحه‌بندی (پاگینیشن) =====
+            'users' => User::latest()->paginate(10),
+
+            // ===== 2. مدیران =====
+            'admins' => Admin::all(),
+
+            // ===== 3. آمارها (Stats) =====
+            'stats' => [
+                'total_users' => User::count(),
+                'total_admins' => Admin::count(),
+                'total_reservations' => Reservation::count(),
+                'total_invoices' => Invoice::count(),
+                'total_desks' => Desk::count(),
+                'active_reservations' => Reservation::where('status', 'active')->count(),
+                'pending_reservations' => Reservation::where('status', 'pending')->count(),
+                'cancelled_reservations' => Reservation::where('status', 'cancelled')->count(),
+                'completed_reservations' => Reservation::where('status', 'completed')->count(),
+                'expired_reservations' => Reservation::where('status', 'expired')->count(),
+                'paid_invoices' => Invoice::where('status', 'paid')->count(),
+                'pending_invoices' => Invoice::where('status', 'pending')->count(),
+                'cancelled_invoices' => Invoice::where('status', 'cancelled')->count(),
+                'refunded_invoices' => Invoice::where('status', 'refunded')->count(),
+            ],
+
+            // ===== 4. آخرین رزروها با Eager Loading =====
             'recent_reservations' => Reservation::with(['user', 'desk'])
-                ->orderBy('created_at', 'desc')
+                ->latest()
                 ->limit(5)
                 ->get(),
+
+            // ===== 5. آخرین فاکتورها =====
+            'recent_invoices' => Invoice::with('user')
+                ->latest()
+                ->limit(5)
+                ->get(),
+
+            // ===== 6. جمع کل فروش =====
+            'total_sales' => Invoice::where('status', 'paid')->sum('final_amount'),
+
+            // ===== 7. مجموع رزروهای امروز =====
+            'today_reservations' => Reservation::whereDate('created_at', today())->count(),
+
+            // ===== 8. مجموع کاربران جدید امروز =====
+            'today_new_users' => User::whereDate('created_at', today())->count(),
         ];
-        
-        // دریافت لیست کاربران و مدیران برای تب‌ها
-        $users = User::all();
-        $admins = Admin::all();
-        
-        return view('admin.panel', compact('stats', 'users', 'admins'));
+
+        return view('admin.panel', $data);
     }
 
     /**
@@ -57,7 +85,8 @@ class AdminController extends Controller
      */
     public function create()
     {
-        return view('admin.admins');
+        $admins = Admin::all();
+        return view('admin.admins', compact('admins'));
     }
 
     /**
@@ -76,7 +105,7 @@ class AdminController extends Controller
         Admin::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => bcrypt($request->password),
             'phone' => $request->phone,
             'role' => $request->role,
             'is_active' => 1,
@@ -92,7 +121,8 @@ class AdminController extends Controller
     public function show($id)
     {
         $admin = Admin::findOrFail($id);
-        return view('admin.admins', compact('admin'));
+        $admins = Admin::all();
+        return view('admin.admins', compact('admin', 'admins'));
     }
 
     /**
@@ -101,7 +131,8 @@ class AdminController extends Controller
     public function edit($id)
     {
         $admin = Admin::findOrFail($id);
-        return view('admin.admins', compact('admin'));
+        $admins = Admin::all();
+        return view('admin.admins', compact('admin', 'admins'));
     }
 
     /**
@@ -110,7 +141,7 @@ class AdminController extends Controller
     public function update(Request $request, $id)
     {
         $admin = Admin::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email,' . $id,
@@ -126,7 +157,7 @@ class AdminController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $data['password'] = bcrypt($request->password);
         }
 
         $admin->update($data);
@@ -141,7 +172,7 @@ class AdminController extends Controller
     public function destroy($id)
     {
         $admin = Admin::findOrFail($id);
-        
+
         if (Admin::count() <= 1) {
             return back()->with('error', 'حداقل یک ادمین باید در سیستم وجود داشته باشد.');
         }
@@ -157,8 +188,8 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::all();
-        return view('admin.panel', compact('users'));
+        $users = User::latest()->paginate(10);
+        return view('admin.users', compact('users'));
     }
 
     public function userShow($id)
@@ -166,7 +197,7 @@ class AdminController extends Controller
         $user = User::findOrFail($id);
         $reservations = $user->reservations;
         $invoices = $user->invoices;
-        return view('admin.panel', compact('user', 'reservations', 'invoices'));
+        return view('admin.users', compact('user', 'reservations', 'invoices'));
     }
 
     public function blockUser($id)
@@ -197,12 +228,12 @@ class AdminController extends Controller
     public function desks()
     {
         $desks = Desk::all();
-        return view('admin.panel', compact('desks'));
+        return view('admin.desks', compact('desks'));
     }
 
     public function deskCreate()
     {
-        return view('admin.panel');
+        return view('admin.desks');
     }
 
     public function deskStore(Request $request)
@@ -225,13 +256,13 @@ class AdminController extends Controller
     public function deskEdit($id)
     {
         $desk = Desk::findOrFail($id);
-        return view('admin.panel', compact('desk'));
+        return view('admin.desks', compact('desk'));
     }
 
     public function deskUpdate(Request $request, $id)
     {
         $desk = Desk::findOrFail($id);
-        
+
         $request->validate([
             'desk_number' => 'required|integer|unique:desks,desk_number,' . $id,
             'name' => 'required|string|max:100',
@@ -261,13 +292,13 @@ class AdminController extends Controller
     public function reservations()
     {
         $reservations = Reservation::with(['user', 'desk'])->get();
-        return view('admin.panel', compact('reservations'));
+        return view('admin.reservations', compact('reservations'));
     }
 
     public function updateReservationStatus(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
-        
+
         $request->validate([
             'status' => 'required|in:pending,active,completed,cancelled,expired',
         ]);
@@ -290,13 +321,13 @@ class AdminController extends Controller
     public function invoices()
     {
         $invoices = Invoice::with('user')->get();
-        return view('admin.panel', compact('invoices'));
+        return view('admin.invoices', compact('invoices'));
     }
 
     public function updateInvoiceStatus(Request $request, $id)
     {
         $invoice = Invoice::findOrFail($id);
-        
+
         $request->validate([
             'status' => 'required|in:pending,paid,cancelled,refunded',
         ]);
