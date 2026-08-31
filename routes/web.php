@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CalendarController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\InvoiceController;
@@ -154,35 +155,63 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     // ============================================================
     Route::prefix('calendar')->name('calendar.')->group(function () {
 
-        // صفحه اصلی تقویم
         Route::get('/', [CalendarController::class, 'index'])->name('index');
-
-        // API دریافت رویدادهای ماه
         Route::get('/api/month', [CalendarController::class, 'getMonthEvents'])->name('api.month');
-
-        // API دریافت رویدادهای روز
         Route::get('/api/day', [CalendarController::class, 'getDayEvents'])->name('api.day');
-
-        // CRUD رویدادها
         Route::post('/store', [CalendarController::class, 'store'])->name('store');
-
-        // افزودن ماه کامل
         Route::post('/store-month', [CalendarController::class, 'storeMonth'])->name('store-month');
-
-        // ویرایش
         Route::get('/{id}/edit', [CalendarController::class, 'edit'])->name('edit');
-
-        // به‌روزرسانی
         Route::put('/{id}', [CalendarController::class, 'update'])->name('update');
-
-        // حذف (تبدیل به عادی)
         Route::delete('/{id}', [CalendarController::class, 'destroy'])->name('destroy');
-
-        // حذف فیزیکی
         Route::delete('/{id}/force', [CalendarController::class, 'forceDelete'])->name('force-delete');
-
-        // تغییر وضعیت تعطیلی
         Route::post('/{id}/toggle-holiday', [CalendarController::class, 'toggleHoliday'])->name('toggle-holiday');
+
+    });
+
+    // ============================================================
+    // 📝 مدیریت بلاگ (Blog Management)
+    // ============================================================
+    Route::prefix('blog')->name('blog.')->group(function () {
+
+        // ===== داشبورد بلاگ =====
+        Route::get('/', [BlogController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [BlogController::class, 'index'])->name('dashboard.index');
+
+        // ===== alias برای سازگاری با لینک‌های قدیمی =====
+        Route::get('/index', [BlogController::class, 'index'])->name('index');
+
+        // ===== پست‌ها =====
+        Route::get('/posts', [BlogController::class, 'posts'])->name('posts');
+        Route::get('/create', [BlogController::class, 'create'])->name('create');
+        Route::post('/store', [BlogController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [BlogController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [BlogController::class, 'update'])->name('update');
+        Route::delete('/{id}', [BlogController::class, 'destroy'])->name('destroy');
+        Route::delete('/{id}/force', [BlogController::class, 'forceDelete'])->name('force-delete');
+        Route::post('/{id}/toggle-status', [BlogController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/{id}/toggle-featured', [BlogController::class, 'toggleFeatured'])->name('toggle-featured');
+
+        // ===== دسته‌بندی‌ها =====
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/', [BlogController::class, 'categories'])->name('index');
+            Route::post('/store', [BlogController::class, 'storeCategory'])->name('store');
+            Route::put('/{id}', [BlogController::class, 'updateCategory'])->name('update');
+            Route::delete('/{id}', [BlogController::class, 'deleteCategory'])->name('destroy');
+        });
+
+        // ===== تگ‌ها =====
+        Route::prefix('tags')->name('tags.')->group(function () {
+            Route::get('/', [BlogController::class, 'tags'])->name('index');
+        });
+
+        // ===== نظرات =====
+        Route::prefix('comments')->name('comments.')->group(function () {
+            Route::get('/', [BlogController::class, 'comments'])->name('index');
+            Route::post('/{id}/approve', [BlogController::class, 'approveComment'])->name('approve');
+            Route::post('/{id}/reject', [BlogController::class, 'rejectComment'])->name('reject');
+            Route::delete('/{id}', [BlogController::class, 'deleteComment'])->name('destroy');
+            Route::delete('/{id}/force', [BlogController::class, 'forceDeleteComment'])->name('force-delete');
+        });
 
     });
 

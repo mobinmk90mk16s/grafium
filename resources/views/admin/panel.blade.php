@@ -1639,71 +1639,83 @@ TAB: DASHBOARD (با کارت‌های رنگی ثابت و زوم)
                 </div>
             </div>
         </div>
+<!-- Blog Tab -->
+<div id="blog-tab" class="tab-content">
+    <div class="flex flex-wrap justify-between items-center mb-6">
+        <div>
+            <div class="flex items-center gap-2">
+                <i data-lucide="newspaper" class="w-5 h-5 text-emerald-400"></i>
+                <h2 class="text-xl font-bold text-white">مدیریت بلاگ</h2>
+            </div>
+            <p class="text-sm text-[#475569] mr-7">مدیریت نوشته‌های بلاگ</p>
+        </div>
+        <a href="{{ route('admin.blog.create') }}" class="btn-emerald">
+            <i data-lucide="plus" class="w-4 h-4"></i> نوشته جدید
+        </a>
+    </div>
 
-        <!-- Blog Tab -->
-        <div id="blog-tab" class="tab-content">
-            <div class="flex flex-wrap justify-between items-center mb-6">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="newspaper" class="w-5 h-5 text-emerald-400"></i>
-                        <h2 class="text-xl font-bold text-white">مدیریت بلاگ</h2>
-                    </div>
-                    <p class="text-sm text-[#475569] mr-7">مدیریت نوشته‌های بلاگ</p>
-                </div>
-                <button class="btn-emerald" onclick="showToast('فرم افزودن نوشته باز می‌شود', 'info')">
-                    <i data-lucide="plus" class="w-4 h-4"></i> نوشته جدید
-                </button>
-            </div>
-            <div class="flex flex-wrap gap-3 mb-5">
-                <input type="text" placeholder="جستجوی نوشته..." class="input-dark max-w-xs" />
-                <select class="filter-select"><option>همه دسته‌ها</option><option>اخبار</option><option>آموزش</option></select>
-                <button class="btn-blue"><i data-lucide="search" class="w-4 h-4"></i> جستجو</button>
-            </div>
-            <div class="table-wrap">
-                <div class="flex items-center justify-between p-4 border-b border-[#1a2f4a]">
-                    <span class="text-xs text-[#475569]">۴ نوشته</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>عنوان</th>
-                                <th>دسته</th>
-                                <th>نویسنده</th>
-                                <th>تاریخ</th>
-                                <th>وضعیت</th>
-                                <th>عملیات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $posts = [
-                                    ['title' => 'پست اول', 'category' => 'اخبار', 'author' => 'مدیر', 'date' => '۱۴۰۵/۰۵/۲۰', 'status' => 'active'],
-                                    ['title' => 'پست دوم', 'category' => 'آموزش', 'author' => 'مدیر', 'date' => '۱۴۰۵/۰۵/۱۸', 'status' => 'pending'],
-                                    ['title' => 'پست سوم', 'category' => 'مقالات', 'author' => 'نویسنده', 'date' => '۱۴۰۵/۰۵/۱۵', 'status' => 'cancelled'],
-                                ];
-                            @endphp
-                            @foreach($posts as $p)
-                            <tr>
-                                <td class="font-medium">{{ $p['title'] }}</td>
-                                <td><span class="badge badge-{{ $p['category'] == 'اخبار' ? 'active' : 'pending' }}">{{ $p['category'] }}</span></td>
-                                <td>{{ $p['author'] }}</td>
-                                <td>{{ $p['date'] }}</td>
-                                <td><span class="badge badge-{{ $p['status'] }}">{{ $p['status'] == 'active' ? 'منتشر شده' : ($p['status'] == 'pending' ? 'در انتظار' : 'پیش‌نویس') }}</span></td>
-                                <td>
-                                    <div class="flex items-center gap-2">
-                                        <button class="text-blue-400 hover:text-blue-300" onclick="showToast('ویرایش نوشته', 'info')"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                                        <button class="text-rose-400 hover:text-rose-300" onclick="showToast('حذف نوشته', 'error')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="flex flex-wrap gap-3 mb-5">
+        <input type="text" placeholder="جستجوی نوشته..." class="input-dark max-w-xs" />
+        <select class="filter-select"><option>همه دسته‌ها</option><option>اخبار</option><option>آموزش</option></select>
+        <button class="btn-blue"><i data-lucide="search" class="w-4 h-4"></i> جستجو</button>
+    </div>
+
+    <div class="table-wrap">
+        <div class="flex items-center justify-between p-4 border-b border-[#1a2f4a]">
+            <span class="text-xs text-[#475569]">۴ نوشته</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>عنوان</th>
+                        <th>دسته</th>
+                        <th>نویسنده</th>
+                        <th>تاریخ</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $posts = [
+                            ['title' => 'پست اول', 'category' => 'اخبار', 'author' => 'مدیر', 'date' => '۱۴۰۵/۰۵/۲۰', 'status' => 'active'],
+                            ['title' => 'پست دوم', 'category' => 'آموزش', 'author' => 'مدیر', 'date' => '۱۴۰۵/۰۵/۱۸', 'status' => 'pending'],
+                            ['title' => 'پست سوم', 'category' => 'مقالات', 'author' => 'نویسنده', 'date' => '۱۴۰۵/۰۵/۱۵', 'status' => 'cancelled'],
+                        ];
+                    @endphp
+                    @foreach($posts as $p)
+                    <tr>
+                        <td class="font-medium">{{ $p['title'] }}</td>
+                        <td><span class="badge badge-{{ $p['category'] == 'اخبار' ? 'active' : 'pending' }}">{{ $p['category'] }}</span></td>
+                        <td>{{ $p['author'] }}</td>
+                        <td>{{ $p['date'] }}</td>
+                        <td><span class="badge badge-{{ $p['status'] }}">{{ $p['status'] == 'active' ? 'منتشر شده' : ($p['status'] == 'pending' ? 'در انتظار' : 'پیش‌نویس') }}</span></td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('admin.blog.edit', $loop->index + 1) }}" class="text-blue-400 hover:text-blue-300">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </a>
+                                <button onclick="showToast('حذف نوشته', 'error')" class="text-rose-400 hover:text-rose-300">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
 
+        <!-- ===== دکمه مشاهده همه ===== -->
+        <div class="flex justify-center p-4 border-t border-[#1a2f4a]">
+            <a href="{{ route('admin.blog.index') }}" class="btn-blue">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                مشاهده همه نوشته‌ها
+            </a>
+        </div>
+    </div>
+</div>
         <!-- Settings Tab -->
         <div id="settings-tab" class="tab-content">
             <div class="flex flex-wrap justify-between items-center mb-6">
