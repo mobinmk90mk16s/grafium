@@ -5,7 +5,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CalendarController;
-use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\InvoiceController;
@@ -27,14 +29,6 @@ Route::get('/services', function () {
     return view('services');
 })->name('services');
 
-Route::get('/blog', function () {
-    return view('blog');
-})->name('blog');
-
-Route::get('/blog/{id}', function ($id) {
-    return view('blog-post', ['id' => $id]);
-})->name('blog.post');
-
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
@@ -42,6 +36,14 @@ Route::get('/contact', function () {
 Route::get('/invoice', function () {
     return view('invoice');
 })->name('invoice');
+
+// ============================================================
+// 📝 بلاگ عمومی (اتصال به دیتابیس)
+// ============================================================
+Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search');
+Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/{id}', [BlogController::class, 'show'])->name('blog.post');
 
 // ============================================================
 // 🔐 لاگین کاربران عادی
@@ -169,50 +171,62 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     });
 
     // ============================================================
-    // 📝 مدیریت بلاگ (Blog Management)
+    // 📝 مدیریت بلاگ (پنل ادمین)
     // ============================================================
     Route::prefix('blog')->name('blog.')->group(function () {
 
-        // ===== داشبورد بلاگ =====
-        Route::get('/', [BlogController::class, 'index'])->name('dashboard');
-        Route::get('/dashboard', [BlogController::class, 'index'])->name('dashboard.index');
+        Route::get('/', [AdminBlogController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [AdminBlogController::class, 'index'])->name('dashboard.index');
+        Route::get('/index', [AdminBlogController::class, 'index'])->name('index');
 
-        // ===== alias برای سازگاری با لینک‌های قدیمی =====
-        Route::get('/index', [BlogController::class, 'index'])->name('index');
+        Route::get('/posts', [AdminBlogController::class, 'posts'])->name('posts');
+        Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
+        Route::post('/store', [AdminBlogController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminBlogController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminBlogController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminBlogController::class, 'destroy'])->name('destroy');
+        Route::delete('/{id}/force', [AdminBlogController::class, 'forceDelete'])->name('force-delete');
+        Route::post('/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/{id}/toggle-featured', [AdminBlogController::class, 'toggleFeatured'])->name('toggle-featured');
 
-        // ===== پست‌ها =====
-        Route::get('/posts', [BlogController::class, 'posts'])->name('posts');
-        Route::get('/create', [BlogController::class, 'create'])->name('create');
-        Route::post('/store', [BlogController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [BlogController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [BlogController::class, 'update'])->name('update');
-        Route::delete('/{id}', [BlogController::class, 'destroy'])->name('destroy');
-        Route::delete('/{id}/force', [BlogController::class, 'forceDelete'])->name('force-delete');
-        Route::post('/{id}/toggle-status', [BlogController::class, 'toggleStatus'])->name('toggle-status');
-        Route::post('/{id}/toggle-featured', [BlogController::class, 'toggleFeatured'])->name('toggle-featured');
-
-        // ===== دسته‌بندی‌ها =====
         Route::prefix('categories')->name('categories.')->group(function () {
-            Route::get('/', [BlogController::class, 'categories'])->name('index');
-            Route::post('/store', [BlogController::class, 'storeCategory'])->name('store');
-            Route::put('/{id}', [BlogController::class, 'updateCategory'])->name('update');
-            Route::delete('/{id}', [BlogController::class, 'deleteCategory'])->name('destroy');
+            Route::get('/', [AdminBlogController::class, 'categories'])->name('index');
+            Route::post('/store', [AdminBlogController::class, 'storeCategory'])->name('store');
+            Route::put('/{id}', [AdminBlogController::class, 'updateCategory'])->name('update');
+            Route::delete('/{id}', [AdminBlogController::class, 'deleteCategory'])->name('destroy');
         });
 
-        // ===== تگ‌ها =====
         Route::prefix('tags')->name('tags.')->group(function () {
-            Route::get('/', [BlogController::class, 'tags'])->name('index');
+            Route::get('/', [AdminBlogController::class, 'tags'])->name('index');
         });
 
-        // ===== نظرات =====
         Route::prefix('comments')->name('comments.')->group(function () {
-            Route::get('/', [BlogController::class, 'comments'])->name('index');
-            Route::post('/{id}/approve', [BlogController::class, 'approveComment'])->name('approve');
-            Route::post('/{id}/reject', [BlogController::class, 'rejectComment'])->name('reject');
-            Route::delete('/{id}', [BlogController::class, 'deleteComment'])->name('destroy');
-            Route::delete('/{id}/force', [BlogController::class, 'forceDeleteComment'])->name('force-delete');
+            Route::get('/', [AdminBlogController::class, 'comments'])->name('index');
+            Route::post('/{id}/approve', [AdminBlogController::class, 'approveComment'])->name('approve');
+            Route::post('/{id}/reject', [AdminBlogController::class, 'rejectComment'])->name('reject');
+            Route::delete('/{id}', [AdminBlogController::class, 'deleteComment'])->name('destroy');
+            Route::delete('/{id}/force', [AdminBlogController::class, 'forceDeleteComment'])->name('force-delete');
         });
 
+    });
+
+    // ============================================================
+    // 🔧 مدیریت خدمات (Services) - جدید
+    // ============================================================
+    Route::prefix('services')->name('services.')->group(function () {
+        Route::get('/', [ServiceController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [ServiceController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ServiceController::class, 'update'])->name('update');
+        Route::post('/{id}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggle-status');
+    });
+
+    // ============================================================
+    // 📅 مدیریت رزروها (Reservations) - جدید
+    // ============================================================
+    Route::prefix('reservations')->name('reservations.')->group(function () {
+        Route::get('/', [ServiceController::class, 'reservations'])->name('index');
+        Route::post('/{id}/status', [ServiceController::class, 'updateReservationStatus'])->name('status');
+        Route::delete('/{id}', [ServiceController::class, 'deleteReservation'])->name('destroy');
     });
 
 });

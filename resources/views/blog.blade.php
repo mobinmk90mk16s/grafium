@@ -453,6 +453,47 @@
             text-decoration: underline;
         }
 
+        /* ===== PAGINATION ===== */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .pagination-wrapper nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination-wrapper .page-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            transition: all 0.3s;
+            font-family: var(--font);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .pagination-wrapper .page-link:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .pagination-wrapper .page-link.active {
+            background: var(--gold-gradient);
+            color: #fff;
+            border-color: var(--gold);
+        }
+
+        .pagination-wrapper .page-link.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .highlight {
             background: var(--gold);
             color: #fff;
@@ -688,31 +729,70 @@
             </div>
         </div>
     </header>
-
     <!-- ============================================================
     BLOG PAGE
-    ============================================================ -->
-    <section class="section blog-page">
-        <div class="container">
-            <div class="section-header">
-                <span class="gradient-badge"><i class="fas fa-newspaper"></i> اخبار و مقالات</span>
-                <h2 class="purple-text">آخرین مطالب GRAFIUM</h2>
-                <p>جدیدترین مقالات آموزشی، اخبار و رویدادهای دنیای گرافیک را دنبال کنید</p>
-            </div>
+============================================================ -->
+<section class="section blog-page">
+    <div class="container">
+        <div class="section-header">
+            <span class="gradient-badge"><i class="fas fa-newspaper"></i> اخبار و مقالات</span>
+            <h2 class="purple-text">آخرین مطالب GRAFIUM</h2>
+            <p>جدیدترین مقالات آموزشی، اخبار و رویدادهای دنیای گرافیک را دنبال کنید</p>
+        </div>
 
-            <!-- باکس جستجو -->
-            <div class="blog-search-wrapper">
-                <input type="text" id="blogSearchInput" class="blog-search-input" placeholder="جستجو در مقالات... (مثلاً: فتوشاپ)" />
-                <button class="blog-search-btn" id="blogSearchBtn" aria-label="جستجو">
+        <!-- باکس جستجو -->
+        <div class="blog-search-wrapper">
+            <form action="{{ route('blog.search') }}" method="GET" style="position:relative;width:100%;">
+                <input type="text" name="q" class="blog-search-input" placeholder="جستجو در مقالات... (مثلاً: فتوشاپ)" value="{{ request('q') }}" />
+                <button type="submit" class="blog-search-btn" aria-label="جستجو">
                     <i class="fas fa-search"></i>
                 </button>
-            </div>
-
-            <!-- گرید مقالات -->
-            <div id="blogGrid" class="blog-grid-4"></div>
+            </form>
         </div>
-    </section>
 
+        <!-- نمایش تعداد نتایج -->
+        @if(request('q'))
+            <p class="text-center text-[#64748b] mb-4">نتایج جستجو برای: <span class="font-bold text-gold">{{ request('q') }}</span></p>
+        @endif
+
+        <!-- گرید مقالات -->
+        <div id="blogGrid" class="blog-grid-4">
+            @forelse($posts as $post)
+                <article class="blog-card" onclick="window.location.href='{{ route('blog.post', $post->id) }}'">
+                    <div class="blog-image" style="background-image: url('{{ $post->media ? asset('storage/' . $post->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}');">
+                        <span class="blog-badge">{{ $post->category->name ?? 'عمومی' }}</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span><i class="fas fa-calendar-alt"></i> {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}</span>
+                            <span><i class="fas fa-tag"></i> {{ $post->tags ? explode(',', $post->tags)[0] : 'عمومی' }}</span>
+                        </div>
+                        <h3>{{ $post->title }}</h3>
+                        <p>{{ Str::limit($post->summary ?? $post->text, 100) }}</p>
+                        <a href="{{ route('blog.post', $post->id) }}" class="gold-link">
+                            ادامه مطلب <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </article>
+            @empty
+                <div class="no-results">
+                    <i class="fas fa-search-minus"></i>
+                    <p>هیچ مقاله‌ای یافت نشد.</p>
+                    <a href="{{ route('blog') }}" class="btn btn-gold-outline" style="margin-top:12px;">
+                        <i class="fas fa-arrow-right"></i> بازگشت به بلاگ
+                    </a>
+                </div>
+            @endforelse
+        </div>
+
+        <!-- Pagination -->
+        @if($posts->hasPages())
+            <div class="pagination-wrapper">
+                {{ $posts->links() }}
+            </div>
+        @endif
+    </div>
+</section>
     <!-- ============================================================
     CTA
     ============================================================ -->
@@ -833,263 +913,6 @@
             if (window.scrollY > 50) header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
             else header.style.boxShadow = 'none';
         });
-
-        // ============================================================
-        // 4. BLOG SYSTEM
-        // ============================================================
-        (function() {
-            // ===== مقالات (دیتابیس فیک) =====
-            const articles = [
-                {
-                    id: 1,
-                    title: "آموزش جامع فتوشاپ از صفر تا صد",
-                    excerpt: "در این مقاله تمام ابزارهای فتوشاپ را قدم‌به‌قدم یاد می‌گیرید.",
-                    content: "فتوشاپ نرم‌افزاری قدرتمند برای ویرایش تصاویر است.",
-                    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop",
-                    badge: "آموزش",
-                    date: "۱۴۰۵/۰۵/۱۸",
-                    tags: ["فتوشاپ", "آموزش", "طراحی"]
-                },
-                {
-                    id: 2,
-                    title: "روتوش حرفه‌ای پرتره در فتوشاپ",
-                    excerpt: "یاد بگیرید چگونه پوست صورت را نرم کنید و رنگ‌ها را متعادل کنید.",
-                    content: "روتوش پرتره یکی از مهم‌ترین مهارت‌های فتوشاپ است.",
-                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop",
-                    badge: "فتوشاپ",
-                    date: "۱۴۰۵/۰۵/۱۷",
-                    tags: ["فتوشاپ", "روتوش", "پرتره"]
-                },
-                {
-                    id: 3,
-                    title: "نکات طلایی طراحی لوگو",
-                    excerpt: "طراحی لوگو از ایده تا اجرا. نکات کاربردی برای طراحی لوگوی ماندگار.",
-                    content: "طراحی لوگو یک فرآیند خلاقانه است.",
-                    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
-                    badge: "طراحی",
-                    date: "۱۴۰۵/۰۵/۱۶",
-                    tags: ["لوگو", "طراحی", "گرافیک"]
-                },
-                {
-                    id: 4,
-                    title: "ایلوستریتور برای طراحان گرافیک",
-                    excerpt: "هر آنچه برای شروع کار با ایلوستریتور نیاز دارید.",
-                    content: "ایلوستریتور نرم‌افزار استاندارد طراحی وکتور است.",
-                    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
-                    badge: "آموزش",
-                    date: "۱۴۰۵/۰۵/۱۵",
-                    tags: ["ایلوستریتور", "طراحی", "وکتور"]
-                },
-                {
-                    id: 5,
-                    title: "موشن گرافیک با افترافکت",
-                    excerpt: "با افترافکت به طرح‌های خود جان بدهید.",
-                    content: "موشن گرافیک ترکیبی از طراحی گرافیک و انیمیشن است.",
-                    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop",
-                    badge: "ویدیو",
-                    date: "۱۴۰۵/۰۵/۱۴",
-                    tags: ["موشن گرافیک", "افترافکت", "انیمیشن"]
-                },
-                {
-                    id: 6,
-                    title: "عکاسی پرتره در استودیو GRAFIUM",
-                    excerpt: "با تجهیزات حرفه‌ای استودیو GRAFIUM عکاسی کنید.",
-                    content: "استودیو GRAFIUM مجهز به نورپردازی حرفه‌ای است.",
-                    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=400&fit=crop",
-                    badge: "عکاسی",
-                    date: "۱۴۰۵/۰۵/۱۳",
-                    tags: ["عکاسی", "استودیو", "پرتره"]
-                },
-                {
-                    id: 7,
-                    title: "بهترین سیستم‌های گرافیکی برای طراحان",
-                    excerpt: "راهنمای انتخاب سیستم مناسب برای کارهای گرافیکی سنگین.",
-                    content: "انتخاب سیستم مناسب برای کار گرافیکی اهمیت زیادی دارد.",
-                    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
-                    badge: "سخت‌افزار",
-                    date: "۱۴۰۵/۰۵/۱۲",
-                    tags: ["سیستم", "سخت‌افزار", "گرافیک"]
-                },
-                {
-                    id: 8,
-                    title: "راهنمای رزرو میز در GRAFIUM",
-                    excerpt: "چگونه میز یا سیستم مورد نظر خود را به‌صورت آنلاین رزرو کنید.",
-                    content: "رزرو میز در GRAFIUM بسیار ساده است.",
-                    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop",
-                    badge: "راهنما",
-                    date: "۱۴۰۵/۰۵/۱۱",
-                    tags: ["رزرو", "میز", "خدمات"]
-                },
-                {
-                    id: 9,
-                    title: "۱۰ ترفند افزایش سرعت اینترنت",
-                    excerpt: "با این ترفندها سرعت اینترنت خود را به حداکثر برسانید.",
-                    content: "اینترنت پرسرعت برای طراحان گرافیک حیاتی است.",
-                    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop",
-                    badge: "ترفند",
-                    date: "۱۴۰۵/۰۵/۱۰",
-                    tags: ["اینترنت", "سرعت", "ترفند"]
-                },
-                {
-                    id: 10,
-                    title: "کارگاه‌های آموزشی GRAFIUM",
-                    excerpt: "از کارگاه‌های تخصصی فتوشاپ و موشن گرافیک دیدن کنید.",
-                    content: "GRAFIUM به‌طور منظم کارگاه‌های آموزشی برگزار می‌کند.",
-                    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
-                    badge: "رویداد",
-                    date: "۱۴۰۵/۰۵/۰۹",
-                    tags: ["کارگاه", "آموزش", "رویداد"]
-                },
-                {
-                    id: 11,
-                    title: "چاپ و صحافی در GRAFIUM",
-                    excerpt: "خدمات چاپ با کیفیت بالا و صحافی حرفه‌ای.",
-                    content: "در GRAFIUM خدمات چاپ دیجیتال ارائه می‌شود.",
-                    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop",
-                    badge: "چاپ",
-                    date: "۱۴۰۵/۰۵/۰۸",
-                    tags: ["چاپ", "صحافی", "خدمات"]
-                },
-                {
-                    id: 12,
-                    title: "ساخت نمونه کار حرفه‌ای برای طراحان",
-                    excerpt: "نمونه کار قوی اولین قدم برای جذب مشتری است.",
-                    content: "یک نمونه کار حرفه‌ای باید پروژه‌های شما را نمایش دهد.",
-                    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop",
-                    badge: "طراحی",
-                    date: "۱۴۰۵/۰۵/۰۷",
-                    tags: ["نمونه کار", "پورتفولیو", "طراحی"]
-                },
-            ];
-
-            // ===== عناصر =====
-            const grid = document.getElementById('blogGrid');
-            const searchInput = document.getElementById('blogSearchInput');
-            const searchBtn = document.getElementById('blogSearchBtn');
-
-            // ===== توابع کمکی =====
-            function escapeHtml(text) {
-                const map = {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                };
-                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-            }
-
-            function highlight(text, query) {
-                if (!query.trim()) return escapeHtml(text);
-                const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                return escapeHtml(text).replace(
-                    new RegExp(escapedQuery, 'gi'),
-                    match => `<mark class="highlight">${match}</mark>`
-                );
-            }
-
-            function countOccurrences(text, query) {
-                if (!query.trim()) return 0;
-                const normalized = text.toLowerCase();
-                const q = query.toLowerCase();
-                let count = 0;
-                let index = normalized.indexOf(q);
-                while (index !== -1) {
-                    count++;
-                    index = normalized.indexOf(q, index + q.length);
-                }
-                return count;
-            }
-
-            function scoreArticle(article, query) {
-                if (!query.trim()) return 0;
-                const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-                let score = 0;
-                terms.forEach(term => {
-                    score += countOccurrences(article.title, term) * 10;
-                    score += countOccurrences(article.excerpt, term) * 5;
-                    score += countOccurrences(article.content, term) * 2;
-                    article.tags.forEach(tag => {
-                        score += countOccurrences(tag, term) * 8;
-                    });
-                });
-                return score;
-            }
-
-            function filterAndSortArticles(query) {
-                if (!query.trim()) return articles.slice();
-                return articles
-                    .map(article => ({ article, score: scoreArticle(article, query) }))
-                    .filter(item => item.score > 0)
-                    .sort((a, b) => b.score - a.score)
-                    .map(item => item.article);
-            }
-
-            function renderArticles(list) {
-                if (list.length === 0) {
-                    grid.innerHTML = `
-                        <div class="no-results">
-                            <i class="fas fa-search-minus"></i>
-                            <p>مقاله‌ای مطابق جستجوی شما پیدا نشد.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                grid.innerHTML = list.map(article => {
-                    // استفاده از url() به جای route() برای جلوگیری از خطا
-                    const postUrl = "{{ url('/blog') }}/" + article.id;
-                    
-                    return `
-                        <article class="blog-card" data-id="${article.id}">
-                            <div class="blog-image" style="background-image: url('${article.image}');">
-                                <span class="blog-badge">${article.badge}</span>
-                            </div>
-                            <div class="blog-content">
-                                <div class="blog-meta">
-                                    <span><i class="fas fa-calendar-alt"></i> ${article.date}</span>
-                                    <span><i class="fas fa-tag"></i> ${article.tags[0]}</span>
-                                </div>
-                                <h3>${highlight(article.title, searchInput.value)}</h3>
-                                <p>${highlight(article.excerpt, searchInput.value)}</p>
-                                <a href="${postUrl}" class="gold-link">
-                                    ادامه مطلب <i class="fas fa-arrow-left"></i>
-                                </a>
-                            </div>
-                        </article>
-                    `;
-                }).join('');
-            }
-
-            function handleSearch() {
-                const query = searchInput.value.trim();
-                const filtered = filterAndSortArticles(query);
-                renderArticles(filtered);
-            }
-
-            // رویدادها
-            searchBtn.addEventListener('click', handleSearch);
-            searchInput.addEventListener('input', handleSearch);
-            searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSearch();
-                }
-            });
-
-            // نمایش اولیه
-            renderArticles(articles);
-
-            // کلیک روی کارت برای رفتن به مقاله
-            document.addEventListener('click', function(e) {
-                const card = e.target.closest('.blog-card');
-                if (card && !e.target.closest('a')) {
-                    const id = card.dataset.id;
-                    window.location.href = "{{ url('/blog') }}/" + id;
-                }
-            });
-
-        })();
 
         console.log('Blog page loaded successfully!');
     </script>

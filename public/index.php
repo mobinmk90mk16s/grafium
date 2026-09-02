@@ -3,6 +3,15 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
+// ============================================================
+// افزایش محدودیت‌های PHP برای جلوگیری از خطای Timeout
+// ============================================================
+ini_set('max_execution_time', 300);
+ini_set('memory_limit', '512M');
+ini_set('max_input_time', 300);
+ini_set('upload_max_filesize', '64M');
+ini_set('post_max_size', '64M');
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...
