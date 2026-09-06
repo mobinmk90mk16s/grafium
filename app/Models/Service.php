@@ -27,45 +27,143 @@ class Service extends Model
         'price' => 'integer',
     ];
 
-    // رابطه با رزروها
+    // ============================================================
+    // روابط (Relationships)
+    // ============================================================
+
+    /**
+     * رابطه با رزروها
+     */
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
     }
 
-    // اسکوپ: خدمات فعال
-    public function scopeActive($query)
+    /**
+     * رابطه با آیتم‌های خدمت
+     */
+    public function items()
     {
-        return $query->where('status', 'active');
+        return $this->hasMany(ServiceItem::class)->orderBy('order', 'asc');
     }
 
-    // اسکوپ: خدمات شیفتی
-    public function scopeShift($query)
+    /**
+     * آیتم‌های فعال
+     */
+    public function activeItems()
     {
-        return $query->where('type', 'shift');
+        return $this->items()->where('status', 'active');
     }
 
-    // اسکوپ: خدمات ساعتی
-    public function scopeHourly($query)
+    /**
+     * رابطه با پلن‌های قیمت‌گذاری
+     */
+    public function pricingPlans()
     {
-        return $query->where('type', 'hourly');
+        return $this->hasMany(ServicePricingPlan::class);
     }
 
-    // دریافت نوع به فارسی
+    /**
+     * پلن‌های فعال
+     */
+    public function activePricingPlans()
+    {
+        return $this->pricingPlans()->where('status', 'active');
+    }
+
+    /**
+     * پلن پیش‌فرض
+     */
+    public function defaultPricingPlan()
+    {
+        return $this->pricingPlans()->where('is_default', true)->first();
+    }
+
+    // ============================================================
+    // متدهای کمکی (Helpers)
+    // ============================================================
+
+    /**
+     * دریافت نوع به فارسی
+     */
     public function getTypePersianAttribute()
     {
         return $this->type === 'shift' ? 'شیفتی' : 'ساعتی';
     }
 
-    // دریافت وضعیت به فارسی
+    /**
+     * دریافت وضعیت به فارسی
+     */
     public function getStatusPersianAttribute()
     {
         return $this->status === 'active' ? 'فعال' : 'غیرفعال';
     }
 
-    // فرمت قیمت
+    /**
+     * فرمت قیمت
+     */
     public function getPriceFormattedAttribute()
     {
         return number_format($this->price) . ' تومان';
+    }
+
+    /**
+     * تعداد آیتم‌های فعال
+     */
+    public function getActiveItemsCountAttribute()
+    {
+        return $this->activeItems()->count();
+    }
+
+    /**
+     * تعداد کل آیتم‌ها
+     */
+    public function getItemsCountAttribute()
+    {
+        return $this->items()->count();
+    }
+
+    /**
+     * تعداد پلن‌ها
+     */
+    public function getPricingPlansCountAttribute()
+    {
+        return $this->pricingPlans()->count();
+    }
+
+    // ============================================================
+    // اسکوپ‌ها (Scopes)
+    // ============================================================
+
+    /**
+     * اسکوپ: خدمات فعال
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * اسکوپ: خدمات غیرفعال
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('status', 'inactive');
+    }
+
+    /**
+     * اسکوپ: خدمات شیفتی
+     */
+    public function scopeShift($query)
+    {
+        return $query->where('type', 'shift');
+    }
+
+    /**
+     * اسکوپ: خدمات ساعتی
+     */
+    public function scopeHourly($query)
+    {
+        return $query->where('type', 'hourly');
     }
 }

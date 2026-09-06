@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\ServiceItemController;
+use App\Http\Controllers\Admin\PricingPlanController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReservationController;
@@ -38,7 +40,7 @@ Route::get('/invoice', function () {
 })->name('invoice');
 
 // ============================================================
-// 📝 بلاگ عمومی (اتصال به دیتابیس)
+// 📝 بلاگ عمومی
 // ============================================================
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search');
@@ -153,10 +155,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     });
 
     // ============================================================
-    // 🗓️ تقویم (Calendar)
+    // 🗓️ تقویم
     // ============================================================
     Route::prefix('calendar')->name('calendar.')->group(function () {
-
         Route::get('/', [CalendarController::class, 'index'])->name('index');
         Route::get('/api/month', [CalendarController::class, 'getMonthEvents'])->name('api.month');
         Route::get('/api/day', [CalendarController::class, 'getDayEvents'])->name('api.day');
@@ -167,14 +168,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::delete('/{id}', [CalendarController::class, 'destroy'])->name('destroy');
         Route::delete('/{id}/force', [CalendarController::class, 'forceDelete'])->name('force-delete');
         Route::post('/{id}/toggle-holiday', [CalendarController::class, 'toggleHoliday'])->name('toggle-holiday');
-
     });
 
     // ============================================================
     // 📝 مدیریت بلاگ (پنل ادمین)
     // ============================================================
     Route::prefix('blog')->name('blog.')->group(function () {
-
         Route::get('/', [AdminBlogController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminBlogController::class, 'index'])->name('dashboard.index');
         Route::get('/index', [AdminBlogController::class, 'index'])->name('index');
@@ -207,11 +206,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
             Route::delete('/{id}', [AdminBlogController::class, 'deleteComment'])->name('destroy');
             Route::delete('/{id}/force', [AdminBlogController::class, 'forceDeleteComment'])->name('force-delete');
         });
-
     });
 
     // ============================================================
-    // 🔧 مدیریت خدمات (Services) - جدید
+    // 🔧 مدیریت خدمات
     // ============================================================
     Route::prefix('services')->name('services.')->group(function () {
         Route::get('/', [ServiceController::class, 'index'])->name('index');
@@ -221,7 +219,32 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     });
 
     // ============================================================
-    // 📅 مدیریت رزروها (Reservations) - جدید
+    // 📋 مدیریت آیتم‌های خدمات
+    // ============================================================
+    Route::prefix('service-items')->name('service-items.')->group(function () {
+        Route::get('/{serviceId}', [ServiceItemController::class, 'index'])->name('index');
+        Route::post('/{serviceId}/store', [ServiceItemController::class, 'store'])->name('store');
+        Route::get('/{serviceId}/{id}/edit', [ServiceItemController::class, 'edit'])->name('edit');
+        Route::put('/{serviceId}/{id}', [ServiceItemController::class, 'update'])->name('update');
+        Route::post('/{serviceId}/{id}/toggle-status', [ServiceItemController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{serviceId}/{id}', [ServiceItemController::class, 'destroy'])->name('destroy');
+        Route::post('/{serviceId}/reorder', [ServiceItemController::class, 'reorder'])->name('reorder');
+    });
+
+    // ============================================================
+    // 💰 مدیریت قیمت‌گذاری
+    // ============================================================
+    Route::prefix('pricing-plans')->name('pricing-plans.')->group(function () {
+        Route::get('/{serviceId}', [PricingPlanController::class, 'index'])->name('index');
+        Route::post('/{serviceId}/store', [PricingPlanController::class, 'store'])->name('store');
+        Route::put('/{serviceId}/{id}', [PricingPlanController::class, 'update'])->name('update');
+        Route::post('/{serviceId}/{id}/toggle-status', [PricingPlanController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{serviceId}/{id}', [PricingPlanController::class, 'destroy'])->name('destroy');
+        Route::post('/{serviceId}/{id}/set-default', [PricingPlanController::class, 'setDefault'])->name('set-default');
+    });
+
+    // ============================================================
+    // 📅 مدیریت رزروها
     // ============================================================
     Route::prefix('reservations')->name('reservations.')->group(function () {
         Route::get('/', [ServiceController::class, 'reservations'])->name('index');

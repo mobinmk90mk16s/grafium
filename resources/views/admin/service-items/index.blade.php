@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>مدیریت خدمات | GRAFIUM</title>
+    <title>مدیریت آیتم‌ها | {{ $service->title }} | GRAFIUM</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -19,7 +19,6 @@
                         rose: { 400: '#fb7185' },
                         amber: { 400: '#fbbf24' },
                         violet: { 400: '#a78bfa' },
-                        gold: { 400: '#d4a373', 500: '#b8874a' },
                     },
                     fontFamily: { vazir: ['Vazirmatn', 'sans-serif'] }
                 }
@@ -82,8 +81,6 @@
         }
         .badge-active { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
         .badge-inactive { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
-        .badge-shift { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .badge-hourly { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
 
         .btn-blue { background: #1a2f4a; color: #60a5fa; border: 1px solid #2a4a6a; padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-blue:hover { background: #2a4a6a; border-color: #3a5a7a; }
@@ -93,9 +90,6 @@
 
         .btn-rose { background: rgba(244, 63, 94, 0.08); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-rose:hover { background: rgba(244, 63, 94, 0.15); }
-
-        .btn-gold { background: rgba(212, 163, 115, 0.08); color: #d4a373; border: 1px solid rgba(212, 163, 115, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-gold:hover { background: rgba(212, 163, 115, 0.15); }
 
         .btn-violet { background: rgba(167, 139, 250, 0.08); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-violet:hover { background: rgba(167, 139, 250, 0.15); }
@@ -119,12 +113,8 @@
             padding: 8px 14px; color: #e2e8f0; font-size: 13px; font-family: 'Vazirmatn', sans-serif;
         }
 
-        /* ===== ACTION BUTTONS ===== */
         .action-buttons {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            flex-wrap: wrap;
+            display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
         }
         .action-buttons .btn-action {
             padding: 6px 12px;
@@ -137,12 +127,10 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            text-decoration: none;
         }
         .action-buttons .btn-action:hover {
             transform: translateY(-2px);
         }
-
         .action-buttons .btn-action-edit {
             background: rgba(59, 130, 246, 0.08);
             color: #60a5fa;
@@ -151,7 +139,6 @@
         .action-buttons .btn-action-edit:hover {
             background: rgba(59, 130, 246, 0.15);
         }
-
         .action-buttons .btn-action-toggle {
             background: rgba(251, 191, 36, 0.08);
             color: #fbbf24;
@@ -160,7 +147,6 @@
         .action-buttons .btn-action-toggle:hover {
             background: rgba(251, 191, 36, 0.15);
         }
-
         .action-buttons .btn-action-delete {
             background: rgba(244, 63, 94, 0.08);
             color: #fb7185;
@@ -168,24 +154,6 @@
         }
         .action-buttons .btn-action-delete:hover {
             background: rgba(244, 63, 94, 0.15);
-        }
-
-        .action-buttons .btn-action-items {
-            background: rgba(167, 139, 250, 0.08);
-            color: #a78bfa;
-            border-color: rgba(167, 139, 250, 0.2);
-        }
-        .action-buttons .btn-action-items:hover {
-            background: rgba(167, 139, 250, 0.15);
-        }
-
-        .action-buttons .btn-action-pricing {
-            background: rgba(212, 163, 115, 0.08);
-            color: #d4a373;
-            border-color: rgba(212, 163, 115, 0.2);
-        }
-        .action-buttons .btn-action-pricing:hover {
-            background: rgba(212, 163, 115, 0.15);
         }
 
         .toast-container {
@@ -227,6 +195,16 @@
             color: #fb7185;
         }
 
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 999;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #0f1f33; border: 1px solid #1a2f4a; border-radius: 20px;
+            padding: 32px; max-width: 550px; width: 90%; max-height: 90vh; overflow-y: auto;
+        }
+
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: relative; border-left: none; border-bottom: 1px solid #1a2f4a; }
             .main-content { margin-right: 0 !important; padding: 16px !important; }
@@ -262,7 +240,7 @@
                 <p class="text-[10px] font-bold text-[#475569] uppercase tracking-wider px-3 mb-2">مدیریت</p>
                 <ul class="space-y-0.5">
                     <li>
-                        <a href="{{ route('admin.services.index') }}" class="menu-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#94a3b8] text-sm font-medium transition">
+                        <a href="{{ route('admin.services.index') }}" class="menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#94a3b8] text-sm font-medium transition">
                             <i data-lucide="settings" class="w-5 h-5 text-[#60a5fa]"></i> خدمات
                             <span class="menu-indicator"></span>
                         </a>
@@ -295,10 +273,11 @@
         <div class="flex flex-wrap justify-between items-center pb-4 border-b border-[#1a2f4a] mb-6">
             <div>
                 <div class="flex items-center gap-3">
-                    <i data-lucide="settings" class="w-6 h-6 text-blue-400"></i>
-                    <h1 class="text-2xl font-extrabold text-white">مدیریت خدمات</h1>
+                    <i data-lucide="grid" class="w-6 h-6 text-violet-400"></i>
+                    <h1 class="text-2xl font-extrabold text-white">آیتم‌های خدمت</h1>
+                    <span class="text-sm text-[#475569]">({{ $service->title }})</span>
                 </div>
-                <p class="text-sm text-[#475569] mt-0.5 mr-9">مدیریت خدمات و امکانات GRAFIUM</p>
+                <p class="text-sm text-[#475569] mt-0.5 mr-9">مدیریت آیتم‌های مربوط به {{ $service->title }}</p>
             </div>
             <div class="flex items-center gap-4">
                 <span class="text-sm text-[#64748b]">{{ Auth::guard('admin')->user()->name ?? 'ادمین' }}</span>
@@ -325,7 +304,7 @@
         <div class="stats-banner">
             <div class="stat-item">
                 <span class="num">{{ $stats['total'] ?? 0 }}</span>
-                <span class="label">کل خدمات</span>
+                <span class="label">کل آیتم‌ها</span>
             </div>
             <div class="stat-item">
                 <span class="num" style="color: #34d399;">{{ $stats['active'] ?? 0 }}</span>
@@ -336,23 +315,15 @@
                 <span class="label">غیرفعال</span>
             </div>
             <div class="stat-item">
-                <span class="num" style="color: #60a5fa;">{{ $stats['shift'] ?? 0 }}</span>
-                <span class="label">شیفتی</span>
-            </div>
-            <div class="stat-item">
-                <span class="num" style="color: #fbbf24;">{{ $stats['hourly'] ?? 0 }}</span>
-                <span class="label">ساعتی</span>
+                <a href="{{ route('admin.services.index') }}" class="text-blue-400 hover:text-blue-300 text-sm">
+                    <i data-lucide="arrow-right" class="w-4 h-4 inline"></i> بازگشت
+                </a>
             </div>
         </div>
 
         <!-- ===== FILTER BAR ===== -->
         <div class="filter-bar">
-            <input type="text" id="searchInput" placeholder="جستجو در خدمات..." onkeyup="filterTable()" class="w-48" />
-            <select id="typeFilter" onchange="filterTable()" class="filter-select">
-                <option value="all">همه نوع‌ها</option>
-                <option value="shift">شیفتی</option>
-                <option value="hourly">ساعتی</option>
-            </select>
+            <input type="text" id="searchInput" placeholder="جستجو در آیتم‌ها..." onkeyup="filterTable()" class="w-48" />
             <select id="statusFilter" onchange="filterTable()" class="filter-select">
                 <option value="all">همه وضعیت‌ها</option>
                 <option value="active">فعال</option>
@@ -364,75 +335,62 @@
             <button class="btn-rose" onclick="resetFilters()">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> بازنشانی
             </button>
+            <button class="btn-emerald mr-auto" onclick="openCreateModal()">
+                <i data-lucide="plus" class="w-4 h-4"></i> آیتم جدید
+            </button>
         </div>
 
         <!-- ===== TABLE ===== -->
         <div class="table-wrap">
             <div class="overflow-x-auto">
-                <table id="servicesTable">
+                <table id="itemsTable">
                     <thead>
                         <tr>
                             <th style="min-width:40px;">#</th>
-                            <th style="min-width:60px;">آیکون</th>
                             <th style="min-width:150px;">عنوان</th>
-                            <th style="min-width:100px;">نوع</th>
-                            <th style="min-width:120px;">قیمت</th>
-                            <th style="min-width:100px;">مکان</th>
+                            <th style="min-width:150px;">مکان</th>
+                            <th style="min-width:200px;">توضیحات</th>
                             <th style="min-width:80px;">وضعیت</th>
-                            <th style="min-width:230px;">عملیات</th>
+                            <th style="min-width:200px;">عملیات</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($services as $service)
-                        <tr data-type="{{ $service->type }}" data-status="{{ $service->status }}" data-search="{{ $service->title }} {{ $service->place }}">
+                        @forelse($items as $item)
+                        <tr data-status="{{ $item->status }}" data-search="{{ $item->title }} {{ $item->place }}">
                             <td>{{ $loop->iteration }}</td>
+                            <td class="font-medium">{{ $item->title }}</td>
+                            <td>{{ $item->place ?? '—' }}</td>
+                            <td class="text-right max-w-xs truncate">{{ $item->description ?? '—' }}</td>
                             <td>
-                                <div class="w-10 h-10 rounded-lg bg-[#1a2f4a] flex items-center justify-center mx-auto">
-                                    <i data-lucide="{{ $service->icon ?? 'package' }}" class="w-5 h-5 text-blue-400"></i>
-                                </div>
-                            </td>
-                            <td class="font-medium">{{ $service->title }}</td>
-                            <td>
-                                <span class="badge badge-{{ $service->type }}">
-                                    {{ $service->type === 'shift' ? 'شیفتی' : 'ساعتی' }}
-                                </span>
-                            </td>
-                            <td class="font-bold text-emerald-400">{{ number_format($service->price) }} تومان</td>
-                            <td>{{ $service->place ?? '—' }}</td>
-                            <td>
-                                <span class="badge badge-{{ $service->status }}">
-                                    {{ $service->status === 'active' ? 'فعال' : 'غیرفعال' }}
+                                <span class="badge badge-{{ $item->status }}">
+                                    {{ $item->status === 'active' ? 'فعال' : 'غیرفعال' }}
                                 </span>
                             </td>
                             <td>
                                 <div class="action-buttons">
                                     <!-- دکمه ویرایش -->
-                                    <a href="{{ route('admin.services.edit', $service->id) }}" class="btn-action btn-action-edit" title="ویرایش">
+                                    <button onclick="openEditModal({{ $item->id }})" class="btn-action btn-action-edit" title="ویرایش">
                                         <i data-lucide="pencil" class="w-4 h-4"></i>
-                                    </a>
-
-                                    <!-- دکمه تغییر وضعیت -->
-                                    <button onclick="toggleStatus({{ $service->id }})" class="btn-action btn-action-toggle" title="{{ $service->status === 'active' ? 'غیرفعال کردن' : 'فعال کردن' }}">
-                                        <i data-lucide="{{ $service->status === 'active' ? 'pause-circle' : 'play-circle' }}" class="w-4 h-4"></i>
                                     </button>
 
-                                    <!-- دکمه آیتم‌ها -->
-                                    <a href="{{ route('admin.service-items.index', $service->id) }}" class="btn-action btn-action-items" title="مدیریت آیتم‌ها">
-                                        <i data-lucide="grid" class="w-4 h-4"></i>
-                                    </a>
+                                    <!-- دکمه تغییر وضعیت -->
+                                    <button onclick="toggleStatus({{ $item->id }})" class="btn-action btn-action-toggle" title="{{ $item->status === 'active' ? 'غیرفعال کردن' : 'فعال کردن' }}">
+                                        <i data-lucide="{{ $item->status === 'active' ? 'pause-circle' : 'play-circle' }}" class="w-4 h-4"></i>
+                                    </button>
 
-                                    <!-- دکمه قیمت‌گذاری -->
-                                    <a href="{{ route('admin.pricing-plans.index', $service->id) }}" class="btn-action btn-action-pricing" title="مدیریت قیمت‌گذاری">
-                                        <i data-lucide="wallet" class="w-4 h-4"></i>
-                                    </a>
+                                    <!-- دکمه حذف -->
+                                    <button onclick="deleteItem({{ $item->id }})" class="btn-action btn-action-delete" title="حذف">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-12 text-[#475569]">
-                                <i data-lucide="package" class="w-12 h-12 mx-auto text-[#475569] mb-3"></i>
-                                <p>هیچ خدمتی یافت نشد</p>
+                            <td colspan="6" class="text-center py-12 text-[#475569]">
+                                <i data-lucide="grid" class="w-12 h-12 mx-auto text-[#475569] mb-3"></i>
+                                <p>هیچ آیتمی یافت نشد</p>
+                                <p class="text-xs mt-1">برای افزودن آیتم جدید، روی دکمه "آیتم جدید" کلیک کنید</p>
                             </td>
                         </tr>
                         @endforelse
@@ -444,28 +402,79 @@
     </main>
 
     <!-- ============================================================
+    MODAL: افزودن/ویرایش آیتم
+    ============================================================ -->
+    <div id="itemModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="{{ isset($item) ? 'pencil' : 'plus' }}" class="w-5 h-5 text-violet-400"></i>
+                    <h3 class="text-xl font-bold text-white" id="modalTitle">افزودن آیتم جدید</h3>
+                </div>
+                <button onclick="closeModal()" class="text-[#64748b] hover:text-white transition">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <form id="itemForm" method="POST">
+                @csrf
+                <input type="hidden" id="formMethod" name="_method" value="POST">
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-[#94a3b8] mb-1">عنوان آیتم</label>
+                        <input type="text" id="itemTitle" name="title" class="input-dark" placeholder="مثال: میز شماره ۱" required />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-[#94a3b8] mb-1">مکان</label>
+                        <input type="text" id="itemPlace" name="place" class="input-dark" placeholder="مثال: سالن اصلی، ردیف اول" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-[#94a3b8] mb-1">توضیحات</label>
+                        <textarea id="itemDescription" name="description" class="input-dark" rows="2" placeholder="توضیحات آیتم..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-[#94a3b8] mb-1">وضعیت</label>
+                        <select id="itemStatus" name="status" class="input-dark">
+                            <option value="active">فعال</option>
+                            <option value="inactive">غیرفعال</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6 pt-4 border-t border-[#1a2f4a]">
+                    <button type="submit" class="btn-emerald w-full justify-center" id="submitBtn">
+                        <i data-lucide="save" class="w-4 h-4"></i> ذخیره
+                    </button>
+                    <button type="button" onclick="closeModal()" class="btn-rose w-full justify-center">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================
     SCRIPTS
     ============================================================ -->
     <script>
         lucide.createIcons();
 
-        // ===== FILTER TABLE =====
+        // ============================================================
+        // FILTER TABLE
+        // ============================================================
         function filterTable() {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const type = document.getElementById('typeFilter').value;
             const status = document.getElementById('statusFilter').value;
-            const rows = document.querySelectorAll('#servicesTable tbody tr');
+            const rows = document.querySelectorAll('#itemsTable tbody tr');
 
             rows.forEach(row => {
                 const title = row.dataset.search?.toLowerCase() || '';
-                const rowType = row.dataset.type || '';
                 const rowStatus = row.dataset.status || '';
                 let show = true;
 
                 if (search && !title.includes(search)) {
-                    show = false;
-                }
-                if (type !== 'all' && rowType !== type) {
                     show = false;
                 }
                 if (status !== 'all' && rowStatus !== status) {
@@ -478,17 +487,71 @@
 
         function resetFilters() {
             document.getElementById('searchInput').value = '';
-            document.getElementById('typeFilter').value = 'all';
             document.getElementById('statusFilter').value = 'all';
             filterTable();
             showToast('فیلترها بازنشانی شدند', 'info');
         }
 
-        // ===== TOGGLE STATUS =====
-        function toggleStatus(id) {
-            if (!confirm('آیا از تغییر وضعیت این خدمت اطمینان دارید؟')) return;
+        // ============================================================
+        // MODAL
+        // ============================================================
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'افزودن آیتم جدید';
+            document.getElementById('submitBtn').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ذخیره';
+            document.getElementById('itemForm').action = "{{ route('admin.service-items.store', $service->id) }}";
+            document.getElementById('formMethod').value = 'POST';
+            document.getElementById('itemTitle').value = '';
+            document.getElementById('itemPlace').value = '';
+            document.getElementById('itemDescription').value = '';
+            document.getElementById('itemStatus').value = 'active';
+            document.getElementById('itemModal').classList.add('active');
+            lucide.createIcons();
+        }
 
-            fetch(`/admin/services/${id}/toggle-status`, {
+        function openEditModal(id) {
+            // دریافت اطلاعات از جدول
+            const row = document.querySelector(`tr[data-id="${id}"]`) || document.querySelector(`tr:has(td:contains("${id}"))`);
+
+            fetch(`/admin/service-items/{{ $service->id }}/${id}/edit`)
+                .then(response => response.text())
+                .then(html => {
+                    // استخراج دیتا از HTML
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+
+                    const title = temp.querySelector('[name="title"]')?.value || '';
+                    const place = temp.querySelector('[name="place"]')?.value || '';
+                    const description = temp.querySelector('[name="description"]')?.value || '';
+                    const status = temp.querySelector('[name="status"]')?.value || 'active';
+
+                    document.getElementById('modalTitle').textContent = 'ویرایش آیتم';
+                    document.getElementById('submitBtn').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ذخیره تغییرات';
+                    document.getElementById('itemForm').action = `/admin/service-items/{{ $service->id }}/${id}`;
+                    document.getElementById('formMethod').value = 'PUT';
+                    document.getElementById('itemTitle').value = title;
+                    document.getElementById('itemPlace').value = place;
+                    document.getElementById('itemDescription').value = description;
+                    document.getElementById('itemStatus').value = status;
+
+                    document.getElementById('itemModal').classList.add('active');
+                    lucide.createIcons();
+                })
+                .catch(() => {
+                    showToast('خطا در بارگذاری اطلاعات', 'error');
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').classList.remove('active');
+        }
+
+        // ============================================================
+        // TOGGLE STATUS
+        // ============================================================
+        function toggleStatus(id) {
+            if (!confirm('آیا از تغییر وضعیت این آیتم اطمینان دارید؟')) return;
+
+            fetch(`/admin/service-items/{{ $service->id }}/${id}/toggle-status`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -498,14 +561,39 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showToast('وضعیت خدمت با موفقیت تغییر کرد', 'success');
+                    showToast('وضعیت آیتم با موفقیت تغییر کرد', 'success');
                     setTimeout(() => location.reload(), 1000);
                 }
             })
             .catch(() => showToast('خطا در تغییر وضعیت', 'error'));
         }
 
-        // ===== TOAST =====
+        // ============================================================
+        // DELETE ITEM
+        // ============================================================
+        function deleteItem(id) {
+            if (!confirm('آیا از حذف این آیتم اطمینان دارید؟')) return;
+
+            fetch(`/admin/service-items/{{ $service->id }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('آیتم با موفقیت حذف شد', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            })
+            .catch(() => showToast('خطا در حذف آیتم', 'error'));
+        }
+
+        // ============================================================
+        // TOAST
+        // ============================================================
         function showToast(message, type = 'info', duration = 3000) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -519,6 +607,19 @@
             lucide.createIcons();
             setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, duration);
         }
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        document.querySelector('.modal-overlay')?.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
     </script>
 
 </body>
