@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>رزرو میز | GRAFIUM</title>
-
+    <title>خدمات | GRAFIUM</title>
+    
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -138,9 +138,18 @@
             color: #fff;
             border-color: transparent;
         }
+        .btn-white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+        .btn-white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+        }
 
         /* ===== SECTION ===== */
-        .section { padding: 25px 0; }
+        .section { padding: 60px 0; }
         .section-header {
             text-align: center;
             max-width: 700px;
@@ -607,15 +616,6 @@
             position: relative;
             z-index: 1;
         }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -708,11 +708,122 @@
             font-size: 14px;
             color: #64748b;
         }
-        .gold-text {
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 40px 36px;
+            max-width: 480px;
+            width: 100%;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 40px rgba(212, 163, 115, 0.15);
+            position: relative;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 18px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .modal-close:hover {
+            color: var(--gold);
+            background: rgba(212, 163, 115, 0.1);
+            transform: rotate(90deg);
+        }
+        .modal-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-body);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+        .modal-tab {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal-tab.active {
             background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #fff;
+        }
+        .modal-tab:hover:not(.active) {
+            color: var(--gold);
+        }
+        .modal-form.hidden {
+            display: none;
+        }
+        .modal-form .form-group {
+            margin-bottom: 18px;
+        }
+        .modal-form label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .modal-form input {
+            width: 100%;
+            padding: 13px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-body);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            transition: all 0.4s;
+            outline: none;
+        }
+        .modal-form input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15);
+        }
+        .modal-form .btn {
+            width: 100%;
+            background: var(--gold-gradient);
+            border-color: var(--gold);
         }
 
         /* ===== RESPONSIVE ===== */
@@ -752,9 +863,9 @@
     <header class="header" id="header">
         <div class="container header-inner">
             <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
             </a>
-            <nav class="nav-desktop">
+            <nav class="nav-desktop" id="navDesktop">
                 <ul>
                     <li><a href="{{ route('home') }}">خانه</a></li>
                     <li><a href="{{ route('about') }}">درباره ما</a></li>
@@ -765,15 +876,7 @@
             </nav>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-gold-outline">خروج</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
+                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
                 <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
             </div>
         </div>
@@ -786,14 +889,53 @@
                 <li><a href="{{ route('contact') }}">تماس</a></li>
             </ul>
             <div class="mobile-auth">
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
+                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
             </div>
         </div>
     </header>
+
+    <!-- ============================================================
+    MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="login">ورود</button>
+                <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+            </div>
+            <form class="modal-form" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">ایمیل</label>
+                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">رمز عبور</label>
+                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
+                </div>
+                <button type="submit" class="btn btn-gold">ورود</button>
+            </form>
+            <form class="modal-form hidden" id="registerForm">
+                <div class="form-group">
+                    <label for="regName">نام و نام خانوادگی</label>
+                    <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">ایمیل</label>
+                    <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">رمز عبور</label>
+                    <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">تکرار رمز عبور</label>
+                    <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
+                </div>
+                <button type="submit" class="btn btn-gold">ثبت‌نام</button>
+            </form>
+        </div>
+    </div>
 
     <!-- ============================================================
     TRUST BAR
@@ -892,7 +1034,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                        <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
                     </a>
                     <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
                     <div class="footer-social">
@@ -926,7 +1068,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; ۲۰۲۶ تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
+                <p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
             </div>
         </div>
     </footer>
@@ -991,7 +1133,51 @@
         });
 
         // ============================================================
-        // 4. RESERVATION SYSTEM
+        // 4. MODAL
+        // ============================================================
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const openModalBtns = document.querySelectorAll('#openModalBtn, #openModalBtnMobile');
+        const modalTabs = document.querySelectorAll('.modal-tab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        function openModal(tab = 'login') {
+            modalOverlay?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            switchTab(tab);
+        }
+
+        function closeModal() {
+            modalOverlay?.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function switchTab(tab) {
+            modalTabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`.modal-tab[data-tab="${tab}"]`)?.classList.add('active');
+            loginForm?.classList.toggle('hidden', tab !== 'login');
+            registerForm?.classList.toggle('hidden', tab !== 'register');
+        }
+
+        openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('login');
+        }));
+
+        modalClose?.addEventListener('click', closeModal);
+        modalOverlay?.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        modalTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============================================================
+        // 5. RESERVATION SYSTEM
         // ============================================================
         (function() {
             // ---------- DATABASE ----------

@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>درباره ما | GRAFIUM</title>
-
-    <!-- CSRF Token (برای فرم‌ها) -->
+    
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -13,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
 
     <style>
-        /* ===== تمام CSS مثل قبل ===== */
+        /* ===== تمام CSS در اینجا ===== */
         * {
             margin: 0;
             padding: 0;
@@ -152,10 +151,19 @@
             color: #fff;
             border-color: transparent;
         }
+        .btn-white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+        .btn-white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+        }
 
         /* ===== SECTION HEADER ===== */
         .section {
-            padding: 25px 0;
+            padding: 60px 0;
         }
         .section-header {
             text-align: center;
@@ -464,15 +472,6 @@
             position: relative;
             z-index: 1;
         }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -571,12 +570,6 @@
             padding-top: 20px;
             font-size: 14px;
             color: #64748b;
-        }
-        .gold-text {
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         /* ===== MODAL ===== */
@@ -764,9 +757,9 @@
     <header class="header" id="header">
         <div class="container header-inner">
             <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
             </a>
-            <nav class="nav-desktop">
+            <nav class="nav-desktop" id="navDesktop">
                 <ul>
                     <li><a href="{{ route('home') }}">خانه</a></li>
                     <li><a href="{{ route('about') }}" class="active">درباره ما</a></li>
@@ -777,17 +770,7 @@
             </nav>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-gold-outline">خروج</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
-
+                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
                 <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
             </div>
         </div>
@@ -800,17 +783,13 @@
                 <li><a href="{{ route('contact') }}">تماس</a></li>
             </ul>
             <div class="mobile-auth">
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
+                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
             </div>
         </div>
     </header>
 
     <!-- ============================================================
-    MODAL (فقط برای لاگین با JS - در Laravel از route استفاده کن)
+    MODAL
     ============================================================ -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
@@ -819,15 +798,14 @@
                 <button class="modal-tab active" data-tab="login">ورود</button>
                 <button class="modal-tab" data-tab="register">ثبت‌نام</button>
             </div>
-            <form class="modal-form" id="loginForm" action="{{ route('login') }}" method="POST">
-                @csrf
+            <form class="modal-form" id="loginForm">
                 <div class="form-group">
                     <label for="loginEmail">ایمیل</label>
-                    <input type="email" id="loginEmail" name="email" placeholder="ایمیل خود را وارد کنید" />
+                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">رمز عبور</label>
-                    <input type="password" id="loginPassword" name="password" placeholder="رمز عبور خود را وارد کنید" />
+                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
                 </div>
                 <button type="submit" class="btn btn-gold">ورود</button>
             </form>
@@ -945,7 +923,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                        <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
                     </a>
                     <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
                     <div class="footer-social">
@@ -979,7 +957,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; ۲۰۲۶ تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
+                <p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
             </div>
         </div>
     </footer>

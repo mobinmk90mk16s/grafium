@@ -4,28 +4,206 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>GRAFIUM | سالن کار اشتراکی گرافیکی</title>
+    
+    {{-- فونت‌ها و CDN ها --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
 
     <style>
-        /* ===== تمام CSS در اینجا ===== */
+        /* ===== LOADING SCREEN ===== */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: var(--deep-navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* لوگو در لودینگ */
+        .loader-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 0 60px rgba(212, 163, 115, 0.3);
+            animation: pulseLogo 1.5s ease-in-out infinite;
+        }
+
+        .loader-logo span {
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 60px rgba(212, 163, 115, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 100px rgba(212, 163, 115, 0.5);
+            }
+        }
+
+        /* اسپینر طلایی */
+        .loader-spinner {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid rgba(212, 163, 115, 0.1);
+            border-top-color: var(--gold);
+            border-right-color: var(--gold-light);
+            animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+            position: relative;
+        }
+
+        .loader-spinner::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            border: 3px solid rgba(212, 163, 115, 0.05);
+            border-top-color: var(--gold-dark);
+            animation: spin 1.2s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite reverse;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* متن لودینگ */
+        .loader-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            animation: fadeText 1.8s ease-in-out infinite;
+            font-family: var(--font);
+        }
+
+        @keyframes fadeText {
+            0%, 100% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-4px); }
+        }
+
+        /* بار پیشرفت */
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 163, 115, 0.3);
+        }
+
+        /* ذرات پس‌زمینه لودینگ */
+        .loader-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatParticle 4s ease-in-out infinite;
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 25%; animation-delay: 0.5s; }
+        .particle:nth-child(3) { left: 40%; animation-delay: 1s; }
+        .particle:nth-child(4) { left: 55%; animation-delay: 1.5s; }
+        .particle:nth-child(5) { left: 70%; animation-delay: 2s; }
+        .particle:nth-child(6) { left: 85%; animation-delay: 2.5s; }
+        .particle:nth-child(7) { left: 15%; animation-delay: 3s; }
+        .particle:nth-child(8) { left: 50%; animation-delay: 3.5s; }
+        .particle:nth-child(9) { left: 75%; animation-delay: 1.2s; }
+        .particle:nth-child(10) { left: 35%; animation-delay: 2.8s; }
+
+        @keyframes floatParticle {
+            0% {
+                opacity: 0;
+                transform: translateY(100px) scale(0);
+            }
+            20% {
+                opacity: 0.6;
+                transform: translateY(0) scale(1);
+            }
+            80% {
+                opacity: 0.6;
+                transform: translateY(-50px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0);
+            }
+        }
+
+        /* محتوای اصلی - ابتدا مخفی */
+        #mainContent {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        #mainContent.visible {
+            opacity: 1;
+        }
+
+        /* ===== تمام CSS قبلی شما اینجا ===== */
         @font-face {
             font-family: 'Vazirmatn';
-            src: url('Vazir_p30download.com.eot') format('woff2');
+            src: url('{{ asset("fonts/Vazir_p30download.com.eot") }}') format('woff2');
             font-weight: 400;
             font-style: normal;
         }
         @font-face {
             font-family: 'Vazirmatn';
-            src: url('Vazir_p30download.com.eot') format('woff2');
+            src: url('{{ asset("fonts/Vazir_p30download.com.eot") }}') format('woff2');
             font-weight: 700;
             font-style: normal;
         }
         @font-face {
             font-family: 'Vazirmatn';
-            src: url('Vazir_p30download.com.eot') format('woff2');
+            src: url('{{ asset("fonts/Vazir_p30download.com.eot") }}') format('woff2');
             font-weight: 800;
             font-style: normal;
         }
@@ -168,10 +346,19 @@
             color: #fff;
             border-color: transparent;
         }
+        .btn-white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+        .btn-white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+        }
 
         /* ===== SECTION HEADER ===== */
         .section {
-            padding: 25px 0;
+            padding: 60px 0;
         }
         .section-header {
             text-align: center;
@@ -954,15 +1141,6 @@
             position: relative;
             z-index: 1;
         }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -1180,9 +1358,7 @@
             border-color: var(--gold);
         }
 
-        /* ============================================================ */
-        /* RESPONSIVE */
-        /* ============================================================ */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             #particleSphere {
                 position: relative;
@@ -1260,6 +1436,21 @@
             #particleSphere {
                 height: 300px;
             }
+            .loader-logo {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+            .loader-spinner {
+                width: 50px;
+                height: 50px;
+            }
+            .loader-text {
+                font-size: 13px;
+            }
+            .loader-progress {
+                width: 150px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1275,350 +1466,438 @@
             #particleSphere {
                 height: 220px;
             }
+            .loader-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            .loader-spinner {
+                width: 40px;
+                height: 40px;
+            }
+            .loader-text {
+                font-size: 11px;
+            }
+            .loader-progress {
+                width: 120px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header" id="header">
-        <div class="container header-inner">
-            <a href="index.html" class="logo">
-                <img src="Aug 2, 2026, 03_28_58 PM.png" alt="Grafium Logo" class="logo-img" />
-            </a>
-            <nav class="nav-desktop" id="navDesktop">
-                <ul>
-                    <li><a href="index.html" class="active">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="contact.html">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
+    <!-- ============================================================
+    LOADING SCREEN
+    ============================================================ -->
+    <div id="loadingScreen">
+        <div class="loader-particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
         </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="index.html">خانه</a></li>
-                <li><a href="{{ route('about') }}">درباره ما</a></li>
-                <li><a href="{{ route('services') }}">خدمات</a></li>
-                <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                <li><a href="contact.html">تماس</a></li>
-            </ul>
-            <div class="mobile-auth">
-                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
+        <div class="loader-wrapper">
+            <div class="loader-logo">
+                <span>G</span>
             </div>
-        </div>
-    </header>
-
-    <!-- ===== MODAL ===== -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="login">ورود</button>
-                <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+            <div class="loader-spinner"></div>
+            <div class="loader-text">در حال بارگذاری ...</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar" id="progressBar"></div>
             </div>
-            <form class="modal-form" id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">ایمیل</label>
-                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">رمز عبور</label>
-                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ورود</button>
-            </form>
-            <form class="modal-form hidden" id="registerForm">
-                <div class="form-group">
-                    <label for="regName">نام و نام خانوادگی</label>
-                    <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regEmail">ایمیل</label>
-                    <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">رمز عبور</label>
-                    <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPasswordConfirm">تکرار رمز عبور</label>
-                    <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ثبت‌نام</button>
-            </form>
         </div>
     </div>
 
-    <!-- ===== HERO SLIDER با کره ۳بعدی ===== -->
-    <section class="hero-slider" id="home">
-        <div class="swiper heroSwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide hero-slide" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&h=800&fit=crop');">
-                    <div class="hero-overlay"></div>
-                    <div class="container hero-content">
-                        <h1 class="gold-text">اولین سالن کار اشتراکی گرافیکی</h1>
-                        <p>فضایی برای خلاقیت، هم‌افزایی و رشد حرفه‌ای</p>
-                        <a href="services.html" class="btn btn-gold">مشاهده خدمات</a>
+    <!-- ============================================================
+    محتوای اصلی
+    ============================================================ -->
+    <div id="mainContent">
+
+        <!-- ===== HEADER ===== -->
+        <header class="header" id="header">
+            <div class="container header-inner">
+                <a href="{{ route('home') }}" class="logo">
+                    <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                </a>
+                <nav class="nav-desktop" id="navDesktop">
+                    <ul>
+                        <li><a href="{{ route('home') }}" class="active">خانه</a></li>
+                        <li><a href="{{ route('about') }}">درباره ما</a></li>
+                        <li><a href="{{ route('services') }}">خدمات</a></li>
+                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
+                        <li><a href="{{ route('contact') }}">تماس</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
+                    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                </div>
+            </div>
+            <div class="mobile-menu" id="mobileMenu">
+                <ul>
+                    <li><a href="{{ route('home') }}">خانه</a></li>
+                    <li><a href="{{ route('about') }}">درباره ما</a></li>
+                    <li><a href="{{ route('services') }}">خدمات</a></li>
+                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
+                    <li><a href="{{ route('contact') }}">تماس</a></li>
+                </ul>
+                <div class="mobile-auth">
+                    <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== MODAL ===== -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-tab="login">ورود</button>
+                    <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+                </div>
+                <form class="modal-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">ایمیل</label>
+                        <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
                     </div>
-                </div>
-                <div class="swiper-slide hero-slide" style="background-image: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1400&h=800&fit=crop');">
-                    <div class="hero-overlay"></div>
-                    <div class="container hero-content">
-                        <h1 class="gold-text">سیستم‌های قدرتمند در دسترس شما</h1>
-                        <p>اجاره سیستم‌های گران‌قیمت برای اجرای پروژه‌های سنگین گرافیکی</p>
-                        <a href="services.html" class="btn btn-gold">مشاهده خدمات</a>
+                    <div class="form-group">
+                        <label for="loginPassword">رمز عبور</label>
+                        <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
                     </div>
-                </div>
-                <div class="swiper-slide hero-slide" style="background-image: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1400&h=800&fit=crop');">
-                    <div class="hero-overlay"></div>
-                    <div class="container hero-content">
-                        <h1 class="gold-text">جامعه‌ای از هنرمندان و طراحان</h1>
-                        <p>همکاری، تبادل ایده و رشد در کنار بهترین‌ها</p>
-                        <a href="#contact" class="btn btn-gold">تماس با ما</a>
+                    <button type="submit" class="btn btn-gold">ورود</button>
+                </form>
+                <form class="modal-form hidden" id="registerForm">
+                    <div class="form-group">
+                        <label for="regName">نام و نام خانوادگی</label>
+                        <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
                     </div>
-                </div>
-            </div>
-            <div class="swiper-pagination"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-        </div>
-        <!-- کره ۳بعدی -->
-        <canvas id="particleSphere"></canvas>
-    </section>
-
-    <!-- ===== TRUST BAR ===== -->
-    <section class="trust-bar">
-        <div class="container" style="overflow:hidden;">
-            <div class="trust-track">
-                <span class="trust-item"><i class="fas fa-check-circle"></i> ۱۰۰+ عضو فعال</span>
-                <span class="trust-item"><i class="fas fa-star"></i> ۹۸٪ رضایت</span>
-                <span class="trust-item"><i class="fas fa-wifi"></i> اینترنت پرسرعت</span>
-                <span class="trust-item"><i class="fas fa-coffee"></i> نوشیدنی رایگان</span>
-                <span class="trust-item"><i class="fas fa-clock"></i> دسترسی ۲۴/۷</span>
-                <span class="trust-item"><i class="fas fa-print"></i> چاپ حرفه‌ای</span>
-                <span class="trust-item"><i class="fas fa-check-circle"></i> ۱۰۰+ عضو فعال</span>
-                <span class="trust-item"><i class="fas fa-star"></i> ۹۸٪ رضایت</span>
-                <span class="trust-item"><i class="fas fa-wifi"></i> اینترنت پرسرعت</span>
-                <span class="trust-item"><i class="fas fa-coffee"></i> نوشیدنی رایگان</span>
-                <span class="trust-item"><i class="fas fa-clock"></i> دسترسی ۲۴/۷</span>
-                <span class="trust-item"><i class="fas fa-print"></i> چاپ حرفه‌ای</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== ABOUT ===== -->
-    <section class="section about" id="about">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge gradient-badge">درباره ما</span>
-                <h2 class="purple-text">چرا <span class="purple-text">GRAFIUM</span>؟</h2>
-                <p>ما اولین سالن کار اشتراکی گرافیکی در شهر هستیم. فضایی که در آن طراحان، هنرمندان و علاقه‌مندان به گرافیک می‌توانند با اجاره سیستم‌های قدرتمند، پروژه‌های خود را بدون محدودیت اجرا کنند.</p>
-                <p>از میزهای کار ارگونومیک تا سیستم‌های i9 و کارت‌های گرافیک حرفه‌ای، همه چیز برای خلق آثار بی‌نظیر فراهم است.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== SERVICES ===== -->
-    <section class="section services" id="services">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge gradient-badge">خدمات ما</span>
-                <h2 class="purple-text">چه خدمات  ارائه می‌دهیم؟</h2>
-                <p>خدمات متنوع برای رفع نیازهای گرافیکی شما</p>
-            </div>
-            <div class="services-grid">
-                <div class="service-card"><div class="service-icon"><i class="fas fa-desktop"></i></div><h3>اجاره سیستم</h3><p>سیستم‌های i9 و RTX</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="services.html" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-couch"></i></div><h3>فضای کار اشتراکی</h3><p>میز ارگونومیک و اینترنت پرسرعت</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-users"></i></div><h3>کارگاه‌های آموزشی</h3><p>دوره‌های فتوشاپ و ایلوستریتور</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-print"></i></div><h3>چاپ و تکثیر</h3><p>چاپ با کیفیت بالا</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-coffee"></i></div><h3>کافه &amp; استراحت</h3><p>فضایی آرام برای تبادل ایده</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-video"></i></div><h3>تدوین و انیمیشن</h3><p>خدمات تدوین و موشن گرافیک</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-paint-brush"></i></div><h3>طراحی گرافیک</h3><p>لوگو، پوستر و هویت بصری</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-                <div class="service-card"><div class="service-icon"><i class="fas fa-photo-video"></i></div><h3>عکاسی و نورپردازی</h3><p>استودیو با تجهیزات حرفه‌ای</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FAQ ===== -->
-    <section class="section faq" id="faq">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge gradient-badge">سوالات متداول</span>
-                <h2 class="purple-text">سوالات متداول</h2>
-                <p>هر آنچه باید درباره گرافیوم بدانید.</p>
-            </div>
-            <div class="faq-list">
-                <div class="faq-item active">
-                    <div class="faq-question"><span>گرافیوم چیست؟</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">گرافیوم یک فضای کار اشتراکی ممتاز است که به‌طور تخصصی برای طراحان گرافیک، هنرمندان و حرفه‌ای‌های خلاق طراحی شده است. ما محیطی حرفه‌ای و الهام‌بخش با امکانات مدرن ارائه می‌دهیم.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question"><span>چگونه می‌توانم میز رزرو کنم؟</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">شما می‌توانید میز را مستقیماً از طریق سیستم رزرو آنلاین ما رزرو کنید. کافی است میزهای موجود را مرور کنید، تاریخ و شیفت مورد نظر را انتخاب کرده و رزرو خود را تایید کنید. این فرآیند سریع و آسان است.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question"><span>ساعات کاری چگونه است؟</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">ساعات کاری ما از شنبه تا پنجشنبه، ۸ صبح تا ۹ شب است. اعضای طرح‌های حرفه‌ای و سازمانی از دسترسی ۲۴/۷ برخوردار هستند.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question"><span>آیا پارکینگ وجود دارد؟</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">بله، ما پارکینگ اختصاصی برای اعضای خود داریم. پارکینگ برای تمام اعضا در طول بازدید رایگان است.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question"><span>آیا می‌توانم اتاق جلسات را جداگانه رزرو کنم؟</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">بله، اتاق‌های جلسات حتی اگر عضو نباشید نیز قابل رزرو هستند. اعضای طرح‌های حرفه‌ای و سازمانی اعتبار اتاق جلسات را در طرح خود دریافت می‌کنند.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question"><span>چه روش‌های پرداختی را می‌پذیرید؟</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">ما تمام کارت‌های اعتباری اصلی، انتقالات بانکی و روش‌های پرداخت دیجیتال را می‌پذیریم. همچنین برنامه‌های پرداخت منعطف برای عضویت‌های بلندمدت ارائه می‌دهیم.</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== BLOG ===== -->
-    <section class="section blog" id="blog">
-        <div class="container">
-            <div class="section-header">
-                <span class="badge gradient-badge">اخبار و مقالات</span>
-                <h2 class="purple-text">آخرین مطالب</h2>
-                <p>جدیدترین اخبار و مقالات آموزشی را دنبال کنید</p>
-            </div>
-            <div class="blog-grid">
-                <article class="blog-card featured">
-                    <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop');"><span class="blog-badge gradient-badge">ویژه</span></div>
-                    <div class="blog-content"><h3>افتتاح رسمی GRAFIUM</h3><p>اولین سالن کار اشتراکی گرافیکی با حضور هنرمندان و طراحان برتر افتتاح شد.</p><a href="#" class="gold-link">ادامه مطلب</a></div>
-                </article>
-                <article class="blog-card">
-                    <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop');"><span class="blog-badge gradient-badge">پربازدید</span></div>
-                    <div class="blog-content"><h3>آموزش رایگان فتوشاپ</h3><p>دوره‌های آموزشی رایگان برای علاقه‌مندان به گرافیک و طراحی دیجیتال.</p><a href="#" class="gold-link">ادامه مطلب</a></div>
-                </article>
-                <article class="blog-card">
-                    <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop');"><span class="blog-badge gradient-badge">آخرین</span></div>
-                    <div class="blog-content"><h3>سیستم‌های جدید به GRAFIUM آمدند</h3><p>ارتقاء سیستم‌ها با جدیدترین پردازنده‌ها و کارت‌های گرافیک برای تجربه بهتر.</p><a href="#" class="gold-link">ادامه مطلب</a></div>
-                </article>
-            </div>
-            <div class="blog-footer"><a href="#" class="btn btn-gold-outline">مشاهده همه اخبار</a></div>
-        </div>
-    </section>
-
-    <!-- ===== NEWSLETTER ===== -->
-    <section class="section newsletter" id="newsletter">
-        <div class="container">
-            <div class="newsletter-box reveal">
-                <h3>در جریان <span style="color:var(--gold);">بمانید</span></h3>
-                <p>در خبرنامه ما عضو شوید و آخرین به‌روزرسانی‌ها، رویدادها و پیشنهادات را دریافت کنید.</p>
-                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('از ثبت‌نام شما متشکریم!');">
-                    <input type="email" placeholder="آدرس ایمیل خود را وارد کنید" required />
-                    <button type="submit" class="btn btn-gold">عضویت <i class="fas fa-arrow-left"></i></button>
+                    <div class="form-group">
+                        <label for="regEmail">ایمیل</label>
+                        <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">رمز عبور</label>
+                        <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
+                    </div>
+                    <div class="form-group">
+                        <label for="regPasswordConfirm">تکرار رمز عبور</label>
+                        <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
+                    </div>
+                    <button type="submit" class="btn btn-gold">ثبت‌نام</button>
                 </form>
             </div>
         </div>
-    </section>
 
-    <!-- ===== STATS ===== -->
-    <section class="section stats">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item"><span class="stat-number" data-target="120">0</span><span class="stat-label">پروژه انجام شده</span></div>
-                <div class="stat-item"><span class="stat-number" data-target="85">0</span><span class="stat-label">طراح حرفه‌ای</span></div>
-                <div class="stat-item"><span class="stat-number" data-target="15">0</span><span class="stat-label">سیستم قدرتمند</span></div>
-                <div class="stat-item"><span class="stat-number" data-target="100">0</span><span class="stat-label">مشتری راضی</span></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== TESTIMONIALS ===== -->
-    <section class="section testimonials">
-        <div class="container">
-            <div class="section-header"><span class="badge gradient-badge">نظرات مشتریان</span><h2 class="purple-text">آنها چه می‌گویند؟</h2></div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card"><div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>“فضای فوق‌العاده، سیستم‌های قدرتمند و محیطی الهام‌بخش.”</p><div class="testimonial-author"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="کاربر" /><div><strong>مهدی کریمی</strong><span>طراح گرافیک</span></div></div></div>
-                <div class="testimonial-card"><div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>“سیستم‌های باورنکردنی، اینترنت عالی و کافه‌ی دنج.”</p><div class="testimonial-author"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="کاربر" /><div><strong>سارا احمدی</strong><span>تصویرساز دیجیتال</span></div></div></div>
-                <div class="testimonial-card"><div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>“همکاری با GRAFIUM باعث شد پروژه‌های سنگینم را بدون نگرانی انجام بدم.”</p><div class="testimonial-author"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="کاربر" /><div><strong>رضا نوری</strong><span>انیماتور</span></div></div></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== CONTACT ===== -->
-    <section class="section contact" id="contact">
-        <div class="container">
-            <div class="section-header"><span class="badge gradient-badge">تماس با ما</span><h2 class="purple-text">در ارتباط باشید</h2><p>ما همیشه آماده پاسخگویی به شما هستیم</p></div>
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <div class="contact-item"><i class="fas fa-map-marker-alt"></i><div><h4>آدرس</h4><p>خیابان اصلی، نبش خیابان دوم، پلاک ۱۲۳</p></div></div>
-                    <div class="contact-item"><i class="fas fa-phone"></i><div><h4>تلفن</h4><p>۰۲۱-۱۲۳۴-۵۶۷۸</p></div></div>
-                    <div class="contact-item"><i class="fas fa-envelope"></i><div><h4>ایمیل</h4><p>info@grafium.ir</p></div></div>
-                    <div class="contact-item"><i class="fas fa-clock"></i><div><h4>ساعت کاری</h4><p>شنبه تا پنجشنبه: ۹ صبح تا ۱۰ شب</p></div></div>
-                </div>
-                <form class="contact-form">
-                    <div class="form-group"><label for="name">نام و نام خانوادگی</label><input type="text" id="name" placeholder="نام خود را وارد کنید" /></div>
-                    <div class="form-group"><label for="email">ایمیل</label><input type="email" id="email" placeholder="ایمیل خود را وارد کنید" /></div>
-                    <div class="form-group"><label for="message">پیام</label><textarea id="message" rows="5" placeholder="پیام خود را بنویسید..."></textarea></div>
-                    <button type="submit" class="btn btn-gold">ارسال پیام</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== CTA ===== -->
-    <section class="cta" id="cta">
-        <div class="container">
-            <span class="badge gradient-badge" style="background:rgba(212,163,115,0.12);color:var(--gold);">شروع کنید</span>
-            <h2 class="section-title">فضای کاری <span style="color:var(--gold);">خود را امروز رزرو کنید</span></h2>
-            <p class="section-subtitle" style="color:rgba(255,255,255,0.35);max-width:600px;margin:0 auto 36px;">به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.</p>
-            <div class="btn-group">
-                <a href="services.html" class="btn btn-gold">رزرو میز <i class="fas fa-arrow-left"></i></a>
-                <a href="#contact" class="btn btn-white">تماس با ما</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="index.html" class="logo"><img src="Aug 2, 2026, 03_28_58 PM.png" alt="Grafium Logo" class="logo-img" /></a>
-                    <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
-                    <div class="footer-social">
-                        <a href="#"><i class="fas fa-comment"></i></a>
-                        <a href="#"><i class="fas fa-check-circle"></i></a>
-                        <a href="#"><i class="fas fa-video"></i></a>
-                        <a href="#"><i class="fas fa-share-alt"></i></a>
+        <!-- ===== HERO SLIDER با کره ۳بعدی ===== -->
+        <section class="hero-slider" id="home">
+            <div class="swiper heroSwiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide hero-slide" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&h=800&fit=crop');">
+                        <div class="hero-overlay"></div>
+                        <div class="container hero-content">
+                            <h1 class="gold-text">اولین سالن کار اشتراکی گرافیکی</h1>
+                            <p>فضایی برای خلاقیت، هم‌افزایی و رشد حرفه‌ای</p>
+                            <a href="{{ route('services') }}" class="btn btn-gold">مشاهده خدمات</a>
+                        </div>
+                    </div>
+                    <div class="swiper-slide hero-slide" style="background-image: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1400&h=800&fit=crop');">
+                        <div class="hero-overlay"></div>
+                        <div class="container hero-content">
+                            <h1 class="gold-text">سیستم‌های قدرتمند در دسترس شما</h1>
+                            <p>اجاره سیستم‌های گران‌قیمت برای اجرای پروژه‌های سنگین گرافیکی</p>
+                            <a href="{{ route('services') }}" class="btn btn-gold">مشاهده خدمات</a>
+                        </div>
+                    </div>
+                    <div class="swiper-slide hero-slide" style="background-image: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1400&h=800&fit=crop');">
+                        <div class="hero-overlay"></div>
+                        <div class="container hero-content">
+                            <h1 class="gold-text">جامعه‌ای از هنرمندان و طراحان</h1>
+                            <p>همکاری، تبادل ایده و رشد در کنار بهترین‌ها</p>
+                            <a href="#contact" class="btn btn-gold">تماس با ما</a>
+                        </div>
                     </div>
                 </div>
-                <div class="footer-links">
-                    <h4>لینک‌های مفید</h4>
-                    <ul><li><a href="index.html">خانه</a></li><li><a href="about.html">درباره ما</a></li><li><a href="services.html">خدمات</a></li><li><a href="#">بلاگ</a></li><li><a href="#">تماس</a></li></ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>اطلاعات تماس</h4>
-                    <ul><li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li><li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li><li><i class="fas fa-envelope"></i> info@grafium.ir</li></ul>
-                </div>
-                <div class="footer-trust">
-                    <h4>نمادهای اعتماد</h4>
-                    <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+            <canvas id="particleSphere"></canvas>
+        </section>
+
+        <!-- ===== TRUST BAR ===== -->
+        <section class="trust-bar">
+            <div class="container" style="overflow:hidden;">
+                <div class="trust-track">
+                    <span class="trust-item"><i class="fas fa-check-circle"></i> ۱۰۰+ عضو فعال</span>
+                    <span class="trust-item"><i class="fas fa-star"></i> ۹۸٪ رضایت</span>
+                    <span class="trust-item"><i class="fas fa-wifi"></i> اینترنت پرسرعت</span>
+                    <span class="trust-item"><i class="fas fa-coffee"></i> نوشیدنی رایگان</span>
+                    <span class="trust-item"><i class="fas fa-clock"></i> دسترسی ۲۴/۷</span>
+                    <span class="trust-item"><i class="fas fa-print"></i> چاپ حرفه‌ای</span>
+                    <span class="trust-item"><i class="fas fa-check-circle"></i> ۱۰۰+ عضو فعال</span>
+                    <span class="trust-item"><i class="fas fa-star"></i> ۹۸٪ رضایت</span>
+                    <span class="trust-item"><i class="fas fa-wifi"></i> اینترنت پرسرعت</span>
+                    <span class="trust-item"><i class="fas fa-coffee"></i> نوشیدنی رایگان</span>
+                    <span class="trust-item"><i class="fas fa-clock"></i> دسترسی ۲۴/۷</span>
+                    <span class="trust-item"><i class="fas fa-print"></i> چاپ حرفه‌ای</span>
                 </div>
             </div>
-            <div class="footer-bottom"><p>&copy; ۲۰۲۶ تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p></div>
-        </div>
-    </footer>
+        </section>
 
-    <!-- ============================================================ -->
-    <!-- ===== تمام JavaScript در اینجا ===== -->
-    <!-- ============================================================ -->
+        <!-- ===== ABOUT ===== -->
+        <section class="section about" id="about">
+            <div class="container">
+                <div class="section-header">
+                    <span class="gradient-badge">درباره ما</span>
+                    <h2 class="purple-text">چرا <span class="purple-text">GRAFIUM</span>؟</h2>
+                    <p>ما اولین سالن کار اشتراکی گرافیکی در شهر هستیم. فضایی که در آن طراحان، هنرمندان و علاقه‌مندان به گرافیک می‌توانند با اجاره سیستم‌های قدرتمند، پروژه‌های خود را بدون محدودیت اجرا کنند.</p>
+                    <p>از میزهای کار ارگونومیک تا سیستم‌های i9 و کارت‌های گرافیک حرفه‌ای، همه چیز برای خلق آثار بی‌نظیر فراهم است.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SERVICES ===== -->
+        <section class="section services" id="services">
+            <div class="container">
+                <div class="section-header">
+                    <span class="gradient-badge">خدمات ما</span>
+                    <h2 class="purple-text">چه خدمات ارائه می‌دهیم؟</h2>
+                    <p>خدمات متنوع برای رفع نیازهای گرافیکی شما</p>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-desktop"></i></div><h3>اجاره سیستم</h3><p>سیستم‌های i9 و RTX</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="{{ route('services') }}" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-couch"></i></div><h3>فضای کار اشتراکی</h3><p>میز ارگونومیک و اینترنت پرسرعت</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-users"></i></div><h3>کارگاه‌های آموزشی</h3><p>دوره‌های فتوشاپ و ایلوستریتور</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-print"></i></div><h3>چاپ و تکثیر</h3><p>چاپ با کیفیت بالا</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-coffee"></i></div><h3>کافه &amp; استراحت</h3><p>فضایی آرام برای تبادل ایده</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-video"></i></div><h3>تدوین و انیمیشن</h3><p>خدمات تدوین و موشن گرافیک</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-paint-brush"></i></div><h3>طراحی گرافیک</h3><p>لوگو، پوستر و هویت بصری</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                    <div class="service-card"><div class="service-icon"><i class="fas fa-photo-video"></i></div><h3>عکاسی و نورپردازی</h3><p>استودیو با تجهیزات حرفه‌ای</p><div class="service-links"><a href="#" class="gold-link">معرفی</a><a href="#" class="gold-link">رزرو</a></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FAQ ===== -->
+        <section class="section faq" id="faq">
+            <div class="container">
+                <div class="section-header">
+                    <span class="gradient-badge">سوالات متداول</span>
+                    <h2 class="purple-text">سوالات متداول</h2>
+                    <p>هر آنچه باید درباره گرافیوم بدانید.</p>
+                </div>
+                <div class="faq-list">
+                    <div class="faq-item active">
+                        <div class="faq-question"><span>گرافیوم چیست؟</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer">گرافیوم یک فضای کار اشتراکی ممتاز است که به‌طور تخصصی برای طراحان گرافیک، هنرمندان و حرفه‌ای‌های خلاق طراحی شده است. ما محیطی حرفه‌ای و الهام‌بخش با امکانات مدرن ارائه می‌دهیم.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question"><span>چگونه می‌توانم میز رزرو کنم؟</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer">شما می‌توانید میز را مستقیماً از طریق سیستم رزرو آنلاین ما رزرو کنید. کافی است میزهای موجود را مرور کنید، تاریخ و شیفت مورد نظر را انتخاب کرده و رزرو خود را تایید کنید. این فرآیند سریع و آسان است.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question"><span>ساعات کاری چگونه است؟</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer">ساعات کاری ما از شنبه تا پنجشنبه، ۸ صبح تا ۹ شب است. اعضای طرح‌های حرفه‌ای و سازمانی از دسترسی ۲۴/۷ برخوردار هستند.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question"><span>آیا پارکینگ وجود دارد؟</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer">بله، ما پارکینگ اختصاصی برای اعضای خود داریم. پارکینگ برای تمام اعضا در طول بازدید رایگان است.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question"><span>آیا می‌توانم اتاق جلسات را جداگانه رزرو کنم؟</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer">بله، اتاق‌های جلسات حتی اگر عضو نباشید نیز قابل رزرو هستند. اعضای طرح‌های حرفه‌ای و سازمانی اعتبار اتاق جلسات را در طرح خود دریافت می‌کنند.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question"><span>چه روش‌های پرداختی را می‌پذیرید؟</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="faq-answer">ما تمام کارت‌های اعتباری اصلی، انتقالات بانکی و روش‌های پرداخت دیجیتال را می‌پذیریم. همچنین برنامه‌های پرداخت منعطف برای عضویت‌های بلندمدت ارائه می‌دهیم.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== BLOG ===== -->
+        <section class="section blog" id="blog">
+            <div class="container">
+                <div class="section-header">
+                    <span class="gradient-badge">اخبار و مقالات</span>
+                    <h2 class="purple-text">آخرین مطالب</h2>
+                    <p>جدیدترین اخبار و مقالات آموزشی را دنبال کنید</p>
+                </div>
+                <div class="blog-grid">
+                    <article class="blog-card featured">
+                        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&h=400&fit=crop');"><span class="blog-badge gradient-badge">ویژه</span></div>
+                        <div class="blog-content"><h3>افتتاح رسمی GRAFIUM</h3><p>اولین سالن کار اشتراکی گرافیکی با حضور هنرمندان و طراحان برتر افتتاح شد.</p><a href="#" class="gold-link">ادامه مطلب</a></div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop');"><span class="blog-badge gradient-badge">پربازدید</span></div>
+                        <div class="blog-content"><h3>آموزش رایگان فتوشاپ</h3><p>دوره‌های آموزشی رایگان برای علاقه‌مندان به گرافیک و طراحی دیجیتال.</p><a href="#" class="gold-link">ادامه مطلب</a></div>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-image" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop');"><span class="blog-badge gradient-badge">آخرین</span></div>
+                        <div class="blog-content"><h3>سیستم‌های جدید به GRAFIUM آمدند</h3><p>ارتقاء سیستم‌ها با جدیدترین پردازنده‌ها و کارت‌های گرافیک برای تجربه بهتر.</p><a href="#" class="gold-link">ادامه مطلب</a></div>
+                    </article>
+                </div>
+                <div class="blog-footer"><a href="#" class="btn btn-gold-outline">مشاهده همه اخبار</a></div>
+            </div>
+        </section>
+
+        <!-- ===== NEWSLETTER ===== -->
+        <section class="section newsletter" id="newsletter">
+            <div class="container">
+                <div class="newsletter-box">
+                    <h3>در جریان <span style="color:var(--gold);">بمانید</span></h3>
+                    <p>در خبرنامه ما عضو شوید و آخرین به‌روزرسانی‌ها، رویدادها و پیشنهادات را دریافت کنید.</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('از ثبت‌نام شما متشکریم!');">
+                        <input type="email" placeholder="آدرس ایمیل خود را وارد کنید" required />
+                        <button type="submit" class="btn btn-gold">عضویت <i class="fas fa-arrow-left"></i></button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STATS ===== -->
+        <section class="section stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-number" data-target="120">0</span><span class="stat-label">پروژه انجام شده</span></div>
+                    <div class="stat-item"><span class="stat-number" data-target="85">0</span><span class="stat-label">طراح حرفه‌ای</span></div>
+                    <div class="stat-item"><span class="stat-number" data-target="15">0</span><span class="stat-label">سیستم قدرتمند</span></div>
+                    <div class="stat-item"><span class="stat-number" data-target="100">0</span><span class="stat-label">مشتری راضی</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TESTIMONIALS ===== -->
+        <section class="section testimonials">
+            <div class="container">
+                <div class="section-header"><span class="gradient-badge">نظرات مشتریان</span><h2 class="purple-text">آنها چه می‌گویند؟</h2></div>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card"><div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>“فضای فوق‌العاده، سیستم‌های قدرتمند و محیطی الهام‌بخش.”</p><div class="testimonial-author"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="کاربر" /><div><strong>مهدی کریمی</strong><span>طراح گرافیک</span></div></div></div>
+                    <div class="testimonial-card"><div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>“سیستم‌های باورنکردنی، اینترنت عالی و کافه‌ی دنج.”</p><div class="testimonial-author"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="کاربر" /><div><strong>سارا احمدی</strong><span>تصویرساز دیجیتال</span></div></div></div>
+                    <div class="testimonial-card"><div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>“همکاری با GRAFIUM باعث شد پروژه‌های سنگینم را بدون نگرانی انجام بدم.”</p><div class="testimonial-author"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="کاربر" /><div><strong>رضا نوری</strong><span>انیماتور</span></div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CONTACT ===== -->
+        <section class="section contact" id="contact">
+            <div class="container">
+                <div class="section-header"><span class="gradient-badge">تماس با ما</span><h2 class="purple-text">در ارتباط باشید</h2><p>ما همیشه آماده پاسخگویی به شما هستیم</p></div>
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <div class="contact-item"><i class="fas fa-map-marker-alt"></i><div><h4>آدرس</h4><p>خیابان اصلی، نبش خیابان دوم، پلاک ۱۲۳</p></div></div>
+                        <div class="contact-item"><i class="fas fa-phone"></i><div><h4>تلفن</h4><p>۰۲۱-۱۲۳۴-۵۶۷۸</p></div></div>
+                        <div class="contact-item"><i class="fas fa-envelope"></i><div><h4>ایمیل</h4><p>info@grafium.ir</p></div></div>
+                        <div class="contact-item"><i class="fas fa-clock"></i><div><h4>ساعت کاری</h4><p>شنبه تا پنجشنبه: ۹ صبح تا ۱۰ شب</p></div></div>
+                    </div>
+                    <form class="contact-form">
+                        <div class="form-group"><label for="name">نام و نام خانوادگی</label><input type="text" id="name" placeholder="نام خود را وارد کنید" /></div>
+                        <div class="form-group"><label for="email">ایمیل</label><input type="email" id="email" placeholder="ایمیل خود را وارد کنید" /></div>
+                        <div class="form-group"><label for="message">پیام</label><textarea id="message" rows="5" placeholder="پیام خود را بنویسید..."></textarea></div>
+                        <button type="submit" class="btn btn-gold">ارسال پیام</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CTA ===== -->
+        <section class="cta" id="cta">
+            <div class="container">
+                <span class="gradient-badge" style="background:rgba(212,163,115,0.12);color:var(--gold);">شروع کنید</span>
+                <h2 class="section-title">فضای کاری <span style="color:var(--gold);">خود را امروز رزرو کنید</span></h2>
+                <p class="section-subtitle" style="color:rgba(255,255,255,0.35);max-width:600px;margin:0 auto 36px;">به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.</p>
+                <div class="btn-group">
+                    <a href="{{ route('services') }}" class="btn btn-gold">رزرو میز <i class="fas fa-arrow-left"></i></a>
+                    <a href="#contact" class="btn btn-white">تماس با ما</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <a href="{{ route('home') }}" class="logo">
+                            <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                        </a>
+                        <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
+                        <div class="footer-social">
+                            <a href="#"><i class="fas fa-comment"></i></a>
+                            <a href="#"><i class="fas fa-check-circle"></i></a>
+                            <a href="#"><i class="fas fa-video"></i></a>
+                            <a href="#"><i class="fas fa-share-alt"></i></a>
+                        </div>
+                    </div>
+                    <div class="footer-links">
+                        <h4>لینک‌های مفید</h4>
+                        <ul><li><a href="{{ route('home') }}">خانه</a></li><li><a href="{{ route('about') }}">درباره ما</a></li><li><a href="{{ route('services') }}">خدمات</a></li><li><a href="{{ route('blog') }}">بلاگ</a></li><li><a href="{{ route('contact') }}">تماس</a></li></ul>
+                    </div>
+                    <div class="footer-contact">
+                        <h4>اطلاعات تماس</h4>
+                        <ul><li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li><li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li><li><i class="fas fa-envelope"></i> info@grafium.ir</li></ul>
+                    </div>
+                    <div class="footer-trust">
+                        <h4>نمادهای اعتماد</h4>
+                        <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
+                    </div>
+                </div>
+                <div class="footer-bottom"><p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p></div>
+            </div>
+        </footer>
+
+    </div>
+    <!-- ===== پایان محتوای اصلی ===== -->
+
+    <!-- ============================================================
+    اسکریپت‌ها
+    ============================================================ -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         // ============================================================
-        // 1. SWIPER SLIDER – حرفه‌ای با Fade + Progress Bar
+        // LOADING SCREEN – ۳.۵ ثانیه
+        // ============================================================
+        (function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContent = document.getElementById('mainContent');
+            const progressBar = document.getElementById('progressBar');
+            const totalTime = 2900; // ۳.۵ ثانیه
+            const intervalTime = 50; // هر ۵۰ میلی‌ثانیه یکبار
+            let progress = 0;
+            let elapsed = 0;
+
+            const timer = setInterval(() => {
+                elapsed += intervalTime;
+                progress = Math.min((elapsed / totalTime) * 100, 100);
+                progressBar.style.width = progress + '%';
+
+                if (elapsed >= totalTime) {
+                    clearInterval(timer);
+                    // مخفی کردن لودینگ
+                    loadingScreen.classList.add('hidden');
+                    // نمایش محتوای اصلی
+                    mainContent.classList.add('visible');
+                }
+            }, intervalTime);
+
+            // در صورت خطا در لودینگ، حداکثر ۴ ثانیه
+            setTimeout(() => {
+                if (!loadingScreen.classList.contains('hidden')) {
+                    clearInterval(timer);
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.add('visible');
+                }
+            }, 4000);
+        })();
+
+        // ============================================================
+        // 1. SWIPER SLIDER
         // ============================================================
         if (document.querySelector('.heroSwiper')) {
             const heroSwiper = new Swiper('.heroSwiper', {
@@ -1669,18 +1948,18 @@
             });
 
             // Progress Bar
-            const progressBar = document.createElement('div');
-            progressBar.className = 'swiper-progress-bar';
-            progressBar.innerHTML = `<span class="swiper-progress-fill"></span>`;
+            const progressBarSwiper = document.createElement('div');
+            progressBarSwiper.className = 'swiper-progress-bar';
+            progressBarSwiper.innerHTML = `<span class="swiper-progress-fill"></span>`;
             const heroSlider = document.querySelector('.hero-slider');
-            if (heroSlider) heroSlider.appendChild(progressBar);
+            if (heroSlider) heroSlider.appendChild(progressBarSwiper);
 
             heroSwiper.on('autoplayTimeLeft', function(s, time, progress) {
-                const fill = progressBar.querySelector('.swiper-progress-fill');
+                const fill = progressBarSwiper.querySelector('.swiper-progress-fill');
                 if (fill) fill.style.width = (1 - progress) * 100 + '%';
             });
             heroSwiper.on('click', function() {
-                const fill = progressBar.querySelector('.swiper-progress-fill');
+                const fill = progressBarSwiper.querySelector('.swiper-progress-fill');
                 if (fill) fill.style.width = '0%';
             });
         }
@@ -1728,18 +2007,7 @@
         });
 
         // ============================================================
-        // 4. SCROLL ANIMATIONS (Reveal)
-        // ============================================================
-        const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-        revealEls.forEach(el => revealObserver.observe(el));
-
-        // ============================================================
-        // 5. STATS COUNTER
+        // 4. STATS COUNTER
         // ============================================================
         const statNumbers = document.querySelectorAll('.stat-number');
         const counterObserver = new IntersectionObserver((entries) => {
@@ -1765,7 +2033,7 @@
         statNumbers.forEach(el => counterObserver.observe(el));
 
         // ============================================================
-        // 6. SMOOTH SCROLL
+        // 5. SMOOTH SCROLL
         // ============================================================
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
@@ -1780,7 +2048,7 @@
         });
 
         // ============================================================
-        // 7. STICKY HEADER SHADOW
+        // 6. STICKY HEADER SHADOW
         // ============================================================
         const header = document.getElementById('header');
         window.addEventListener('scroll', () => {
@@ -1790,7 +2058,7 @@
         });
 
         // ============================================================
-        // 8. MODAL
+        // 7. MODAL
         // ============================================================
         const modalOverlay = document.getElementById('modalOverlay');
         const modalClose = document.getElementById('modalClose');
@@ -1827,7 +2095,7 @@
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
         // ============================================================
-        // 9. FAQ ACCORDION
+        // 8. FAQ ACCORDION
         // ============================================================
         document.querySelectorAll('.faq-question').forEach(q => {
             q.addEventListener('click', function() {
@@ -1839,7 +2107,7 @@
         });
 
         // ============================================================
-        // 10. 3D PARTICLE SPHERE
+        // 9. 3D PARTICLE SPHERE
         // ============================================================
         (function() {
             const canvas = document.getElementById('particleSphere');

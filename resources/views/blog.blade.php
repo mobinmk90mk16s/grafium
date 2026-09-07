@@ -149,7 +149,7 @@
         }
 
         /* ===== SECTION ===== */
-        .section { padding: 25px 0; }
+        .section { padding: 60px 0; }
         .section-header {
             text-align: center;
             max-width: 700px;
@@ -639,6 +639,123 @@
             color: #64748b;
         }
 
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 40px 36px;
+            max-width: 480px;
+            width: 100%;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 40px rgba(212, 163, 115, 0.15);
+            position: relative;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 18px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .modal-close:hover {
+            color: var(--gold);
+            background: rgba(212, 163, 115, 0.1);
+            transform: rotate(90deg);
+        }
+        .modal-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-body);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+        .modal-tab {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal-tab.active {
+            background: var(--gold-gradient);
+            color: #fff;
+        }
+        .modal-tab:hover:not(.active) {
+            color: var(--gold);
+        }
+        .modal-form.hidden {
+            display: none;
+        }
+        .modal-form .form-group {
+            margin-bottom: 18px;
+        }
+        .modal-form label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .modal-form input {
+            width: 100%;
+            padding: 13px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-body);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            transition: all 0.4s;
+            outline: none;
+        }
+        .modal-form input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15);
+        }
+        .modal-form .btn {
+            width: 100%;
+            background: var(--gold-gradient);
+            border-color: var(--gold);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
             .blog-grid-4 {
@@ -687,9 +804,9 @@
     <header class="header" id="header">
         <div class="container header-inner">
             <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
             </a>
-            <nav class="nav-desktop">
+            <nav class="nav-desktop" id="navDesktop">
                 <ul>
                     <li><a href="{{ route('home') }}">خانه</a></li>
                     <li><a href="{{ route('about') }}">درباره ما</a></li>
@@ -700,15 +817,7 @@
             </nav>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-gold-outline">خروج</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
+                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
                 <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
             </div>
         </div>
@@ -721,78 +830,119 @@
                 <li><a href="{{ route('contact') }}">تماس</a></li>
             </ul>
             <div class="mobile-auth">
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
+                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
             </div>
         </div>
     </header>
-    <!-- ============================================================
-    BLOG PAGE
-============================================================ -->
-<section class="section blog-page">
-    <div class="container">
-        <div class="section-header">
-            <span class="gradient-badge"><i class="fas fa-newspaper"></i> اخبار و مقالات</span>
-            <h2 class="purple-text">آخرین مطالب GRAFIUM</h2>
-            <p>جدیدترین مقالات آموزشی، اخبار و رویدادهای دنیای گرافیک را دنبال کنید</p>
-        </div>
 
-        <!-- باکس جستجو -->
-        <div class="blog-search-wrapper">
-            <form action="{{ route('blog.search') }}" method="GET" style="position:relative;width:100%;">
-                <input type="text" name="q" class="blog-search-input" placeholder="جستجو در مقالات... (مثلاً: فتوشاپ)" value="{{ request('q') }}" />
-                <button type="submit" class="blog-search-btn" aria-label="جستجو">
-                    <i class="fas fa-search"></i>
-                </button>
+    <!-- ============================================================
+    MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="login">ورود</button>
+                <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+            </div>
+            <form class="modal-form" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">ایمیل</label>
+                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">رمز عبور</label>
+                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
+                </div>
+                <button type="submit" class="btn btn-gold">ورود</button>
+            </form>
+            <form class="modal-form hidden" id="registerForm">
+                <div class="form-group">
+                    <label for="regName">نام و نام خانوادگی</label>
+                    <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">ایمیل</label>
+                    <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">رمز عبور</label>
+                    <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">تکرار رمز عبور</label>
+                    <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
+                </div>
+                <button type="submit" class="btn btn-gold">ثبت‌نام</button>
             </form>
         </div>
+    </div>
 
-        <!-- نمایش تعداد نتایج -->
-        @if(request('q'))
-            <p class="text-center text-[#64748b] mb-4">نتایج جستجو برای: <span class="font-bold text-gold">{{ request('q') }}</span></p>
-        @endif
+    <!-- ============================================================
+    BLOG PAGE
+    ============================================================ -->
+    <section class="section blog-page">
+        <div class="container">
+            <div class="section-header">
+                <span class="gradient-badge"><i class="fas fa-newspaper"></i> اخبار و مقالات</span>
+                <h2 class="purple-text">آخرین مطالب GRAFIUM</h2>
+                <p>جدیدترین مقالات آموزشی، اخبار و رویدادهای دنیای گرافیک را دنبال کنید</p>
+            </div>
 
-        <!-- گرید مقالات -->
-        <div id="blogGrid" class="blog-grid-4">
-            @forelse($posts as $post)
-                <article class="blog-card" onclick="window.location.href='{{ route('blog.post', $post->id) }}'">
-                    <div class="blog-image" style="background-image: url('{{ $post->media ? asset('storage/' . $post->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}');">
-                        <span class="blog-badge">{{ $post->category->name ?? 'عمومی' }}</span>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span><i class="fas fa-calendar-alt"></i> {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}</span>
-                            <span><i class="fas fa-tag"></i> {{ $post->tags ? explode(',', $post->tags)[0] : 'عمومی' }}</span>
+            <!-- باکس جستجو -->
+            <div class="blog-search-wrapper">
+                <form action="{{ route('blog.search') }}" method="GET" style="position:relative;width:100%;">
+                    <input type="text" name="q" class="blog-search-input" placeholder="جستجو در مقالات... (مثلاً: فتوشاپ)" value="{{ request('q') }}" />
+                    <button type="submit" class="blog-search-btn" aria-label="جستجو">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- نمایش تعداد نتایج -->
+            @if(request('q'))
+                <p class="text-center text-gray-500 dark:text-gray-400 mb-4">نتایج جستجو برای: <span class="font-bold text-gold">{{ request('q') }}</span></p>
+            @endif
+
+            <!-- گرید مقالات -->
+            <div id="blogGrid" class="blog-grid-4">
+                @forelse($posts as $post)
+                    <article class="blog-card" onclick="window.location.href='{{ route('blog.post', $post->id) }}'">
+                        <div class="blog-image" style="background-image: url('{{ $post->media ? asset('storage/' . $post->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}');">
+                            <span class="blog-badge">{{ $post->category->name ?? 'عمومی' }}</span>
                         </div>
-                        <h3>{{ $post->title }}</h3>
-                        <p>{{ Str::limit($post->summary ?? $post->text, 100) }}</p>
-                        <a href="{{ route('blog.post', $post->id) }}" class="gold-link">
-                            ادامه مطلب <i class="fas fa-arrow-left"></i>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span><i class="fas fa-calendar-alt"></i> {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}</span>
+                                <span><i class="fas fa-tag"></i> {{ $post->tags ? explode(',', $post->tags)[0] : 'عمومی' }}</span>
+                            </div>
+                            <h3>{{ $post->title }}</h3>
+                            <p>{{ Str::limit($post->summary ?? $post->text, 100) }}</p>
+                            <a href="{{ route('blog.post', $post->id) }}" class="gold-link">
+                                ادامه مطلب <i class="fas fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </article>
+                @empty
+                    <div class="no-results">
+                        <i class="fas fa-search-minus"></i>
+                        <p>هیچ مقاله‌ای یافت نشد.</p>
+                        <a href="{{ route('blog') }}" class="btn btn-gold-outline" style="margin-top:12px;">
+                            <i class="fas fa-arrow-right"></i> بازگشت به بلاگ
                         </a>
                     </div>
-                </article>
-            @empty
-                <div class="no-results">
-                    <i class="fas fa-search-minus"></i>
-                    <p>هیچ مقاله‌ای یافت نشد.</p>
-                    <a href="{{ route('blog') }}" class="btn btn-gold-outline" style="margin-top:12px;">
-                        <i class="fas fa-arrow-right"></i> بازگشت به بلاگ
-                    </a>
-                </div>
-            @endforelse
-        </div>
-
-        <!-- Pagination -->
-        @if($posts->hasPages())
-            <div class="pagination-wrapper">
-                {{ $posts->links() }}
+                @endforelse
             </div>
-        @endif
-    </div>
-</section>
+
+            <!-- Pagination -->
+            @if($posts->hasPages())
+                <div class="pagination-wrapper">
+                    {{ $posts->links() }}
+                </div>
+            @endif
+        </div>
+    </section>
+
     <!-- ============================================================
     CTA
     ============================================================ -->
@@ -816,7 +966,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
+                        <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
                     </a>
                     <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
                     <div class="footer-social">
@@ -850,7 +1000,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; ۲۰۲۶ تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
+                <p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
             </div>
         </div>
     </footer>
@@ -914,7 +1064,51 @@
             else header.style.boxShadow = 'none';
         });
 
-        console.log('Blog page loaded successfully!');
+        // ============================================================
+        // 4. MODAL
+        // ============================================================
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const openModalBtns = document.querySelectorAll('#openModalBtn, #openModalBtnMobile');
+        const modalTabs = document.querySelectorAll('.modal-tab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        function openModal(tab = 'login') {
+            modalOverlay?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            switchTab(tab);
+        }
+
+        function closeModal() {
+            modalOverlay?.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function switchTab(tab) {
+            modalTabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`.modal-tab[data-tab="${tab}"]`)?.classList.add('active');
+            loginForm?.classList.toggle('hidden', tab !== 'login');
+            registerForm?.classList.toggle('hidden', tab !== 'register');
+        }
+
+        openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal('login');
+        }));
+
+        modalClose?.addEventListener('click', closeModal);
+        modalOverlay?.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        modalTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        console.log('✅ Blog page loaded successfully!');
     </script>
 
 </body>
