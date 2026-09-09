@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'پنل مدیریت | GRAFIUM')</title>
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,6 +28,7 @@
         }
     </script>
 
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
@@ -79,9 +81,7 @@
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .menu-item.active .menu-indicator {
-            opacity: 1;
-        }
+        .menu-item.active .menu-indicator { opacity: 1; }
 
         .avatar-icon {
             width: 36px;
@@ -97,40 +97,18 @@
 
         .btn-blue { background: #1a2f4a; color: #60a5fa; border: 1px solid #2a4a6a; padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-blue:hover { background: #2a4a6a; border-color: #3a5a7a; }
+
         .btn-emerald { background: rgba(52, 211, 153, 0.08); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-emerald:hover { background: rgba(52, 211, 153, 0.15); }
+
         .btn-rose { background: rgba(244, 63, 94, 0.08); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-rose:hover { background: rgba(244, 63, 94, 0.15); }
+
         .btn-gold { background: rgba(212, 163, 115, 0.08); color: #d4a373; border: 1px solid rgba(212, 163, 115, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-gold:hover { background: rgba(212, 163, 115, 0.15); }
+
         .btn-violet { background: rgba(167, 139, 250, 0.08); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.2); padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
         .btn-violet:hover { background: rgba(167, 139, 250, 0.15); }
-
-        .toast-container {
-            position: fixed; bottom: 24px; left: 24px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-        .toast-item {
-            padding: 14px 20px; border-radius: 12px; min-width: 300px; max-width: 450px;
-            backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            animation: slideIn 0.4s ease forwards;
-            display: flex; align-items: center; gap: 12px;
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-        .toast-item.hiding { animation: slideOut 0.3s ease forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100px); } }
-
-        .toast-success { background: rgba(52, 211, 153, 0.15); border-color: rgba(52, 211, 153, 0.3); color: #34d399; }
-        .toast-error { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #fb7185; }
-        .toast-info { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #60a5fa; }
-
-        .alert {
-            padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
-            display: flex; align-items: center; gap: 10px; font-size: 14px;
-        }
-        .alert-success { background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.2); color: #34d399; }
-        .alert-error { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.2); color: #fb7185; }
 
         .badge {
             padding: 4px 14px; border-radius: 9999px; font-size: 11px; font-weight: 600;
@@ -146,12 +124,15 @@
 </head>
 <body>
 
+    <!-- ===== SIDEBAR (یکپارچه برای همه صفحات) ===== -->
     @include('admin.partials.sidebar')
 
+    <!-- ===== MAIN CONTENT ===== -->
     <main class="mr-[270px] p-6 min-h-screen">
         @yield('content')
     </main>
 
+    <!-- ===== SCRIPTS ===== -->
     <script>
         lucide.createIcons();
     </script>

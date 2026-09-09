@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'مدیریت مدیران | GRAFIUM')
+@section('title', 'مدیریت کاربران | GRAFIUM')
 
 @section('content')
 <style>
@@ -68,9 +68,7 @@
     }
     .badge-active { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
     .badge-inactive { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
-    .badge-super_admin { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-    .badge-manager { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
-    .badge-support { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .badge-blocked { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
 
     /* ===== BUTTONS ===== */
     .btn-blue {
@@ -121,37 +119,41 @@
     }
     .btn-rose:hover { background: rgba(244, 63, 94, 0.15); }
 
-    /* ===== FORM ===== */
-    .form-card {
-        background: #0f1f33;
-        border: 1px solid #1a2f4a;
-        border-radius: 16px;
-        padding: 28px;
-        max-width: 700px;
-        margin: 0 auto 24px;
-    }
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #94a3b8;
-        margin-bottom: 5px;
-    }
-
-    .input-dark {
-        background: #0a1628;
-        border: 1px solid #1a2f4a;
+    .btn-amber {
+        background: rgba(251, 191, 36, 0.08);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        padding: 8px 20px;
         border-radius: 8px;
-        padding: 10px 14px;
-        color: #e2e8f0;
+        font-weight: 600;
         font-size: 13px;
-        width: 100%;
-        transition: border 0.2s;
-        font-family: 'Vazirmatn', sans-serif;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-    .input-dark:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-    .input-dark::placeholder { color: #475569; }
+    .btn-amber:hover { background: rgba(251, 191, 36, 0.15); }
+
+    /* ===== ACTION BUTTONS ===== */
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .action-buttons button {
+        padding: 4px 10px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        font-size: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-family: 'Vazirmatn', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
 
     /* ===== TOAST ===== */
     .toast-container {
@@ -194,26 +196,6 @@
         color: #fb7185;
     }
 
-    /* ===== ACTION BUTTONS ===== */
-    .action-buttons {
-        display: flex;
-        gap: 6px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .action-buttons button {
-        padding: 4px 10px;
-        border-radius: 6px;
-        border: 1px solid transparent;
-        font-size: 12px;
-        cursor: pointer;
-        transition: 0.2s;
-        font-family: 'Vazirmatn', sans-serif;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
     .avatar-icon {
         width: 36px;
         height: 36px;
@@ -226,6 +208,7 @@
         font-size: 16px;
     }
 
+    /* ===== FILTER BAR ===== */
     .filter-bar {
         display: flex;
         flex-wrap: wrap;
@@ -252,15 +235,44 @@
     }
     .filter-bar .w-48 { width: 12rem; }
 
+    /* ===== PAGINATION ===== */
+    .pagination-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: #0a1628;
+        border-radius: 12px;
+        border: 1px solid #1a2f4a;
+        margin-top: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .pagination-bar .page-info { color: #64748b; font-size: 13px; }
+    .pagination-bar .page-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pagination-bar .page-btns button {
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: 1px solid #1a2f4a;
+        background: transparent;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: 0.2s;
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 13px;
+    }
+    .pagination-bar .page-btns button:hover { background: #1a2f4a; color: #fff; }
+    .pagination-bar .page-btns button.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
     @media (max-width: 768px) {
         .main-content { margin-right: 0 !important; padding: 16px !important; }
         .table-wrap { overflow-x: auto; }
         .table-wrap table { font-size: 11px; }
         .table-wrap thead th, .table-wrap tbody td { padding: 8px 6px; }
-        .form-card { padding: 16px; }
         .filter-bar { flex-direction: column; align-items: stretch; }
         .stats-banner { grid-template-columns: repeat(2, 1fr); }
         .toast-item { min-width: auto; max-width: 90%; }
+        .pagination-bar { flex-direction: column; align-items: center; }
     }
     @media (max-width: 480px) {
         .table-wrap table { font-size: 10px; }
@@ -273,26 +285,10 @@
 <div class="flex flex-wrap justify-between items-center pb-4 border-b border-[#1a2f4a] mb-6">
     <div>
         <div class="flex items-center gap-3">
-            <i data-lucide="user-cog" class="w-6 h-6 text-violet-400"></i>
-            <h1 class="text-2xl font-extrabold text-white">
-                @if(isset($admin) && Route::currentRouteName() == 'admin.admins.edit')
-                    ویرایش مدیر
-                @elseif(Route::currentRouteName() == 'admin.admins.create')
-                    افزودن مدیر جدید
-                @else
-                    مدیریت مدیران
-                @endif
-            </h1>
+            <i data-lucide="users" class="w-6 h-6 text-emerald-400"></i>
+            <h1 class="text-2xl font-extrabold text-white">مدیریت کاربران</h1>
         </div>
-        <p class="text-sm text-[#475569] mt-0.5 mr-9">
-            @if(isset($admin) && Route::currentRouteName() == 'admin.admins.edit')
-                ویرایش اطلاعات مدیر "{{ $admin->name }}"
-            @elseif(Route::currentRouteName() == 'admin.admins.create')
-                ایجاد یک مدیر جدید در سیستم
-            @else
-                مدیریت همه مدیران و دسترسی‌های سیستم
-            @endif
-        </p>
+        <p class="text-sm text-[#475569] mt-0.5 mr-9">مدیریت همه کاربران ثبت‌نام شده در سیستم</p>
     </div>
     <div class="flex items-center gap-4">
         <span class="text-sm text-[#64748b]">{{ Auth::guard('admin')->user()->name ?? 'ادمین' }}</span>
@@ -318,127 +314,31 @@
 <!-- ===== STATS BANNER ===== -->
 <div class="stats-banner">
     <div class="stat-item">
-        <span class="num">{{ isset($admins) ? $admins->count() : 0 }}</span>
-        <span class="label">کل مدیران</span>
+        <span class="num">{{ isset($users) ? $users->total() : 0 }}</span>
+        <span class="label">کل کاربران</span>
     </div>
     <div class="stat-item">
-        <span class="num" style="color: #34d399;">{{ isset($admins) ? $admins->where('is_active', 1)->count() : 0 }}</span>
+        <span class="num" style="color: #34d399;">{{ isset($users) ? $users->where('status', 'active')->count() : 0 }}</span>
         <span class="label">فعال</span>
     </div>
     <div class="stat-item">
-        <span class="num" style="color: #94a3b8;">{{ isset($admins) ? $admins->where('is_active', 0)->count() : 0 }}</span>
+        <span class="num" style="color: #94a3b8;">{{ isset($users) ? $users->where('status', 'inactive')->count() : 0 }}</span>
         <span class="label">غیرفعال</span>
     </div>
     <div class="stat-item">
-        <a href="{{ route('admin.admins.create') }}" class="text-emerald-400 hover:text-emerald-300 text-sm flex items-center gap-1 justify-center">
-            <i data-lucide="plus" class="w-4 h-4"></i> مدیر جدید
-        </a>
+        <span class="num" style="color: #fb7185;">{{ isset($users) ? $users->where('status', 'blocked')->count() : 0 }}</span>
+        <span class="label">مسدود</span>
     </div>
 </div>
 
-<!-- ============================================================
-فرم افزودن/ویرایش مدیر (در صفحه create یا edit)
-============================================================ -->
-@if(Route::currentRouteName() == 'admin.admins.create' || Route::currentRouteName() == 'admin.admins.edit')
-<div class="form-card">
-    <div class="flex items-center gap-3 mb-6">
-        <i data-lucide="{{ isset($admin) ? 'pencil' : 'user-plus' }}" class="w-6 h-6 text-emerald-400"></i>
-        <h2 class="text-xl font-bold text-white">
-            {{ isset($admin) ? 'ویرایش مدیر' : 'افزودن مدیر جدید' }}
-        </h2>
-    </div>
-
-    <form method="POST" action="{{ isset($admin) ? route('admin.admins.update', $admin->id) : route('admin.admins.store') }}">
-        @csrf
-        @if(isset($admin))
-            @method('PUT')
-        @endif
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-[#94a3b8] mb-1.5">نام کامل</label>
-                <input type="text" name="name" value="{{ old('name', $admin->name ?? '') }}" 
-                       class="input-dark" placeholder="مثال: علی محمدی" required />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-[#94a3b8] mb-1.5">ایمیل</label>
-                <input type="email" name="email" value="{{ old('email', $admin->email ?? '') }}" 
-                       class="input-dark" placeholder="admin@example.com" required />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-[#94a3b8] mb-1.5">شماره تماس</label>
-                <input type="text" name="phone" value="{{ old('phone', $admin->phone ?? '') }}" 
-                       class="input-dark" placeholder="مثال: 09123456789" />
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-[#94a3b8] mb-1.5">نقش کاربری</label>
-                <select name="role" class="input-dark" required>
-                    <option value="super_admin" {{ old('role', $admin->role ?? '') == 'super_admin' ? 'selected' : '' }}>مدیر اصلی</option>
-                    <option value="manager" {{ old('role', $admin->role ?? '') == 'manager' ? 'selected' : '' }}>مدیر</option>
-                    <option value="support" {{ old('role', $admin->role ?? '') == 'support' ? 'selected' : '' }}>پشتیبان</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-[#94a3b8] mb-1.5">
-                    {{ isset($admin) ? 'رمز عبور جدید (اختیاری)' : 'رمز عبور' }}
-                </label>
-                <input type="password" name="password" class="input-dark" 
-                       placeholder="{{ isset($admin) ? 'برای تغییر وارد کنید' : 'حداقل ۸ کاراکتر' }}" 
-                       {{ isset($admin) ? '' : 'required' }} />
-            </div>
-
-            @if(isset($admin))
-            <div>
-                <label class="block text-sm font-medium text-[#94a3b8] mb-1.5">وضعیت</label>
-                <select name="is_active" class="input-dark">
-                    <option value="1" {{ old('is_active', $admin->is_active ?? 1) == 1 ? 'selected' : '' }}>فعال</option>
-                    <option value="0" {{ old('is_active', $admin->is_active ?? 1) == 0 ? 'selected' : '' }}>غیرفعال</option>
-                </select>
-            </div>
-            @endif
-        </div>
-
-        <div class="flex gap-3 mt-6 pt-4 border-t border-[#1a2f4a]">
-            <button type="submit" class="btn-emerald">
-                <i data-lucide="save" class="w-4 h-4"></i>
-                {{ isset($admin) ? 'به‌روزرسانی مدیر' : 'ایجاد مدیر' }}
-            </button>
-            <a href="{{ route('admin.admins.index') }}" class="btn-blue">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> بازگشت
-            </a>
-        </div>
-
-        @if($errors->any())
-        <div class="mt-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400 text-sm">
-            <ul class="list-disc pr-5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-    </form>
-</div>
-@endif
-
-<!-- ===== FILTER BAR (فقط در حالت لیست) ===== -->
-@if(Route::currentRouteName() != 'admin.admins.create' && Route::currentRouteName() != 'admin.admins.edit')
+<!-- ===== FILTER BAR ===== -->
 <div class="filter-bar">
-    <input type="text" id="searchInput" placeholder="جستجو در مدیران..." onkeyup="filterTable()" class="w-48" />
-    <select id="roleFilter" onchange="filterTable()" class="filter-select">
-        <option value="all">همه نقش‌ها</option>
-        <option value="super_admin">مدیر اصلی</option>
-        <option value="manager">مدیر</option>
-        <option value="support">پشتیبان</option>
-    </select>
+    <input type="text" id="searchInput" placeholder="جستجو در کاربران..." onkeyup="filterTable()" class="w-48" />
     <select id="statusFilter" onchange="filterTable()" class="filter-select">
         <option value="all">همه وضعیت‌ها</option>
         <option value="active">فعال</option>
         <option value="inactive">غیرفعال</option>
+        <option value="blocked">مسدود</option>
     </select>
     <button class="btn-blue" onclick="filterTable()">
         <i data-lucide="search" class="w-4 h-4"></i> جستجو
@@ -446,71 +346,73 @@
     <button class="btn-rose" onclick="resetFilters()">
         <i data-lucide="refresh-cw" class="w-4 h-4"></i> بازنشانی
     </button>
-    <a href="{{ route('admin.admins.create') }}" class="btn-emerald mr-auto">
-        <i data-lucide="plus" class="w-4 h-4"></i> مدیر جدید
-    </a>
 </div>
-@endif
 
-<!-- ===== TABLE (همیشه نمایش داده می‌شود) ===== -->
+<!-- ===== TABLE ===== -->
 <div class="table-wrap">
     <div class="overflow-x-auto">
-        <table id="adminsTable">
+        <table id="usersTable">
             <thead>
                 <tr>
                     <th style="min-width:40px;">#</th>
-                    <th style="min-width:150px;">مدیر</th>
+                    <th style="min-width:150px;">کاربر</th>
                     <th style="min-width:180px;">ایمیل</th>
-                    <th style="min-width:100px;">نقش</th>
+                    <th style="min-width:100px;">شماره تماس</th>
                     <th style="min-width:100px;">وضعیت</th>
                     <th style="min-width:120px;">عملیات</th>
                 </tr>
             </thead>
             <tbody>
-                @if(isset($admins) && $admins->count() > 0)
-                    @foreach($admins as $index => $admin)
-                    <tr data-role="{{ $admin->role }}" data-status="{{ $admin->is_active ? 'active' : 'inactive' }}" data-search="{{ $admin->name }} {{ $admin->email }}">
-                        <td>{{ $index + 1 }}</td>
+                @if(isset($users) && $users->count() > 0)
+                    @foreach($users as $index => $user)
+                    <tr data-status="{{ $user->status }}" data-search="{{ $user->name }} {{ $user->email }}">
+                        <td>{{ $users->firstItem() + $index }}</td>
                         <td>
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full bg-[#1a2f4a] flex items-center justify-center text-[10px] text-[#60a5fa] font-bold">
-                                    {{ substr($admin->name, 0, 1) }}
+                                    {{ substr($user->name, 0, 1) }}
                                 </div>
-                                <span>{{ $admin->name }}</span>
+                                <span>{{ $user->name }}</span>
                             </div>
                         </td>
-                        <td>{{ $admin->email }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->phone ?? '—' }}</td>
                         <td>
-                            <span class="badge badge-{{ $admin->role }}">
-                                @switch($admin->role)
-                                    @case('super_admin') مدیر اصلی @break
-                                    @case('manager') مدیر @break
-                                    @case('support') پشتیبان @break
-                                    @default {{ $admin->role }}
+                            <span class="badge badge-{{ $user->status }}">
+                                @switch($user->status)
+                                    @case('active') فعال @break
+                                    @case('inactive') غیرفعال @break
+                                    @case('blocked') مسدود @break
+                                    @default {{ $user->status }}
                                 @endswitch
                             </span>
                         </td>
                         <td>
-                            <span class="badge badge-{{ $admin->is_active ? 'active' : 'inactive' }}">
-                                {{ $admin->is_active ? 'فعال' : 'غیرفعال' }}
-                            </span>
-                        </td>
-                        <td>
                             <div class="action-buttons">
-                                @if(Route::currentRouteName() != 'admin.admins.edit')
-                                    <a href="{{ route('admin.admins.edit', $admin->id) }}" class="text-blue-400 hover:text-blue-300 transition">
-                                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                                    </a>
-                                @endif
-                                @if($admin->id != Auth::guard('admin')->id() && Route::currentRouteName() != 'admin.admins.edit')
-                                    <form action="{{ route('admin.admins.destroy', $admin->id) }}" method="POST" class="inline" onsubmit="return confirm('آیا از حذف این مدیر اطمینان دارید؟')">
+                                @if($user->status != 'blocked')
+                                    <form action="{{ route('admin.users.block', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('آیا از مسدود کردن این کاربر اطمینان دارید؟')">
                                         @csrf
-                                        @method('DELETE')
+                                        @method('PUT')
                                         <button type="submit" class="text-rose-400 hover:text-rose-300 transition">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            <i data-lucide="ban" class="w-4 h-4"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.users.unblock', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('آیا از فعال کردن این کاربر اطمینان دارید؟')">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="text-emerald-400 hover:text-emerald-300 transition">
+                                            <i data-lucide="check-circle" class="w-4 h-4"></i>
                                         </button>
                                     </form>
                                 @endif
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('آیا از حذف این کاربر اطمینان دارید؟')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-rose-400 hover:text-rose-300 transition">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -518,9 +420,8 @@
                 @else
                     <tr>
                         <td colspan="6" class="text-center py-12 text-[#475569]">
-                            <i data-lucide="user-cog" class="w-12 h-12 mx-auto text-[#475569] mb-3"></i>
-                            <p>هیچ مدیری یافت نشد</p>
-                            <p class="text-xs mt-1">برای افزودن مدیر جدید، روی دکمه "مدیر جدید" کلیک کنید</p>
+                            <i data-lucide="users" class="w-12 h-12 mx-auto text-[#475569] mb-3"></i>
+                            <p>هیچ کاربری یافت نشد</p>
                         </td>
                     </tr>
                 @endif
@@ -528,6 +429,16 @@
         </table>
     </div>
 </div>
+
+<!-- ===== PAGINATION ===== -->
+@if(isset($users) && $users->hasPages())
+<div class="pagination-bar">
+    <span class="page-info">نمایش {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }} از {{ $users->total() }} کاربر</span>
+    <div class="page-btns">
+        {{ $users->links() }}
+    </div>
+</div>
+@endif
 
 <!-- ============================================================
 TOAST
@@ -543,20 +454,15 @@ SCRIPTS
     // ===== FILTER TABLE =====
     function filterTable() {
         const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
-        const role = document.getElementById('roleFilter')?.value || 'all';
         const status = document.getElementById('statusFilter')?.value || 'all';
-        const rows = document.querySelectorAll('#adminsTable tbody tr');
+        const rows = document.querySelectorAll('#usersTable tbody tr');
 
         rows.forEach(row => {
             const name = row.dataset.search?.toLowerCase() || '';
-            const rowRole = row.dataset.role || '';
             const rowStatus = row.dataset.status || '';
             let show = true;
 
             if (search && !name.includes(search)) {
-                show = false;
-            }
-            if (role !== 'all' && rowRole !== role) {
                 show = false;
             }
             if (status !== 'all' && rowStatus !== status) {
@@ -569,11 +475,9 @@ SCRIPTS
 
     function resetFilters() {
         const searchInput = document.getElementById('searchInput');
-        const roleFilter = document.getElementById('roleFilter');
         const statusFilter = document.getElementById('statusFilter');
         
         if (searchInput) searchInput.value = '';
-        if (roleFilter) roleFilter.value = 'all';
         if (statusFilter) statusFilter.value = 'all';
         
         filterTable();

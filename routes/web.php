@@ -174,10 +174,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     // 📝 مدیریت بلاگ (پنل ادمین)
     // ============================================================
     Route::prefix('blog')->name('blog.')->group(function () {
+
+        // ===== داشبورد بلاگ =====
         Route::get('/', [AdminBlogController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminBlogController::class, 'index'])->name('dashboard.index');
         Route::get('/index', [AdminBlogController::class, 'index'])->name('index');
 
+        // ===== پست‌ها =====
         Route::get('/posts', [AdminBlogController::class, 'posts'])->name('posts');
         Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
         Route::post('/store', [AdminBlogController::class, 'store'])->name('store');
@@ -188,17 +191,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::post('/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('/{id}/toggle-featured', [AdminBlogController::class, 'toggleFeatured'])->name('toggle-featured');
 
+        // ===== دسته‌بندی‌ها =====
         Route::prefix('categories')->name('categories.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'categories'])->name('index');
+            Route::get('/create', [AdminBlogController::class, 'createCategory'])->name('create');
             Route::post('/store', [AdminBlogController::class, 'storeCategory'])->name('store');
+            Route::get('/{id}/edit', [AdminBlogController::class, 'editCategory'])->name('edit');
             Route::put('/{id}', [AdminBlogController::class, 'updateCategory'])->name('update');
             Route::delete('/{id}', [AdminBlogController::class, 'deleteCategory'])->name('destroy');
         });
 
+        // ===== تگ‌ها =====
         Route::prefix('tags')->name('tags.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'tags'])->name('index');
         });
 
+        // ===== نظرات =====
         Route::prefix('comments')->name('comments.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'comments'])->name('index');
             Route::post('/{id}/approve', [AdminBlogController::class, 'approveComment'])->name('approve');
@@ -206,6 +214,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
             Route::delete('/{id}', [AdminBlogController::class, 'deleteComment'])->name('destroy');
             Route::delete('/{id}/force', [AdminBlogController::class, 'forceDeleteComment'])->name('force-delete');
         });
+
     });
 
     // ============================================================
