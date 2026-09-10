@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceItemController;
 use App\Http\Controllers\Admin\PricingPlanController;
+use App\Http\Controllers\Admin\SchedulingController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReservationController;
@@ -27,9 +28,14 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
-Route::get('/services', function () {
-    return view('services');
-})->name('services');
+// صفحه لیست خدمات
+Route::get('/services', [App\Http\Controllers\ServiceController::class, 'index'])->name('services');
+
+// صفحه جزئیات خدمت (لیست میزها)
+Route::get('/services/{id}', [App\Http\Controllers\ServiceController::class, 'show'])->name('services.show');
+
+// صفحه رزرو (جدول شیفت‌ها)
+Route::get('/services/{serviceId}/items/{itemId}', [App\Http\Controllers\ServiceController::class, 'reserve'])->name('services.reserve');
 
 Route::get('/contact', function () {
     return view('contact');
@@ -175,12 +181,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     // ============================================================
     Route::prefix('blog')->name('blog.')->group(function () {
 
-        // ===== داشبورد بلاگ =====
         Route::get('/', [AdminBlogController::class, 'index'])->name('dashboard');
         Route::get('/dashboard', [AdminBlogController::class, 'index'])->name('dashboard.index');
         Route::get('/index', [AdminBlogController::class, 'index'])->name('index');
 
-        // ===== پست‌ها =====
         Route::get('/posts', [AdminBlogController::class, 'posts'])->name('posts');
         Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
         Route::post('/store', [AdminBlogController::class, 'store'])->name('store');
@@ -191,7 +195,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::post('/{id}/toggle-status', [AdminBlogController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('/{id}/toggle-featured', [AdminBlogController::class, 'toggleFeatured'])->name('toggle-featured');
 
-        // ===== دسته‌بندی‌ها =====
         Route::prefix('categories')->name('categories.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'categories'])->name('index');
             Route::get('/create', [AdminBlogController::class, 'createCategory'])->name('create');
@@ -201,12 +204,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
             Route::delete('/{id}', [AdminBlogController::class, 'deleteCategory'])->name('destroy');
         });
 
-        // ===== تگ‌ها =====
         Route::prefix('tags')->name('tags.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'tags'])->name('index');
         });
 
-        // ===== نظرات =====
         Route::prefix('comments')->name('comments.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'comments'])->name('index');
             Route::post('/{id}/approve', [AdminBlogController::class, 'approveComment'])->name('approve');
@@ -261,11 +262,40 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::delete('/{id}', [ServiceController::class, 'deleteReservation'])->name('destroy');
     });
 
+    // ============================================================
+    // 🕐 مدیریت زمان‌بندی (Scheduling)
+    // ============================================================
+    Route::prefix('scheduling')->name('scheduling.')->group(function () {
+        Route::get('/', [SchedulingController::class, 'index'])->name('index');
+        Route::get('/create', [SchedulingController::class, 'create'])->name('create');
+        Route::post('/store', [SchedulingController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [SchedulingController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [SchedulingController::class, 'update'])->name('update');
+        Route::post('/{id}/toggle-status', [SchedulingController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{id}', [SchedulingController::class, 'destroy'])->name('destroy');
+    });
+
 });
 
-// ============================================================
-// مسیر جایگزین برای تقویم
-// ============================================================
+
 Route::get('/admin/calendar', [CalendarController::class, 'index'])
     ->name('admin.calendar')
     ->middleware(['auth:admin']);
+
+// Scheduling Routes (Admin)
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/scheduling', [App\Http\Controllers\Admin\SchedulingController::class, 'index'])
+        ->name('admin.scheduling.index');
+    Route::get('/scheduling/create', [App\Http\Controllers\Admin\SchedulingController::class, 'create'])
+        ->name('admin.scheduling.create');
+    Route::post('/scheduling', [App\Http\Controllers\Admin\SchedulingController::class, 'store'])
+        ->name('admin.scheduling.store');
+    Route::get('/scheduling/{id}/edit', [App\Http\Controllers\Admin\SchedulingController::class, 'edit'])
+        ->name('admin.scheduling.edit');
+    Route::put('/scheduling/{id}', [App\Http\Controllers\Admin\SchedulingController::class, 'update'])
+        ->name('admin.scheduling.update');
+    Route::post('/scheduling/{id}/toggle-status', [App\Http\Controllers\Admin\SchedulingController::class, 'toggleStatus'])
+        ->name('admin.scheduling.toggle-status');
+    Route::delete('/scheduling/{id}', [App\Http\Controllers\Admin\SchedulingController::class, 'destroy'])
+        ->name('admin.scheduling.destroy');
+});

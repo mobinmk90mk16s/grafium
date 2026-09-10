@@ -29,29 +29,36 @@ class ServiceItem extends Model
     // روابط
     // ============================================================
 
-    /**
-     * رابطه با خدمت
-     */
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * رابطه با زمان‌بندی‌ها
+     */
+    public function schedulings()
+    {
+        return $this->hasMany(Scheduling::class);
+    }
+
+    /**
+     * زمان‌بندی‌های آینده
+     */
+    public function upcomingSchedulings()
+    {
+        return $this->schedulings()->where('date_time', '>=', now());
     }
 
     // ============================================================
     // متدهای کمکی
     // ============================================================
 
-    /**
-     * دریافت وضعیت به فارسی
-     */
     public function getStatusPersianAttribute()
     {
         return $this->status === 'active' ? 'فعال' : 'غیرفعال';
     }
 
-    /**
-     * دریافت کلاس بج وضعیت
-     */
     public function getStatusBadgeClassAttribute()
     {
         return $this->status === 'active' ? 'badge-active' : 'badge-inactive';
@@ -61,25 +68,16 @@ class ServiceItem extends Model
     // اسکوپ‌ها
     // ============================================================
 
-    /**
-     * اسکوپ: آیتم‌های فعال
-     */
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
     }
 
-    /**
-     * اسکوپ: آیتم‌های غیرفعال
-     */
     public function scopeInactive($query)
     {
         return $query->where('status', 'inactive');
     }
 
-    /**
-     * اسکوپ: مرتب‌سازی بر اساس order
-     */
     public function scopeOrdered($query)
     {
         return $query->orderBy('order', 'asc');

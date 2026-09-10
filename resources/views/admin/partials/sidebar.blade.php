@@ -102,6 +102,12 @@
                         <span class="menu-indicator"></span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.scheduling.index') }}" class="menu-item {{ request()->routeIs('admin.scheduling*') ? 'active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#94a3b8] text-sm font-medium transition">
+                        <i data-lucide="clock" class="w-5 h-5 text-[#60a5fa]"></i> زمان‌بندی
+                        <span class="menu-indicator"></span>
+                    </a>
+                </li>
             </ul>
         </div>
 
