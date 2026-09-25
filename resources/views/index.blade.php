@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>GRAFIUM | سالن کار اشتراکی گرافیکی</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -244,6 +245,14 @@
         .btn-white::before { background: #f0f5fa; }
         .btn-white:hover { transform: translateY(-4px); box-shadow: 0 20px 55px rgba(255, 255, 255, 0.3); }
 
+        .btn-link {
+            display: block; width: 100%; margin-top: 10px;
+            background: none; border: none; color: var(--text-muted);
+            font-family: var(--font); font-size: 13px; cursor: pointer;
+            transition: color 0.3s; text-align: center; padding: 6px;
+        }
+        .btn-link:hover { color: var(--gold); }
+
         /* ===== SECTION HEADER ===== */
         .section { padding: 100px 0; position: relative; }
         .section-header {
@@ -315,6 +324,157 @@
             color: #fff; cursor: pointer; padding: 8px;
         }
         [data-theme="light"] .menu-toggle { color: var(--deep-navy); }
+
+        /* ===== USER AVATAR & DROPDOWN ===== */
+        .user-dropdown { position: relative; }
+
+        .user-avatar-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--gold-gradient);
+            color: #fff;
+            border: 2px solid rgba(212, 163, 115, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .user-avatar-btn::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent, var(--gold-light), transparent 30%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            animation: rotateAvatar 3s linear infinite;
+            z-index: -1;
+        }
+        @keyframes rotateAvatar { to { transform: rotate(360deg); } }
+        .user-avatar-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.5);
+        }
+        .user-avatar-btn:hover::before { opacity: 1; }
+
+        .user-avatar-btn i { transition: transform 0.4s; }
+        .user-avatar-btn.open i { transform: scale(0.9); }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 16px);
+            left: 0;
+            background: var(--bg-card);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 10px;
+            min-width: 230px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 6px rgba(212, 163, 115, 0.08);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-15px) scale(0.92);
+            transform-origin: top left;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; left: 0;
+            height: 3px;
+            background: var(--gold-gradient);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .dropdown-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .dropdown-menu.open::before { opacity: 1; }
+
+        .dropdown-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 6px;
+        }
+        .dropdown-header .user-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .dropdown-header .user-phone {
+            font-size: 12px;
+            color: var(--text-muted);
+            direction: ltr;
+            text-align: right;
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-family: var(--font);
+            text-align: right;
+            position: relative;
+            overflow: hidden;
+        }
+        .dropdown-item::before {
+            content: '';
+            position: absolute;
+            right: 0; top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--gold-gradient);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+            transform-origin: bottom;
+        }
+        .dropdown-item:hover {
+            background: rgba(212, 163, 115, 0.08);
+            color: var(--gold-dark);
+            padding-right: 22px;
+        }
+        [data-theme="dark"] .dropdown-item:hover { color: var(--gold); }
+        .dropdown-item:hover::before { transform: scaleY(1); }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--gold);
+            font-size: 15px;
+            transition: transform 0.3s;
+        }
+        .dropdown-item:hover i { transform: scale(1.15); }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 12px;
+        }
+
+        .logout-item:hover {
+            background: rgba(244, 63, 94, 0.1);
+            color: #fb7185;
+        }
+        .logout-item:hover i { color: #fb7185; }
+        .logout-item::before { background: linear-gradient(180deg, #fb7185, #f43f5e); }
 
         /* ===== MOBILE MENU ===== */
         .mobile-menu {
@@ -964,20 +1124,14 @@
             color: var(--gold); background: rgba(212, 163, 115, 0.1);
             transform: rotate(90deg);
         }
-        .modal-tabs {
-            display: flex; gap: 6px; background: var(--bg-body);
-            padding: 5px; border-radius: 14px;
-            border: 1px solid var(--border); margin-bottom: 32px;
+        .modal-title {
+            text-align: center; margin-bottom: 8px;
+            font-size: 24px; font-weight: 800;
         }
-        .modal-tab {
-            flex: 1; padding: 12px 16px; border: none;
-            background: transparent; border-radius: 10px;
-            font-weight: 700; font-size: 14px; color: var(--text-muted);
-            cursor: pointer; transition: all 0.3s; font-family: var(--font);
+        .modal-subtitle {
+            text-align: center; color: var(--text-muted);
+            font-size: 14px; margin-bottom: 28px;
         }
-        .modal-tab.active { background: var(--gold-gradient); color: #fff; box-shadow: 0 6px 20px rgba(212, 163, 115, 0.3); }
-        .modal-tab:hover:not(.active) { color: var(--gold); }
-        .modal-form.hidden { display: none; }
         .modal-form .form-group { margin-bottom: 20px; }
         .modal-form label {
             display: block; font-weight: 600; font-size: 13px;
@@ -994,7 +1148,262 @@
             border-color: var(--gold);
             box-shadow: 0 0 0 5px rgba(212, 163, 115, 0.12);
         }
+        .modal-form input[dir="ltr"] {
+            text-align: left;
+            letter-spacing: 4px;
+            font-weight: 700;
+            font-size: 18px;
+        }
         .modal-form .btn { width: 100%; background: var(--gold-gradient); border-color: transparent; margin-top: 6px; }
+
+        /* ===== BOT-START BLOCK ===== */
+        .bot-start-block {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .bot-icon {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: linear-gradient(135deg, #2AABEE, #229ED9);
+            color: #fff; font-size: 36px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 15px 40px rgba(42, 171, 238, 0.35);
+            animation: botPulse 2s ease-in-out infinite;
+        }
+        @keyframes botPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 15px 40px rgba(42, 171, 238, 0.35); }
+            50% { transform: scale(1.05); box-shadow: 0 20px 55px rgba(42, 171, 238, 0.5); }
+        }
+        .bot-start-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 10px; width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #2AABEE, #229ED9);
+            color: #fff; border-radius: 14px;
+            font-weight: 700; font-size: 15px;
+            transition: all 0.3s; margin-bottom: 12px;
+            box-shadow: 0 10px 30px rgba(42, 171, 238, 0.3);
+            border: none; cursor: pointer; text-decoration: none;
+            font-family: var(--font);
+        }
+        .bot-start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(42, 171, 238, 0.5);
+        }
+        .otp-inputs {
+            display: flex; justify-content: center; gap: 10px;
+            direction: ltr; margin: 20px 0;
+        }
+        .otp-inputs input {
+            width: 50px; height: 60px;
+            text-align: center; font-size: 24px; font-weight: 800;
+            border: 2px solid var(--border); border-radius: 14px;
+            background: var(--bg-body); color: var(--text);
+            transition: all 0.3s; outline: none;
+            font-family: var(--font);
+            padding: 0;
+        }
+        .otp-inputs input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 5px rgba(212, 163, 115, 0.15);
+            transform: scale(1.08);
+        }
+        .otp-inputs input.filled {
+            border-color: var(--gold);
+            background: rgba(212, 163, 115, 0.08);
+        }
+        .otp-timer {
+            text-align: center; color: var(--text-muted);
+            font-size: 13px; margin-top: 12px;
+        }
+        .otp-timer span {
+            color: var(--gold);
+            font-weight: 700;
+            font-family: monospace;
+            direction: ltr;
+            display: inline-block;
+        }
+        .otp-resend {
+            display: block; width: 100%; margin-top: 10px;
+            background: none; border: none; color: var(--text-muted);
+            font-family: var(--font); font-size: 13px; cursor: pointer;
+            transition: color 0.3s; text-align: center; padding: 6px;
+        }
+        .otp-resend:hover:not(:disabled) { color: var(--gold); }
+        .otp-resend:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .alert-box {
+            padding: 12px 16px; border-radius: 12px; font-size: 13px;
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-bottom: 18px; line-height: 1.7;
+        }
+        .alert-info {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.25);
+            color: #60a5fa;
+        }
+        .alert-error {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.25);
+            color: #fb7185;
+        }
+        .alert-success {
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            color: #34d399;
+        }
+        .alert-box i { margin-top: 3px; }
+
+        /* ===== PROFILE MODAL ===== */
+        .profile-modal {
+            max-width: 560px;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .profile-avatar-wrap {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 15px 40px rgba(212, 163, 115, 0.35);
+            border: 4px solid var(--bg-card);
+        }
+        .profile-avatar-edit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            color: #fff;
+            border: 3px solid var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .profile-avatar-edit:hover {
+            transform: scale(1.15) rotate(15deg);
+        }
+        .profile-header h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .profile-header .phone-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            direction: ltr;
+        }
+
+        .profile-form .form-group { margin-bottom: 18px; }
+        .profile-form label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .profile-form label i {
+            color: var(--gold);
+            font-size: 12px;
+        }
+        .profile-form input,
+        .profile-form textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-body);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            transition: all 0.4s;
+            outline: none;
+            resize: none;
+        }
+        .profile-form input:focus,
+        .profile-form textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 5px rgba(212, 163, 115, 0.1);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .toast-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 22px;
+            background: var(--bg-card);
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            min-width: 300px;
+            max-width: 420px;
+            animation: toastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .toast-item.hiding {
+            animation: toastOut 0.4s ease forwards;
+        }
+        .toast-item i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .toast-success { border-color: #34d399; }
+        .toast-success i { color: #34d399; }
+        .toast-error { border-color: #fb7185; }
+        .toast-error i { color: #fb7185; }
+        .toast-info { border-color: #60a5fa; }
+        .toast-info i { color: #60a5fa; }
+        .toast-warning { border-color: #fbbf24; }
+        .toast-warning i { color: #fbbf24; }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-100px) scale(0.85);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        @keyframes toastOut {
+            to {
+                opacity: 0;
+                transform: translateX(-100px) scale(0.85);
+            }
+        }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
@@ -1042,6 +1451,10 @@
             .contact-form { padding: 28px 20px; }
             .modal { padding: 32px 24px; border-radius: 22px; }
             .section-header { margin-bottom: 50px; }
+            .dropdown-menu { left: auto; right: 0; }
+            .otp-inputs input { width: 42px; height: 52px; font-size: 20px; }
+            .toast-container { left: 15px; right: 15px; bottom: 15px; }
+            .toast-item { min-width: auto; }
         }
         @media (max-width: 480px) {
             .hero-slide { height: 420px; }
@@ -1058,6 +1471,8 @@
             .container { padding: 0 16px; }
             .btn { padding: 12px 26px; font-size: 13px; }
             .service-card { padding: 30px 20px; }
+            .otp-inputs { gap: 6px; }
+            .otp-inputs input { width: 38px; height: 48px; font-size: 18px; }
         }
     </style>
 </head>
@@ -1090,82 +1505,162 @@
     </div>
 
     <div id="mainContent">
-
-        <!-- ===== HEADER ===== -->
-        <header class="header" id="header">
-            <div class="container header-inner">
-                <a href="{{ route('home') }}" class="logo">
-                    <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-                </a>
-                <nav class="nav-desktop" id="navDesktop">
-                    <ul>
-                        <li><a href="{{ route('home') }}" class="active">خانه</a></li>
-                        <li><a href="{{ route('about') }}">درباره ما</a></li>
-                        <li><a href="{{ route('services') }}">خدمات</a></li>
-                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                        <li><a href="{{ route('contact') }}">تماس</a></li>
-                    </ul>
-                </nav>
-                <div class="header-actions">
-                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                    <a href="#" class="btn btn-gold" id="openModalBtn"><span>ورود</span></a>
-                    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-                </div>
-            </div>
-            <div class="mobile-menu" id="mobileMenu">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-                <div class="mobile-auth">
-                    <a href="#" class="btn btn-gold" id="openModalBtnMobile"><span>ورود</span></a>
-                </div>
-            </div>
-        </header>
-
-        <!-- ===== MODAL ===== -->
+        
+@include('partials.header')
+        <!-- ============================================================
+        AUTH MODAL (OTP)
+        ============================================================ -->
         <div class="modal-overlay" id="modalOverlay">
             <div class="modal">
                 <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-                <div class="modal-tabs">
-                    <button class="modal-tab active" data-tab="login">ورود</button>
-                    <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+
+                {{-- ===== مرحله ۱: وارد کردن شماره ===== --}}
+                <div id="stepPhone">
+                    <h3 class="modal-title">ورود / ثبت‌نام</h3>
+                    <p class="modal-subtitle">شماره موبایل خود را وارد کنید</p>
+
+                    <form class="modal-form" id="phoneForm" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label for="phoneInput">شماره موبایل</label>
+                            <input type="tel" id="phoneInput" placeholder="09123456789" dir="ltr" maxlength="11" autocomplete="tel" />
+                        </div>
+                        <div id="phoneError" class="alert-box alert-error" style="display:none;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="phoneErrorText"></span>
+                        </div>
+                        <button type="submit" class="btn btn-gold" id="sendOtpBtn">
+                            <span>ارسال کد</span>
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </form>
                 </div>
-                <form class="modal-form" id="loginForm">
-                    <div class="form-group">
-                        <label for="loginEmail">ایمیل</label>
-                        <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
+
+                {{-- ===== مرحله ۲: استارت بازو ===== --}}
+                <div id="stepBotStart" style="display:none;">
+                    <div class="bot-start-block">
+                        <div class="bot-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3 class="modal-title">استارت بازوی بله</h3>
+                        <p class="modal-subtitle">
+                            برای دریافت کد ورود، لطفاً ابتدا بازوی ما را در پیام‌رسان بله استارت کنید.
+                        </p>
+
+                        <a href="https://ble.ir/GRAFIUM_bot" target="_blank" rel="noopener" class="bot-start-btn" id="botLinkBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>رفتن به بازوی GRAFIUM</span>
+                        </a>
+
+                        <div class="alert-box alert-info" style="text-align:right;">
+                            <i class="fas fa-info-circle"></i>
+                            <span>پس از استارت بازو، به این صفحه برگردید و دوباره روی دکمه زیر کلیک کنید.</span>
+                        </div>
+
+                        <button type="button" class="btn btn-gold" id="retrySendOtp" style="width:100%;">
+                            <span>استارت کردم، دوباره تلاش کن</span>
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button type="button" class="btn-link" id="backToPhoneFromBot">ویرایش شماره</button>
                     </div>
-                    <div class="form-group">
-                        <label for="loginPassword">رمز عبور</label>
-                        <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
+                </div>
+
+                {{-- ===== مرحله ۳: وارد کردن کد OTP ===== --}}
+                <div id="stepCode" style="display:none;">
+                    <h3 class="modal-title">کد تایید</h3>
+                    <p class="modal-subtitle">
+                        کد ۶ رقمی ارسال شده به بله را وارد کنید
+                    </p>
+
+                    <div id="codeError" class="alert-box alert-error" style="display:none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="codeErrorText"></span>
                     </div>
-                    <button type="submit" class="btn btn-gold"><span>ورود به حساب</span></button>
-                </form>
-                <form class="modal-form hidden" id="registerForm">
-                    <div class="form-group">
-                        <label for="regName">نام و نام خانوادگی</label>
-                        <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
+
+                    <div id="codeSuccess" class="alert-box alert-success" style="display:none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="codeSuccessText"></span>
                     </div>
-                    <div class="form-group">
-                        <label for="regEmail">ایمیل</label>
-                        <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
+
+                    <div class="otp-inputs" id="otpInputs">
+                        <input type="text" inputmode="numeric" maxlength="1" data-index="0" />
+                        <input type="text" inputmode="numeric" maxlength="1" data-index="1" />
+                        <input type="text" inputmode="numeric" maxlength="1" data-index="2" />
+                        <input type="text" inputmode="numeric" maxlength="1" data-index="3" />
+                        <input type="text" inputmode="numeric" maxlength="1" data-index="4" />
+                        <input type="text" inputmode="numeric" maxlength="1" data-index="5" />
                     </div>
-                    <div class="form-group">
-                        <label for="regPassword">رمز عبور</label>
-                        <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
+
+                    <button type="button" class="btn btn-gold" id="verifyOtpBtn" style="width:100%;">
+                        <span>تایید و ورود</span>
+                        <i class="fas fa-check"></i>
+                    </button>
+
+                    <p class="otp-timer">
+                        ارسال مجدد تا <span id="timer">۰۲:۰۰</span>
+                    </p>
+                    <button type="button" class="otp-resend" id="resendOtp" disabled>
+                        <i class="fas fa-redo"></i> ارسال مجدد کد
+                    </button>
+                    <button type="button" class="btn-link" id="backToPhoneFromCode">ویرایش شماره</button>
+                </div>
+
+            </div>
+        </div>
+
+        {{-- ============================================================
+        PROFILE EDIT MODAL
+        ============================================================ --}}
+        @auth
+        <div class="modal-overlay" id="profileModalOverlay">
+            <div class="modal profile-modal">
+                <button class="modal-close" id="profileModalClose"><i class="fas fa-times"></i></button>
+
+                <div class="profile-header">
+                    <div class="profile-avatar-wrap">
+                        <div class="profile-avatar" id="profileAvatarPreview">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ asset(auth()->user()->avatar) }}" alt="{{ auth()->user()->display_name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+                            @else
+                                <i class="fas fa-user"></i>
+                            @endif
+                        </div>
                     </div>
+                    <h3>{{ auth()->user()->display_name }}</h3>
+                    <span class="phone-text">{{ auth()->user()->phone }}</span>
+                </div>
+
+                <form class="profile-form" id="profileForm" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
                     <div class="form-group">
-                        <label for="regPasswordConfirm">تکرار رمز عبور</label>
-                        <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
+                        <label for="profileName"><i class="fas fa-user"></i> نام و نام خانوادگی</label>
+                        <input type="text" id="profileName" name="name" value="{{ auth()->user()->name }}" placeholder="نام خود را وارد کنید" required />
                     </div>
-                    <button type="submit" class="btn btn-gold"><span>ایجاد حساب</span></button>
+
+                    <div class="form-group">
+                        <label for="profileEmail"><i class="fas fa-envelope"></i> ایمیل (اختیاری)</label>
+                        <input type="email" id="profileEmail" name="email" value="{{ auth()->user()->email }}" placeholder="example@email.com" dir="ltr" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profilePhone"><i class="fas fa-phone"></i> شماره موبایل</label>
+                        <input type="tel" id="profilePhone" value="{{ auth()->user()->phone }}" dir="ltr" disabled style="opacity:0.6;cursor:not-allowed;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileAddress"><i class="fas fa-map-marker-alt"></i> آدرس (اختیاری)</label>
+                        <textarea id="profileAddress" name="address" rows="2" placeholder="آدرس خود را وارد کنید">{{ auth()->user()->address }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold" style="width:100%;">
+                        <span>ذخیره تغییرات</span>
+                        <i class="fas fa-save"></i>
+                    </button>
                 </form>
             </div>
         </div>
+        @endauth
 
         <!-- ===== HERO SLIDER ===== -->
         <section class="hero-slider" id="home">
@@ -1448,7 +1943,7 @@
                     <div class="newsletter-icon"><i class="fas fa-envelope-open-text"></i></div>
                     <h3>در جریان <span class="gold-text">بمانید</span></h3>
                     <p>در خبرنامه ما عضو شوید و آخرین به‌روزرسانی‌ها، رویدادها و پیشنهادات را دریافت کنید.</p>
-                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('از ثبت‌نام شما متشکریم!');">
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); showToast('از ثبت‌نام شما متشکریم!', 'success');">
                         <input type="email" placeholder="آدرس ایمیل خود را وارد کنید" required />
                         <button type="submit" class="btn btn-gold"><span>عضویت</span> <i class="fas fa-arrow-left"></i></button>
                     </form>
@@ -1601,6 +2096,11 @@
 
     </div>
 
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         // ============================================================
@@ -1636,6 +2136,34 @@
         })();
 
         // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-item toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 400);
+            }, duration);
+        }
+
+        // ============================================================
         // SWIPER
         // ============================================================
         if (document.querySelector('.heroSwiper')) {
@@ -1650,17 +2178,7 @@
                 navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
                 on: {
                     init: function() {
-                        const activeSlide = document.querySelector('.swiper-slide-active');
-                        if (activeSlide) {
-                            const tag = activeSlide.querySelector('.hero-tag');
-                            const h1 = activeSlide.querySelector('h1');
-                            const p = activeSlide.querySelector('p');
-                            const btn = activeSlide.querySelector('.btn');
-                            if (tag) setTimeout(() => tag.classList.add('animate-in'), 100);
-                            if (h1) setTimeout(() => h1.classList.add('animate-in'), 300);
-                            if (p) setTimeout(() => p.classList.add('animate-in'), 500);
-                            if (btn) setTimeout(() => btn.classList.add('animate-in'), 700);
-                        }
+                        animateSlide();
                         this.update();
                     },
                     slideChangeTransitionStart: function() {
@@ -1669,20 +2187,23 @@
                         });
                     },
                     slideChangeTransitionEnd: function() {
-                        const activeSlide = document.querySelector('.swiper-slide-active');
-                        if (activeSlide) {
-                            const tag = activeSlide.querySelector('.hero-tag');
-                            const h1 = activeSlide.querySelector('h1');
-                            const p = activeSlide.querySelector('p');
-                            const btn = activeSlide.querySelector('.btn');
-                            if (tag) setTimeout(() => tag.classList.add('animate-in'), 100);
-                            if (h1) setTimeout(() => h1.classList.add('animate-in'), 300);
-                            if (p) setTimeout(() => p.classList.add('animate-in'), 500);
-                            if (btn) setTimeout(() => btn.classList.add('animate-in'), 700);
-                        }
+                        animateSlide();
                     }
                 }
             });
+
+            function animateSlide() {
+                const activeSlide = document.querySelector('.swiper-slide-active');
+                if (!activeSlide) return;
+                const tag = activeSlide.querySelector('.hero-tag');
+                const h1 = activeSlide.querySelector('h1');
+                const p = activeSlide.querySelector('p');
+                const btn = activeSlide.querySelector('.btn');
+                if (tag) setTimeout(() => tag.classList.add('animate-in'), 100);
+                if (h1) setTimeout(() => h1.classList.add('animate-in'), 300);
+                if (p) setTimeout(() => p.classList.add('animate-in'), 500);
+                if (btn) setTimeout(() => btn.classList.add('animate-in'), 700);
+            }
 
             const progressBarSwiper = document.createElement('div');
             progressBarSwiper.className = 'swiper-progress-bar';
@@ -1791,39 +2312,466 @@
         });
 
         // ============================================================
-        // MODAL
+        // USER DROPDOWN
+        // ============================================================
+        const avatarBtn = document.getElementById('avatarBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const userDropdown = document.getElementById('userDropdown');
+
+        avatarBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('open');
+            if (isOpen) {
+                dropdownMenu.classList.remove('open');
+                avatarBtn.classList.remove('open');
+            } else {
+                dropdownMenu.classList.add('open');
+                avatarBtn.classList.add('open');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (userDropdown && !userDropdown.contains(e.target)) {
+                dropdownMenu?.classList.remove('open');
+                avatarBtn?.classList.remove('open');
+            }
+        });
+
+        // ============================================================
+        // PROFILE MODAL
+        // ============================================================
+        const openProfileBtn = document.getElementById('openProfileBtn');
+        const profileModalOverlay = document.getElementById('profileModalOverlay');
+        const profileModalClose = document.getElementById('profileModalClose');
+
+        openProfileBtn?.addEventListener('click', () => {
+            dropdownMenu?.classList.remove('open');
+            avatarBtn?.classList.remove('open');
+            profileModalOverlay?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeProfileModal() {
+            profileModalOverlay?.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        profileModalClose?.addEventListener('click', closeProfileModal);
+        profileModalOverlay?.addEventListener('click', (e) => {
+            if (e.target === profileModalOverlay) closeProfileModal();
+        });
+
+        // ============================================================
+        // AUTH MODAL + OTP
         // ============================================================
         const modalOverlay = document.getElementById('modalOverlay');
         const modalClose = document.getElementById('modalClose');
         const openModalBtns = document.querySelectorAll('#openModalBtn, #openModalBtnMobile');
-        const modalTabs = document.querySelectorAll('.modal-tab');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
 
-        function openModal(tab = 'login') {
+        const stepPhone = document.getElementById('stepPhone');
+        const stepBotStart = document.getElementById('stepBotStart');
+        const stepCode = document.getElementById('stepCode');
+
+        const phoneInput = document.getElementById('phoneInput');
+        const phoneError = document.getElementById('phoneError');
+        const phoneErrorText = document.getElementById('phoneErrorText');
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+
+        const retrySendOtp = document.getElementById('retrySendOtp');
+        const backToPhoneFromBot = document.getElementById('backToPhoneFromBot');
+
+        const otpInputs = document.querySelectorAll('#otpInputs input');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const codeError = document.getElementById('codeError');
+        const codeErrorText = document.getElementById('codeErrorText');
+        const codeSuccess = document.getElementById('codeSuccess');
+        const codeSuccessText = document.getElementById('codeSuccessText');
+        const backToPhoneFromCode = document.getElementById('backToPhoneFromCode');
+        const timerEl = document.getElementById('timer');
+        const resendOtp = document.getElementById('resendOtp');
+
+     let otpTimerInterval = null;
+let currentPhone = '';
+let isSending = false;
+
+        function openModal() {
             modalOverlay?.classList.add('active');
             document.body.style.overflow = 'hidden';
-            switchTab(tab);
+            resetAuthModal();
         }
+
         function closeModal() {
             modalOverlay?.classList.remove('active');
             document.body.style.overflow = '';
+            clearInterval(otpTimerInterval);
         }
-        function switchTab(tab) {
-            modalTabs.forEach(t => t.classList.remove('active'));
-            document.querySelector(`.modal-tab[data-tab="${tab}"]`)?.classList.add('active');
-            loginForm?.classList.toggle('hidden', tab !== 'login');
-            registerForm?.classList.toggle('hidden', tab !== 'register');
+
+        function resetAuthModal() {
+            stepPhone.style.display = 'block';
+            stepBotStart.style.display = 'none';
+            stepCode.style.display = 'none';
+            phoneError.style.display = 'none';
+            codeError.style.display = 'none';
+            codeSuccess.style.display = 'none';
+            otpInputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+            clearInterval(otpTimerInterval);
+            if (resendOtp) resendOtp.disabled = true;
         }
+
+        function showStep(step) {
+            stepPhone.style.display = step === 'phone' ? 'block' : 'none';
+            stepBotStart.style.display = step === 'bot' ? 'block' : 'none';
+            stepCode.style.display = step === 'code' ? 'block' : 'none';
+        }
+
         openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
             e.preventDefault();
-            openModal('login');
+            openModal();
         }));
-        modalClose?.addEventListener('click', closeModal);
-        modalOverlay?.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
-        modalTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
+        modalClose?.addEventListener('click', closeModal);
+        modalOverlay?.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeProfileModal();
+            }
+        });
+
+        // ============================================================
+        // SEND OTP
+        // ============================================================
+ async function sendOtp(phone) {
+    if (isSending) return;
+    isSending = true;
+
+    // ✅ ذخیره شماره در متغیر global
+    currentPhone = phone;
+
+    sendOtpBtn.disabled = true;
+    sendOtpBtn.innerHTML = '<span>در حال ارسال...</span><i class="fas fa-spinner fa-spin"></i>';
+    phoneError.style.display = 'none';
+
+    try {
+        const res = await fetch('{{ route("otp.send") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ phone }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            showStep('code');
+            startTimer(120);
+            showToast('کد ورود به بله شما ارسال شد', 'success');
+            setTimeout(() => otpInputs[0].focus(), 300);
+        } else if (data.needs_bot_start) {
+            showStep('bot');
+        } else {
+            phoneErrorText.textContent = data.message || 'خطا در ارسال کد';
+            phoneError.style.display = 'flex';
+        }
+    } catch (err) {
+        phoneErrorText.textContent = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.';
+        phoneError.style.display = 'flex';
+    } finally {
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.innerHTML = '<span>ارسال کد</span><i class="fas fa-arrow-left"></i>';
+        isSending = false;
+    }
+}
+        // ============================================================
+        // FORM SUBMIT
+        // ============================================================
+        document.getElementById('phoneForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const phone = phoneInput.value.trim();
+
+            if (!phone || phone.length < 10) {
+                phoneErrorText.textContent = 'لطفاً شماره موبایل معتبر وارد کنید.';
+                phoneError.style.display = 'flex';
+                return;
+            }
+
+            sendOtp(phone);
+        });
+// ============================================================
+// RETRY SEND OTP (after bot start) - with polling
+// ============================================================
+let chatIdPollingInterval = null;
+
+retrySendOtp?.addEventListener('click', () => {
+    if (!currentPhone) {
+        showStep('phone');
+        return;
+    }
+
+    retrySendOtp.disabled = true;
+    retrySendOtp.innerHTML = '<span>در حال بررسی...</span><i class="fas fa-spinner fa-spin"></i>';
+
+    let attempts = 0;
+    const maxAttempts = 15;
+
+    clearInterval(chatIdPollingInterval);
+    chatIdPollingInterval = setInterval(async () => {
+        attempts++;
+
+        try {
+            const res = await fetch('{{ route("otp.check-chat-id") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ phone: currentPhone }),
+            });
+
+            const data = await res.json();
+
+            if (data.success && data.has_chat_id) {
+                clearInterval(chatIdPollingInterval);
+                retrySendOtp.disabled = false;
+                retrySendOtp.innerHTML = '<span>استارت کردم، دوباره تلاش کن</span><i class="fas fa-redo"></i>';
+
+                showToast('بازو با موفقیت متصل شد! در حال ارسال کد...', 'success');
+
+                sendOtp(currentPhone);
+                return;
+            }
+
+            if (attempts >= maxAttempts) {
+                clearInterval(chatIdPollingInterval);
+                retrySendOtp.disabled = false;
+                retrySendOtp.innerHTML = '<span>استارت کردم، دوباره تلاش کن</span><i class="fas fa-redo"></i>';
+                showToast('زمان انتظار به پایان رسید. لطفاً بازو را استارت کنید و دوباره تلاش کنید.', 'warning');
+            }
+        } catch (err) {
+            console.error('Polling error:', err);
+        }
+    }, 2000);
+});
+
+backToPhoneFromBot?.addEventListener('click', () => {
+    showStep('phone');
+    phoneError.style.display = 'none';
+});
+
+backToPhoneFromCode?.addEventListener('click', () => {
+    showStep('phone');
+    clearInterval(otpTimerInterval);
+    otpInputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+});
+
+// ============================================================
+// OTP INPUTS AUTO-FOCUS
+// ============================================================
+otpInputs.forEach((input, idx) => {
+    input.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = val;
+
+        if (val) {
+            e.target.classList.add('filled');
+            if (idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
+        } else {
+            e.target.classList.remove('filled');
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+            otpInputs[idx - 1].focus();
+        }
+    });
+
+    input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        if (paste.length === 6) {
+            paste.split('').forEach((char, i) => {
+                if (otpInputs[i]) {
+                    otpInputs[i].value = char;
+                    otpInputs[i].classList.add('filled');
+                }
+            });
+            otpInputs[5].focus();
+        }
+    });
+});
+        // ============================================================
+        // OTP INPUTS AUTO-FOCUS
+        // ============================================================
+        otpInputs.forEach((input, idx) => {
+            input.addEventListener('input', (e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = val;
+
+                if (val) {
+                    e.target.classList.add('filled');
+                    if (idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
+                } else {
+                    e.target.classList.remove('filled');
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                    otpInputs[idx - 1].focus();
+                }
+            });
+
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+                if (paste.length === 6) {
+                    paste.split('').forEach((char, i) => {
+                        if (otpInputs[i]) {
+                            otpInputs[i].value = char;
+                            otpInputs[i].classList.add('filled');
+                        }
+                    });
+                    otpInputs[5].focus();
+                }
+            });
+        });
+
+        // ============================================================
+        // VERIFY OTP
+        // ============================================================
+        verifyOtpBtn?.addEventListener('click', async () => {
+            const code = Array.from(otpInputs).map(i => i.value).join('');
+
+            if (code.length !== 6) {
+                codeErrorText.textContent = 'لطفاً کد ۶ رقمی را کامل وارد کنید.';
+                codeError.style.display = 'flex';
+                return;
+            }
+
+            verifyOtpBtn.disabled = true;
+            verifyOtpBtn.innerHTML = '<span>در حال بررسی...</span><i class="fas fa-spinner fa-spin"></i>';
+            codeError.style.display = 'none';
+
+            try {
+                const res = await fetch('{{ route("otp.verify") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ phone: currentPhone || phoneInput.value.trim(), code }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    codeSuccessText.textContent = 'ورود موفق! در حال انتقال...';
+                    codeSuccess.style.display = 'flex';
+                    showToast('خوش آمدید!', 'success');
+                    setTimeout(() => window.location.reload(), 900);
+                } else {
+                    codeErrorText.textContent = data.message || 'کد وارد شده صحیح نیست.';
+                    codeError.style.display = 'flex';
+                    otpInputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+                    otpInputs[0].focus();
+                }
+            } catch (err) {
+                codeErrorText.textContent = 'خطا در ارتباط با سرور.';
+                codeError.style.display = 'flex';
+            } finally {
+                verifyOtpBtn.disabled = false;
+                verifyOtpBtn.innerHTML = '<span>تایید و ورود</span><i class="fas fa-check"></i>';
+            }
+        });
+
+        // Auto verify on last digit
+        otpInputs[5]?.addEventListener('input', () => {
+            const code = Array.from(otpInputs).map(i => i.value).join('');
+            if (code.length === 6) {
+                setTimeout(() => verifyOtpBtn?.click(), 200);
+            }
+        });
+
+        // ============================================================
+        // OTP TIMER
+        // ============================================================
+        function startTimer(seconds) {
+            clearInterval(otpTimerInterval);
+            let remaining = seconds;
+            updateTimerDisplay(remaining);
+            if (resendOtp) resendOtp.disabled = true;
+
+            otpTimerInterval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(otpTimerInterval);
+                    timerEl.textContent = '۰۰:۰۰';
+                    if (resendOtp) resendOtp.disabled = false;
+                    return;
+                }
+                updateTimerDisplay(remaining);
+            }, 1000);
+        }
+
+        function updateTimerDisplay(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            if (timerEl) timerEl.textContent = `${m}:${s}`;
+        }
+
+        resendOtp?.addEventListener('click', () => {
+            if (phoneInput.value.trim()) {
+                sendOtp(phoneInput.value.trim());
+            }
+        });
+
+        // ============================================================
+// LOGOUT
+// ============================================================
+const logoutBtn = document.getElementById('logoutBtn');
+
+logoutBtn?.addEventListener('click', async () => {
+    if (!confirm('آیا از خروج از حساب اطمینان دارید؟')) return;
+
+    logoutBtn.disabled = true;
+    const originalHTML = logoutBtn.innerHTML;
+    logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>در حال خروج...</span>';
+
+    try {
+        const res = await fetch('{{ route("logout") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (res.ok || res.redirected) {
+            showToast('با موفقیت خارج شدید', 'success');
+            setTimeout(() => {
+                window.location.href = '{{ route("home") }}';
+            }, 800);
+        } else {
+            showToast('خطا در خروج. لطفاً دوباره تلاش کنید.', 'error');
+            logoutBtn.disabled = false;
+            logoutBtn.innerHTML = originalHTML;
+        }
+    } catch (err) {
+        showToast('خطا در ارتباط با سرور', 'error');
+        logoutBtn.disabled = false;
+        logoutBtn.innerHTML = originalHTML;
+    }
+});
         // ============================================================
         // FAQ ACCORDION
         // ============================================================

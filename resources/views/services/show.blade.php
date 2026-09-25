@@ -434,31 +434,7 @@
     </style>
 </head>
 <body>
-
-    <!-- ============================================================
-    HEADER
-    ============================================================ -->
-    <header class="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium" class="logo-img" />
-            </a>
-            <nav class="nav-desktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}" class="active">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
-        </div>
-    </header>
-
+    @include('partials.header')
     <!-- ============================================================
     BREADCRUMB
     ============================================================ -->

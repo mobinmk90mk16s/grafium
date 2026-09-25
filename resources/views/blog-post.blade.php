@@ -7,7 +7,7 @@
     <title>{{ $post->title }} | GRAFIUM</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="{{ $post->meta_description ?? $post->summary ?? Str::limit($post->text, 150) }}">
+    <meta name="description" content="{{ $post->meta_description ?? $post->summary ?? Str::limit(strip_tags($post->text), 150) }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -15,15 +15,13 @@
 
     <style>
         /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --deep-navy: #0a1628;
-            --deep-navy-light: #132238;
+            --navy-800: #0f1f33;
+            --navy-700: #132238;
+            --navy-600: #1a2f4a;
             --gold: #d4a373;
             --gold-dark: #b8874a;
             --gold-light: #f0d5b0;
@@ -31,28 +29,32 @@
             --navy-gradient: linear-gradient(135deg, #0a1628, #1a2f4a);
             --bg-body: #f5f7fa;
             --bg-card: #ffffff;
+            --bg-soft: #fafbfc;
             --text: #0a1628;
             --text-muted: #6b7a8a;
             --border: #e4e7ec;
-            --shadow: 0 4px 30px rgba(10, 22, 40, 0.08);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.04);
+            --shadow: 0 8px 30px rgba(10, 22, 40, 0.08);
+            --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.15);
+            --shadow-gold: 0 20px 50px rgba(212, 163, 115, 0.25);
+            --radius: 24px;
+            --radius-sm: 16px;
             --font: "Vazirmatn", "Inter", sans-serif;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a1628;
-            --bg-card: #132238;
+            --bg-card: #0f1f33;
+            --bg-soft: #132238;
             --text: #f0f0f0;
-            --text-muted: #a0a0a0;
+            --text-muted: #94a3b8;
             --border: #1a2f4a;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font);
@@ -62,931 +64,853 @@
             transition: background 0.4s, color 0.4s;
             line-height: 1.7;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        ::selection {
-            background: var(--gold);
-            color: #fff;
-        }
+        ::selection { background: var(--gold); color: #fff; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        img {
-            max-width: 100%;
-            display: block;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* ===== TEXT & BADGE ===== */
-        .gold-text {
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .purple-text {
-            color: var(--deep-navy);
-        }
-
-        [data-theme="dark"] .purple-text {
-            color: #f0f0f0;
-        }
-
-        .gradient-badge {
-            display: inline-block;
-            background: var(--gold-gradient);
-            color: #fff;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-            background: var(--gold-gradient);
-            color: #fff;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3);
-        }
-
-        .btn-gold {
-            background: var(--gold-gradient);
-            border-color: var(--gold);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.2);
-        }
-
-        .btn-gold:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 8px 35px rgba(212, 163, 115, 0.35);
-        }
-
-        .btn-gold-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-        }
-
-        .btn-gold-outline:hover {
-            background: var(--gold-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
-
-        /* ===== SECTION ===== */
-        .section {
-            padding: 25px 0;
-        }
-
-        .section-header {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto 50px;
-        }
-
-        .section-header h2 {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
-            padding: 8px 0;
-            transition: background 0.4s, border-color 0.4s;
-        }
-
-        [data-theme="dark"] .header {
-            background: rgba(10, 22, 40, 0.95);
-        }
-
-        [data-theme="light"] .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 800;
-        }
-
-        .logo-img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .nav-desktop ul {
-            display: flex;
-            gap: 28px;
-        }
-
-        .nav-desktop a {
-            font-weight: 500;
-            font-size: 15px;
-            position: relative;
-            transition: color 0.3s;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        [data-theme="light"] .nav-desktop a {
-            color: var(--deep-navy);
-        }
-
-        .nav-desktop a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            right: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold-gradient);
-            transition: width 0.3s;
-        }
-
-        .nav-desktop a:hover::after {
-            width: 100%;
-        }
-
-        .nav-desktop a:hover {
-            color: var(--gold);
-        }
-
-        .nav-desktop a.active {
-            color: var(--gold);
-        }
-
-        .nav-desktop a.active::after {
-            width: 100%;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: transparent;
-            color: #fff;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        [data-theme="light"] .theme-toggle {
-            border-color: var(--border);
-            color: var(--deep-navy);
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        [data-theme="light"] .menu-toggle {
-            color: var(--deep-navy);
-        }
-
-        /* ===== MOBILE MENU ===== */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-        }
-
-        .mobile-menu.open {
-            display: flex;
-        }
-
-        .mobile-menu ul {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .mobile-menu a {
-            font-weight: 500;
-            font-size: 16px;
-        }
-
-        .mobile-auth {
-            display: flex;
-            gap: 12px;
-        }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
 
         /* ============================================================
-           ARTICLE PAGE
-           ============================================================ */
-        .article-page {
-            padding: 60px 0;
+        ARTICLE SECTION
+        ============================================================ */
+        .article-section {
+            padding: 40px 0 60px;
+            background: var(--bg-body);
         }
 
         .article-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: var(--bg-card);
             border-radius: var(--radius);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             overflow: hidden;
-            transition: all 0.3s ease;
         }
 
-        .article-container:hover {
-            box-shadow: 0 8px 50px rgba(212, 163, 115, 0.1);
-        }
-
+        /* ===== HERO IMAGE ===== */
         .article-hero {
-            height: 300px;
-            background-size: cover;
-            background-position: center;
+            height: 380px;
             position: relative;
+            overflow: hidden;
+            background: var(--navy-gradient);
+        }
+        .article-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(10, 22, 40, 0.85) 100%);
+            pointer-events: none;
         }
 
-        .article-hero .article-badge {
+        .article-badge {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 20px;
+            right: 20px;
             background: var(--gold-gradient);
             color: #fff;
             padding: 6px 18px;
-            border-radius: 40px;
-            font-size: 13px;
+            border-radius: 9999px;
+            font-size: 12px;
             font-weight: 700;
-            z-index: 1;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.4);
         }
 
-        .article-body {
-            padding: 30px 35px;
+        /* ===== TITLE OVERLAY ===== */
+        .article-title-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            padding: 40px 48px 32px;
+            z-index: 2;
+            color: #fff;
         }
-
+        .article-title {
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
         .article-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 18px;
             align-items: center;
-            color: var(--text-muted);
             font-size: 13px;
-            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.85);
         }
-
+        .article-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
         .article-meta i {
             color: var(--gold);
-            margin-left: 5px;
+            font-size: 12px;
         }
 
-        .article-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            line-height: 1.5;
+        /* ===== BODY ===== */
+        .article-body {
+            padding: 48px 56px;
         }
 
+        /* ===== EXCERPT ===== */
         .article-excerpt {
             font-size: 17px;
-            color: var(--text-muted);
-            line-height: 1.9;
-            margin-bottom: 24px;
-            border-right: 3px solid var(--gold);
-            padding-right: 15px;
-        }
-
-        .article-content {
-            font-size: 16px;
             line-height: 2;
             color: var(--text);
-            text-align: justify;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            padding: 24px 28px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-sm);
+            border-right: 4px solid var(--gold);
+            font-weight: 500;
+            position: relative;
+        }
+        [data-theme="dark"] .article-excerpt {
+            background: var(--navy-700);
         }
 
+        /* ============================================================
+        ARTICLE CONTENT — STYLED (این مهم‌ترین بخشه)
+        ============================================================ */
+        .article-content {
+            font-size: 16px;
+            line-height: 2.1;
+            color: var(--text);
+            text-align: justify;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* پاراگراف‌ها */
+        .article-content p {
+            margin-bottom: 20px;
+            line-height: 2.1;
+            text-align: justify;
+        }
+
+        /* هدینگ‌ها */
+        .article-content h1,
+        .article-content h2,
+        .article-content h3,
+        .article-content h4,
+        .article-content h5,
+        .article-content h6 {
+            color: var(--text);
+            font-weight: 800;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            position: relative;
+            padding-right: 20px;
+        }
+        .article-content h1 {
+            font-size: 28px;
+        }
+        .article-content h2 {
+            font-size: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+        .article-content h2::before,
+        .article-content h3::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 60%;
+            background: var(--gold-gradient);
+            border-radius: 3px;
+        }
+        .article-content h3 {
+            font-size: 20px;
+        }
+        .article-content h4 {
+            font-size: 18px;
+        }
+
+        /* لیست‌ها */
+        .article-content ul,
+        .article-content ol {
+            margin: 20px 0;
+            padding-right: 28px;
+        }
+        .article-content ul li,
+        .article-content ol li {
+            margin-bottom: 10px;
+            line-height: 2;
+            position: relative;
+        }
+        .article-content ul {
+            list-style: none;
+            padding-right: 0;
+        }
+        .article-content ul li {
+            padding-right: 28px;
+        }
+        .article-content ul li::before {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            box-shadow: 0 0 8px rgba(212, 163, 115, 0.5);
+        }
+        .article-content ol {
+            list-style: none;
+            counter-reset: list-counter;
+            padding-right: 0;
+        }
+        .article-content ol li {
+            counter-increment: list-counter;
+            padding-right: 44px;
+        }
+        .article-content ol li::before {
+            content: counter(list-counter);
+            position: absolute;
+            right: 0;
+            top: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.35);
+        }
+
+        /* تصاویر */
         .article-content img {
             max-width: 100%;
-            border-radius: 12px;
-            margin: 20px 0;
+            height: auto;
+            border-radius: var(--radius-sm);
+            margin: 28px auto;
+            box-shadow: var(--shadow);
+            display: block;
         }
 
+        /* بلاک‌کوت */
+        .article-content blockquote {
+            margin: 28px 0;
+            padding: 24px 32px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-sm);
+            border-right: 4px solid var(--gold);
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 2;
+            position: relative;
+        }
+        [data-theme="dark"] .article-content blockquote {
+            background: var(--navy-700);
+        }
+        .article-content blockquote::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 80px;
+            color: rgba(212, 163, 115, 0.15);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        /* لینک‌ها */
+        .article-content a {
+            color: var(--gold-dark);
+            font-weight: 600;
+            text-decoration: underline;
+            text-decoration-color: rgba(212, 163, 115, 0.4);
+            text-underline-offset: 4px;
+            transition: all 0.3s;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .article-content a:hover {
+            color: var(--gold);
+            text-decoration-color: var(--gold);
+        }
+
+        /* کد */
+        .article-content code {
+            background: var(--bg-soft);
+            color: var(--gold-dark);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            direction: ltr;
+            display: inline-block;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+        [data-theme="dark"] .article-content code {
+            background: var(--navy-700);
+        }
+        .article-content pre {
+            background: var(--navy-800);
+            color: #f0f0f0;
+            padding: 20px 24px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            margin: 24px 0;
+            font-size: 14px;
+            line-height: 1.8;
+            direction: ltr;
+            text-align: left;
+            max-width: 100%;
+        }
+        .article-content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* جداول */
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            font-size: 14px;
+        }
+        .article-content table thead {
+            background: var(--navy-gradient);
+            color: #fff;
+        }
+        .article-content table th {
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .article-content table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            text-align: right;
+        }
+        .article-content table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .article-content table tbody tr:nth-child(even) {
+            background: var(--bg-soft);
+        }
+        [data-theme="dark"] .article-content table tbody tr:nth-child(even) {
+            background: var(--navy-700);
+        }
+
+        /* جداکننده */
+        .article-content hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 40px 0;
+            opacity: 0.5;
+        }
+
+        /* متن bold و italic */
+        .article-content strong,
+        .article-content b {
+            color: var(--text);
+            font-weight: 800;
+        }
+        .article-content em,
+        .article-content i {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        /* iframe (ویدیو) */
+        .article-content iframe {
+            max-width: 100%;
+            width: 100%;
+            border-radius: var(--radius-sm);
+            margin: 24px 0;
+            box-shadow: var(--shadow);
+        }
+
+        /* ============================================================
+        TAGS
+        ============================================================ */
         .article-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 25px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 2px dashed var(--border);
         }
+        .article-tags-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .article-tags-title i { color: var(--gold); }
 
         .article-tag {
-            background: var(--bg-body);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--bg-soft);
             border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 5px 15px;
-            border-radius: 30px;
+            border-radius: 9999px;
             font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
             transition: all 0.3s;
         }
-
-        .article-tag:hover {
-            border-color: var(--gold);
-            color: var(--gold);
+        [data-theme="dark"] .article-tag {
+            background: var(--navy-700);
         }
+        .article-tag:hover {
+            background: var(--gold-gradient);
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.3);
+        }
+        .article-tag i {
+            color: var(--gold);
+            font-size: 11px;
+        }
+        .article-tag:hover i { color: #fff; }
 
+        /* ============================================================
+        BACK LINK
+        ============================================================ */
+        .back-wrapper {
+            margin-top: 40px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+        }
         .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            color: var(--gold);
-            transition: color 0.3s;
-        }
-
-        .back-link:hover {
-            color: var(--gold-dark);
-        }
-
-        /* Related Posts */
-        .related-posts {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid var(--border);
-        }
-
-        .related-posts h3 {
-            font-size: 20px;
+            gap: 10px;
+            padding: 12px 24px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 14px;
             font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 14px;
             color: var(--text);
+            transition: all 0.3s;
+        }
+        [data-theme="dark"] .back-link {
+            background: var(--navy-700);
+        }
+        .back-link:hover {
+            background: var(--gold-gradient);
+            color: #fff;
+            border-color: transparent;
+            transform: translateX(-6px);
+            box-shadow: 0 10px 25px rgba(212, 163, 115, 0.35);
+        }
+        .back-link i {
+            transition: transform 0.3s;
+        }
+        .back-link:hover i {
+            transform: translateX(-6px);
+        }
+
+        /* ============================================================
+        RELATED POSTS
+        ============================================================ */
+        .related-section {
+            margin-top: 60px;
+            padding: 40px 0;
+        }
+        .related-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .related-header h3 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .related-header h3 i { color: var(--gold); }
+        .related-header h3 .gold-line {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .related-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 24px;
         }
 
         .related-card {
-            background: var(--bg-body);
-            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border-radius: var(--radius);
             overflow: hidden;
             border: 1px solid var(--border);
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            display: block;
         }
-
         .related-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-8px);
             border-color: var(--gold);
+            box-shadow: var(--shadow-gold);
         }
 
-        .related-card img {
+        .related-image {
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            background: var(--navy-gradient);
+        }
+        .related-image img {
             width: 100%;
-            height: 120px;
+            height: 100%;
             object-fit: cover;
+            transition: transform 0.8s;
+        }
+        .related-card:hover .related-image img {
+            transform: scale(1.1);
         }
 
-        .related-card .related-content {
-            padding: 12px 16px;
-            text-align: center;
+        .related-content {
+            padding: 20px;
         }
-
-        .related-card .related-content h4 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
+        .related-content h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: color 0.3s;
         }
-
-        .related-card .related-content p {
-            font-size: 12px;
-            color: var(--text-muted);
+        .related-card:hover .related-content h4 {
+            color: var(--gold-dark);
         }
-
-        .article-not-found {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-
-        .article-not-found i {
-            font-size: 40px;
+        [data-theme="dark"] .related-card:hover .related-content h4 {
             color: var(--gold);
-            margin-bottom: 15px;
+        }
+        .related-content p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        /* ===== CTA ===== */
+        /* ============================================================
+        CTA
+        ============================================================ */
         .cta {
             background: var(--navy-gradient);
             color: #fff;
-            padding: 80px 0;
+            padding: 100px 0;
             text-align: center;
             position: relative;
             overflow: hidden;
             border-top: 2px solid var(--gold);
         }
-
         .cta::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.04), transparent 60%);
+            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.08), transparent 60%);
         }
-
-        .cta .section-title {
-            color: #fff;
+        .cta::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(212, 163, 115, 0.06), transparent 60%);
         }
-
-        .cta .section-subtitle {
-            color: rgba(255, 255, 255, 0.35);
+        .cta .container { position: relative; z-index: 1; }
+        .cta h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .cta h2 .gold-line {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cta p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            max-width: 600px;
             margin: 0 auto 36px;
         }
-
-        .cta .btn-group {
+        .cta-buttons {
             display: flex;
             gap: 18px;
             justify-content: center;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
         }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--deep-navy);
-            color: #c8c8d4;
-            padding: 60px 0 20px;
-            margin-top: 40px;
-            border-top: 2px solid var(--gold);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            text-align: center;
-        }
-
-        .footer-brand .logo {
-            justify-content: center;
-        }
-
-        .footer-brand p {
-            font-size: 14px;
-            max-width: 300px;
-            margin: 0 auto 16px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .footer-social {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .footer-social a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c8c8d4;
-            transition: var(--transition);
-        }
-
-        .footer-social a:hover {
-            background: var(--gold);
-            color: #fff;
-        }
-
-        .footer-links h4,
-        .footer-contact h4,
-        .footer-trust h4 {
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 16px;
-        }
-
-        .footer-links ul,
-        .footer-contact ul {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .footer-links a,
-        .footer-contact li {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-
-        .footer-links a:hover {
-            color: var(--gold);
-        }
-
-        .footer-contact li {
-            display: flex;
+        .cta-btn {
+            display: inline-flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .footer-contact li i {
-            color: var(--gold);
-            width: 20px;
-        }
-
-        .trust-icons {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .trust-icons span {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
+            padding: 15px 32px;
+            border-radius: 60px;
+            font-weight: 700;
             font-size: 14px;
-            color: #64748b;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid transparent;
+        }
+        .cta-btn.gold {
+            background: var(--gold-gradient);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.35);
+        }
+        .cta-btn.gold:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.55);
+        }
+        .cta-btn.gold:hover i { transform: translateX(-5px); }
+        .cta-btn.gold i { transition: transform 0.3s; }
+        .cta-btn.white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+        }
+        .cta-btn.white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(255, 255, 255, 0.3);
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* ============================================================
+        RESPONSIVE
+        ============================================================ */
+        @media (max-width: 992px) {
+            .related-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 768px) {
-            .nav-desktop {
-                display: none;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            .article-hero {
-                height: 200px;
-            }
-
-            .article-body {
-                padding: 20px;
-            }
-
-            .article-title {
-                font-size: 22px;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .cta {
-                padding: 60px 0;
-            }
-
-            .related-grid {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 0 16px; }
+            .article-hero { height: 280px; }
+            .article-title-overlay { padding: 28px 24px 24px; }
+            .article-title { font-size: 22px; }
+            .article-meta { font-size: 11px; gap: 12px; }
+            .article-body { padding: 32px 24px; }
+            .article-excerpt { font-size: 15px; padding: 18px 20px; }
+            .article-content { font-size: 15px; }
+            .article-content h1 { font-size: 22px; }
+            .article-content h2 { font-size: 19px; }
+            .article-content h3 { font-size: 17px; }
+            .related-grid { grid-template-columns: 1fr; }
+            .cta h2 { font-size: 26px; }
+            .cta { padding: 60px 0; }
         }
-
         @media (max-width: 480px) {
-            .article-hero {
-                height: 160px;
-            }
-
-            .article-body {
-                padding: 16px;
-            }
-
-            .article-title {
-                font-size: 18px;
-            }
-
-            .article-excerpt {
-                font-size: 14px;
-            }
-
-            .article-content {
-                font-size: 14px;
-            }
-
-            .article-meta {
-                font-size: 11px;
-                gap: 8px;
-            }
+            .article-hero { height: 240px; }
+            .article-title { font-size: 19px; }
+            .article-body { padding: 24px 18px; }
+            .article-excerpt { font-size: 14px; padding: 16px; }
+            .article-content { font-size: 14px; }
+            .article-content h2::before,
+            .article-content h3::before { width: 4px; }
+            .cta-buttons { flex-direction: column; }
+            .cta-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- ============================================================
-    HEADER
-    ============================================================ -->
-    <header class="header" id="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-            </a>
-            <nav class="nav-desktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}" class="active">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-gold-outline">خروج</button>
-                </form>
-                @else
-                <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="{{ route('home') }}">خانه</a></li>
-                <li><a href="{{ route('about') }}">درباره ما</a></li>
-                <li><a href="{{ route('services') }}">خدمات</a></li>
-                <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                <li><a href="{{ route('contact') }}">تماس</a></li>
-            </ul>
-            <div class="mobile-auth">
-                @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                @else
-                <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
-            </div>
-        </div>
-    </header>
+    @include('partials.header')
 
     <!-- ============================================================
-    ARTICLE PAGE
+    ARTICLE SECTION
     ============================================================ -->
-    <section class="section article-page">
+    <section class="article-section">
         <div class="container">
-            <div class="article-container">
-                <div class="article-hero" style="background-image: url('{{ $post->media ? asset('storage/' . $post->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}');">
-                    <span class="article-badge">{{ $post->category->name ?? 'عمومی' }}</span>
-                </div>
-                <div class="article-body">
-                    <div class="article-meta">
-                        <span><i class="fas fa-calendar-alt"></i> {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}</span>
-                        <span><i class="fas fa-eye"></i> {{ number_format($post->views) }} بازدید</span>
-                        @if($post->category)
-                        <span><i class="fas fa-folder"></i> {{ $post->category->name }}</span>
-                        @endif
+            <article class="article-container">
+
+                <!-- ===== HERO ===== -->
+                <div class="article-hero">
+                    <img
+                        src="{{ $post->media ? asset('storage/' . $post->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=600&fit=crop' }}"
+                        alt="{{ $post->title }}"
+                        onerror="this.style.display='none'"
+                    />
+
+                    <span class="article-badge">
+                        <i class="fas fa-folder"></i>
+                        {{ $post->category->name ?? 'عمومی' }}
+                    </span>
+
+                    <!-- Title overlay -->
+                    <div class="article-title-overlay">
+                        <h1 class="article-title">{{ $post->title }}</h1>
+                        <div class="article-meta">
+                            <span>
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}
+                            </span>
+                            <span>
+                                <i class="fas fa-eye"></i>
+                                {{ number_format($post->views ?? 0) }} بازدید
+                            </span>
+                            @if($post->author)
+                            <span>
+                                <i class="fas fa-user"></i>
+                                {{ $post->author->name }}
+                            </span>
+                            @endif
+                        </div>
                     </div>
-                    <h1 class="article-title purple-text">{{ $post->title }}</h1>
+                </div>
+
+                <!-- ===== BODY ===== -->
+                <div class="article-body">
+
+                    <!-- Excerpt -->
                     @if($post->summary)
-                    <div class="article-excerpt">{{ $post->summary }}</div>
+                        <div class="article-excerpt">
+                            {{ $post->summary }}
+                        </div>
                     @endif
+
+                    <!-- Content (متن مقاله) -->
                     <div class="article-content">
                         {!! $post->text !!}
                     </div>
+
+                    <!-- Tags -->
                     @if($post->tags)
-                    <div class="article-tags">
-                        @foreach(explode(',', $post->tags) as $tag)
-                        <span class="article-tag">{{ trim($tag) }}</span>
-                        @endforeach
-                    </div>
-                    @endif
-                    <a href="{{ route('blog') }}" class="back-link">
-                        <i class="fas fa-arrow-right"></i>
-                        بازگشت به مقالات
-                    </a>
-                    <!-- Related Posts -->
-                    @if(isset($relatedPosts) && $relatedPosts->count() > 0)
-                    <div class="related-posts">
-                        <h3>مقالات مرتبط</h3>
-                        <div class="related-grid">
-                            @foreach($relatedPosts as $related)
-                            <div class="related-card" onclick="window.location.href='{{ route('blog.post', $related->id) }}'">
-                                <img src="{{ $related->media ? asset('storage/' . $related->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}" alt="{{ $related->title }}" />
-                                <div class="related-content">
-                                    <h4>{{ $related->title }}</h4>
-                                    <p>{{ Str::limit($related->summary ?? $related->text, 50) }}</p>
-                                </div>
+                        <div class="article-tags">
+                            <div class="article-tags-title">
+                                <i class="fas fa-tags"></i>
+                                برچسب‌ها
                             </div>
+                            @foreach(explode(',', $post->tags) as $tag)
+                                <a href="{{ route('blog.search', ['q' => trim($tag)]) }}" class="article-tag">
+                                    <i class="fas fa-tag"></i>
+                                    {{ trim($tag) }}
+                                </a>
                             @endforeach
                         </div>
-                    </div>
                     @endif
 
-                    <!-- ============================================================
-    CTA
-    ============================================================ -->
-                    <section class="cta" id="cta">
-                        <div class="container">
-                            <span class="gradient-badge" style="background:rgba(212,163,115,0.12);color:var(--gold);">شروع کنید</span>
-                            <h2 class="section-title">فضای کاری <span style="color:var(--gold);">خود را امروز رزرو کنید</span></h2>
-                            <p class="section-subtitle" style="color:rgba(255,255,255,0.35);max-width:600px;margin:0 auto 36px;">به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.</p>
-                            <div class="btn-group">
-                                <a href="{{ route('services') }}" class="btn btn-gold">رزرو میز <i class="fas fa-arrow-left"></i></a>
-                                <a href="{{ route('contact') }}" class="btn btn-white">تماس با ما</a>
-                            </div>
-                        </div>
-                    </section>
+                    <!-- Back link -->
+                    <div class="back-wrapper">
+                        <a href="{{ route('blog') }}" class="back-link">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>بازگشت به مقالات</span>
+                        </a>
+                    </div>
 
-                    <!-- ============================================================
-    FOOTER
-    ============================================================ -->
-                    <footer class="footer">
-                        <div class="container">
-                            <div class="footer-grid">
-                                <div class="footer-brand">
-                                    <a href="{{ route('home') }}" class="logo">
-                                        <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-                                    </a>
-                                    <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
-                                    <div class="footer-social">
-                                        <a href="#"><i class="fas fa-comment"></i></a>
-                                        <a href="#"><i class="fas fa-check-circle"></i></a>
-                                        <a href="#"><i class="fas fa-video"></i></a>
-                                        <a href="#"><i class="fas fa-share-alt"></i></a>
-                                    </div>
+                </div>
+
+            </article>
+
+            <!-- ===== RELATED POSTS ===== -->
+            @if(isset($relatedPosts) && $relatedPosts->count() > 0)
+                <div class="related-section">
+                    <div class="related-header">
+                        <h3>
+                            <i class="fas fa-book-open"></i>
+                            <span class="gold-line">مقالات مرتبط</span>
+                        </h3>
+                    </div>
+
+                    <div class="related-grid">
+                        @foreach($relatedPosts as $related)
+                            <a href="{{ route('blog.post', $related->id) }}" class="related-card">
+                                <div class="related-image">
+                                    <img
+                                        src="{{ $related->media ? asset('storage/' . $related->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}"
+                                        alt="{{ $related->title }}"
+                                        onerror="this.style.display='none'"
+                                    />
                                 </div>
-                                <div class="footer-links">
-                                    <h4>لینک‌های مفید</h4>
-                                    <ul>
-                                        <li><a href="{{ route('home') }}">خانه</a></li>
-                                        <li><a href="{{ route('about') }}">درباره ما</a></li>
-                                        <li><a href="{{ route('services') }}">خدمات</a></li>
-                                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                                        <li><a href="{{ route('contact') }}">تماس</a></li>
-                                    </ul>
+                                <div class="related-content">
+                                    <h4>{{ $related->title }}</h4>
+                                    <p>{{ Str::limit(strip_tags($related->summary ?? $related->text), 80) }}</p>
                                 </div>
-                                <div class="footer-contact">
-                                    <h4>اطلاعات تماس</h4>
-                                    <ul>
-                                        <li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li>
-                                        <li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li>
-                                        <li><i class="fas fa-envelope"></i> info@grafium.ir</li>
-                                    </ul>
-                                </div>
-                                <div class="footer-trust">
-                                    <h4>نمادهای اعتماد</h4>
-                                    <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
-                                </div>
-                            </div>
-                            <div class="footer-bottom">
-                                <p>&copy; ۲۰۲۶ تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
-                            </div>
-                        </div>
-                    </footer>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
-                    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
-                    <script>
-                        // ============================================================
-                        // 1. THEME TOGGLE
-                        // ============================================================
-                        const themeToggle = document.getElementById('themeToggle');
-                        const themeIcon = themeToggle?.querySelector('i');
-                        let darkMode = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : true;
+        </div>
+    </section>
 
-                        function applyTheme() {
-                            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-                            if (themeIcon) themeIcon.className = darkMode ? 'fas fa-moon' : 'fas fa-sun';
-                            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-                        }
-                        applyTheme();
-
-                        themeToggle?.addEventListener('click', () => {
-                            darkMode = !darkMode;
-                            applyTheme();
-                        });
-
-                        // ============================================================
-                        // 2. MOBILE MENU
-                        // ============================================================
-                        const menuToggle = document.getElementById('menuToggle');
-                        const mobileMenu = document.getElementById('mobileMenu');
-
-                        menuToggle?.addEventListener('click', () => {
-                            mobileMenu?.classList.toggle('open');
-                            const icon = menuToggle.querySelector('i');
-                            if (icon) {
-                                icon.classList.toggle('fa-bars');
-                                icon.classList.toggle('fa-times');
-                            }
-                        });
-
-                        document.querySelectorAll('.mobile-menu a').forEach(link => {
-                            link.addEventListener('click', () => {
-                                mobileMenu?.classList.remove('open');
-                                const icon = menuToggle?.querySelector('i');
-                                if (icon) {
-                                    icon.classList.add('fa-bars');
-                                    icon.classList.remove('fa-times');
-                                }
-                            });
-                        });
-
-                        // ============================================================
-                        // 3. HEADER SHADOW
-                        // ============================================================
-                        const header = document.getElementById('header');
-                        window.addEventListener('scroll', () => {
-                            if (!header) return;
-                            if (window.scrollY > 50) header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
-                            else header.style.boxShadow = 'none';
-                        });
-
-                        console.log('Blog post page loaded successfully!');
-                    </script>
+    <!-- ===== CTA ===== -->
+    <section class="cta">
+        <div class="container">
+            <h2>
+                فضای کاری <span class="gold-line">خود را امروز رزرو کنید</span>
+            </h2>
+            <p>
+                به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.
+            </p>
+            <div class="cta-buttons">
+                <a href="{{ route('services') }}" class="cta-btn gold">
+                    <i class="fas fa-rocket"></i>
+                    <span>رزرو میز</span>
+                </a>
+                <a href="{{ route('contact') }}" class="cta-btn white">
+                    <i class="fas fa-headset"></i>
+                    <span>تماس با ما</span>
+                </a>
+            </div>
+        </div>
+    </section>
 
 </body>
 

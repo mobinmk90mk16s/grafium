@@ -13,15 +13,13 @@
 
     <style>
         /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --deep-navy: #0a1628;
-            --deep-navy-light: #132238;
+            --navy-800: #0f1f33;
+            --navy-700: #132238;
+            --navy-600: #1a2f4a;
             --gold: #d4a373;
             --gold-dark: #b8874a;
             --gold-light: #f0d5b0;
@@ -29,23 +27,30 @@
             --navy-gradient: linear-gradient(135deg, #0a1628, #1a2f4a);
             --bg-body: #f5f7fa;
             --bg-card: #ffffff;
+            --bg-soft: #fafbfc;
             --text: #0a1628;
             --text-muted: #6b7a8a;
             --border: #e4e7ec;
-            --shadow: 0 4px 30px rgba(10, 22, 40, 0.08);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.04);
+            --shadow: 0 8px 30px rgba(10, 22, 40, 0.08);
+            --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.15);
+            --shadow-gold: 0 20px 50px rgba(212, 163, 115, 0.25);
+            --radius: 24px;
+            --radius-sm: 16px;
+            --transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             --font: "Vazirmatn", "Inter", sans-serif;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a1628;
-            --bg-card: #132238;
+            --bg-card: #0f1f33;
+            --bg-soft: #132238;
             --text: #f0f0f0;
-            --text-muted: #a0a0a0;
+            --text-muted: #94a3b8;
             --border: #1a2f4a;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         html { scroll-behavior: smooth; }
@@ -58,468 +63,592 @@
             transition: background 0.4s, color 0.4s;
             line-height: 1.7;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         ::selection { background: var(--gold); color: #fff; }
-
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
         img { max-width: 100%; display: block; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        /* ============================================================
+        PAGE HERO
+        ============================================================ */
+        .page-hero {
+            background: var(--deep-navy);
+            padding: 70px 0 140px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 85% 20%, rgba(212, 163, 115, 0.18), transparent 45%),
+                radial-gradient(circle at 15% 80%, rgba(212, 163, 115, 0.1), transparent 50%);
+            animation: heroGlow 15s ease-in-out infinite alternate;
+        }
+        @keyframes heroGlow {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 163, 115, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 163, 115, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
         }
 
-        /* ===== TEXT & BADGE ===== */
-        .gold-text {
+        .page-hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #fff;
+            animation: fadeUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(212, 163, 115, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.35);
+            backdrop-filter: blur(10px);
+            color: var(--gold-light);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-badge::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: badgeShine 3s ease-in-out infinite;
+        }
+        @keyframes badgeShine {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .page-hero h1 {
+            font-size: 46px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .page-hero h1 .gold-line {
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        .purple-text {
-            color: var(--deep-navy);
-        }
-        [data-theme="dark"] .purple-text {
-            color: #f0f0f0;
-        }
-
-        .gradient-badge {
-            display: inline-block;
-            background: var(--gold-gradient);
-            color: #fff;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-            background: var(--gold-gradient);
-            color: #fff;
-        }
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3);
-        }
-        .btn-gold {
-            background: var(--gold-gradient);
-            border-color: var(--gold);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.2);
-        }
-        .btn-gold:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 8px 35px rgba(212, 163, 115, 0.35);
-        }
-        .btn-gold-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-        }
-        .btn-gold-outline:hover {
-            background: var(--gold-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
-
-        /* ===== SECTION ===== */
-        .section { padding: 60px 0; }
-        .section-header {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto 50px;
-        }
-        .section-header h2 {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
-            padding: 8px 0;
-            transition: background 0.4s, border-color 0.4s;
-        }
-        [data-theme="dark"] .header {
-            background: rgba(10, 22, 40, 0.95);
-        }
-        [data-theme="light"] .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .logo-img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .nav-desktop ul {
-            display: flex;
-            gap: 28px;
-        }
-        .nav-desktop a {
-            font-weight: 500;
-            font-size: 15px;
-            position: relative;
-            transition: color 0.3s;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        [data-theme="light"] .nav-desktop a {
-            color: var(--deep-navy);
-        }
-        .nav-desktop a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            right: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold-gradient);
-            transition: width 0.3s;
-        }
-        .nav-desktop a:hover::after {
-            width: 100%;
-        }
-        .nav-desktop a:hover {
-            color: var(--gold);
-        }
-        .nav-desktop a.active {
-            color: var(--gold);
-        }
-        .nav-desktop a.active::after {
-            width: 100%;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: transparent;
-            color: #fff;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        [data-theme="light"] .theme-toggle {
-            border-color: var(--border);
-            color: var(--deep-navy);
-        }
-        .theme-toggle:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-        }
-        [data-theme="light"] .menu-toggle {
-            color: var(--deep-navy);
-        }
-
-        /* ===== MOBILE MENU ===== */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-        }
-        .mobile-menu.open {
-            display: flex;
-        }
-        .mobile-menu ul {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .mobile-menu a {
-            font-weight: 500;
-            font-size: 16px;
-        }
-        .mobile-auth {
-            display: flex;
-            gap: 12px;
+        .page-hero p {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         /* ============================================================
-           BLOG PAGE
-           ============================================================ */
-        .blog-page {
-            padding: 60px 0;
-        }
-
-        .blog-search-wrapper {
+        BLOG SECTION
+        ============================================================ */
+        .blog-section {
+            margin-top: -80px;
             position: relative;
-            max-width: 500px;
-            margin: 0 auto 50px;
+            z-index: 2;
+            padding-bottom: 80px;
         }
 
-        .blog-search-input {
-            width: 100%;
-            padding: 14px 50px 14px 18px;
-            border: 2px solid var(--border);
-            border-radius: 40px;
+        /* ============================================================
+        SEARCH BOX
+        ============================================================ */
+        .search-wrapper {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+            animation: fadeUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
+        }
+        .search-box {
+            position: relative;
             background: var(--bg-card);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .search-box:focus-within {
+            border-color: var(--gold);
+            box-shadow: var(--shadow-gold);
+            transform: translateY(-2px);
+        }
+        .search-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--bg-soft);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .search-box:focus-within .search-icon {
+            background: var(--gold-gradient);
+            color: #fff;
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
             color: var(--text);
             font-family: var(--font);
             font-size: 15px;
             outline: none;
-            transition: all 0.4s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 0 8px;
         }
-
-        .blog-search-input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15), 0 8px 30px rgba(212, 163, 115, 0.05);
-        }
-
-        .blog-search-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-submit {
+            padding: 0 24px;
+            height: 48px;
+            border-radius: 14px;
             background: var(--gold-gradient);
             color: #fff;
             border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 700;
             font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .search-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(212, 163, 115, 0.4);
+        }
+
+        /* Results info */
+        .results-info {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .results-info .highlight {
+            color: var(--gold-dark);
+            font-weight: 800;
+        }
+        [data-theme="dark"] .results-info .highlight { color: var(--gold); }
+
+        .results-info .clear-search {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 12px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: rgba(244, 63, 94, 0.1);
+            color: #fb7185;
+            font-size: 12px;
+            font-weight: 700;
             transition: all 0.3s;
         }
-
-        .blog-search-btn:hover {
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.35);
+        .results-info .clear-search:hover {
+            background: rgba(244, 63, 94, 0.2);
         }
 
-        .blog-grid-4 {
+        /* ============================================================
+        BLOG GRID
+        ============================================================ */
+        .blog-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-top: 30px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
         }
 
+        /* ============================================================
+        BLOG CARD
+        ============================================================ */
         .blog-card {
             background: var(--bg-card);
             border-radius: var(--radius);
             overflow: hidden;
             border: 1px solid var(--border);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            display: flex;
+            flex-direction: column;
             cursor: pointer;
-            box-shadow: var(--shadow);
+            animation: cardFadeIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+        .blog-card:nth-child(1) { animation-delay: 0.05s; }
+        .blog-card:nth-child(2) { animation-delay: 0.1s; }
+        .blog-card:nth-child(3) { animation-delay: 0.15s; }
+        .blog-card:nth-child(4) { animation-delay: 0.2s; }
+        .blog-card:nth-child(5) { animation-delay: 0.25s; }
+        .blog-card:nth-child(6) { animation-delay: 0.3s; }
+        .blog-card:nth-child(7) { animation-delay: 0.35s; }
+        .blog-card:nth-child(8) { animation-delay: 0.4s; }
+        .blog-card:nth-child(9) { animation-delay: 0.45s; }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .blog-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-12px);
             border-color: var(--gold);
-            box-shadow: 0 12px 40px rgba(212, 163, 115, 0.12);
+            box-shadow: var(--shadow-gold);
         }
 
+        /* Shine effect */
+        .blog-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 163, 115, 0.12), transparent);
+            transition: left 0.8s;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .blog-card:hover::after { left: 150%; }
+
+        /* ============================================================
+        BLOG IMAGE
+        ============================================================ */
         .blog-image {
-            height: 180px;
-            background-size: cover;
-            background-position: center;
+            width: 100%;
+            height: 220px;
             position: relative;
-            border-radius: var(--radius) var(--radius) 0 0;
+            overflow: hidden;
+            background: var(--navy-gradient);
+        }
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .blog-card:hover .blog-image img {
+            transform: scale(1.1);
+        }
+        .blog-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(10, 22, 40, 0.7) 100%);
+            pointer-events: none;
         }
 
+        /* Category badge */
         .blog-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 12px;
+            top: 16px;
+            right: 16px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: rgba(10, 22, 40, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.4s;
+        }
+        .blog-badge i { color: var(--gold); font-size: 10px; }
+        .blog-card:hover .blog-badge {
+            background: var(--gold-gradient);
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+        .blog-card:hover .blog-badge i { color: #fff; }
+
+        /* Date overlay (bottom of image) */
+        .blog-date-overlay {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: rgba(212, 163, 115, 0.9);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 11px;
             font-weight: 700;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.4s;
+        }
+        .blog-card:hover .blog-date-overlay {
+            background: var(--gold-gradient);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.4);
+        }
+
+        /* ============================================================
+        BLOG CONTENT
+        ============================================================ */
+        .blog-content {
+            padding: 26px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .blog-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 12px;
+            line-height: 1.45;
+            transition: color 0.3s;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .blog-card:hover .blog-title {
+            color: var(--gold-dark);
+        }
+        [data-theme="dark"] .blog-card:hover .blog-title { color: var(--gold); }
+
+        .blog-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.9;
+            margin-bottom: 18px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Footer */
+        .blog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        .blog-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .blog-author i {
+            color: var(--gold);
+            font-size: 11px;
+        }
+
+        .blog-read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold);
+            transition: all 0.3s;
+        }
+        .blog-read-more i {
+            transition: transform 0.3s;
+            font-size: 11px;
+        }
+        .blog-card:hover .blog-read-more {
+            color: var(--gold-dark);
+            gap: 10px;
+        }
+        [data-theme="dark"] .blog-card:hover .blog-read-more { color: var(--gold); }
+        .blog-card:hover .blog-read-more i { transform: translateX(-4px); }
+
+        /* Tags row */
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .blog-tag {
+            padding: 3px 10px;
+            border-radius: 9999px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .blog-tag:hover {
+            background: rgba(212, 163, 115, 0.1);
+            color: var(--gold);
+            border-color: rgba(212, 163, 115, 0.3);
+        }
+
+        /* ============================================================
+        EMPTY STATE
+        ============================================================ */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 100px 20px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 2px dashed var(--border);
+        }
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(212, 163, 115, 0.1), rgba(212, 163, 115, 0.03));
+            border: 2px dashed rgba(212, 163, 115, 0.3);
+            color: var(--gold);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            margin-bottom: 22px;
+            animation: emptyFloat 3s ease-in-out infinite;
+        }
+        @keyframes emptyFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .empty-state .btn-gold-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 9999px;
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: var(--font);
+        }
+        .empty-state .btn-gold-outline:hover {
             background: var(--gold-gradient);
             color: #fff;
+            border-color: transparent;
+            transform: translateY(-3px);
         }
 
-        .blog-content {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .blog-content h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text);
-            line-height: 1.5;
-        }
-
-        .blog-content p {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 12px;
-            line-height: 1.7;
-        }
-
-        .blog-meta {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .blog-meta i {
-            color: var(--gold);
-            margin-left: 4px;
-        }
-
-        .gold-link {
-            color: var(--gold);
-            font-weight: 600;
-            font-size: 13px;
-            transition: color 0.3s;
-            text-decoration: none;
-        }
-
-        .gold-link:hover {
-            color: var(--gold-dark);
-            text-decoration: underline;
-        }
-
-        /* ===== PAGINATION ===== */
+        /* ============================================================
+        PAGINATION
+        ============================================================ */
         .pagination-wrapper {
             display: flex;
             justify-content: center;
-            margin-top: 40px;
+            margin-top: 50px;
         }
-
         .pagination-wrapper nav {
             display: flex;
             gap: 8px;
             align-items: center;
-        }
-
-        .pagination-wrapper .page-link {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
             background: var(--bg-card);
-            color: var(--text);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .pagination-wrapper nav > div {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .pagination-wrapper a,
+        .pagination-wrapper span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
             transition: all 0.3s;
             font-family: var(--font);
-            font-size: 14px;
-            cursor: pointer;
         }
-
-        .pagination-wrapper .page-link:hover {
-            border-color: var(--gold);
+        .pagination-wrapper a:hover {
+            background: var(--bg-soft);
             color: var(--gold);
         }
-
-        .pagination-wrapper .page-link.active {
-            background: var(--gold-gradient);
-            color: #fff;
-            border-color: var(--gold);
+        .pagination-wrapper span[aria-current="page"] span,
+        .pagination-wrapper .active span {
+            background: var(--gold-gradient) !important;
+            color: #fff !important;
+            box-shadow: 0 6px 18px rgba(212, 163, 115, 0.35);
+        }
+        .pagination-wrapper svg {
+            width: 16px;
+            height: 16px;
         }
 
-        .pagination-wrapper .page-link.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .highlight {
-            background: var(--gold);
-            color: #fff;
-            padding: 0 3px;
-            border-radius: 4px;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-            font-size: 16px;
-            grid-column: 1 / -1;
-        }
-
-        .no-results i {
-            font-size: 40px;
-            color: var(--gold);
-            margin-bottom: 15px;
-        }
-
-        /* ===== CTA ===== */
+        /* ============================================================
+        CTA
+        ============================================================ */
         .cta {
             background: var(--navy-gradient);
             color: #fff;
-            padding: 80px 0;
+            padding: 100px 0;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -529,587 +658,281 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.04), transparent 60%);
+            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.08), transparent 60%);
         }
-        .cta .section-title {
-            color: #fff;
+        .cta::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(212, 163, 115, 0.06), transparent 60%);
         }
-        .cta .section-subtitle {
-            color: rgba(255, 255, 255, 0.35);
+        .cta .container { position: relative; z-index: 1; }
+        .cta h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .cta h2 .gold-line {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cta p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            max-width: 600px;
             margin: 0 auto 36px;
         }
-        .cta .btn-group {
+        .cta-buttons {
             display: flex;
             gap: 18px;
             justify-content: center;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
         }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--deep-navy);
-            color: #c8c8d4;
-            padding: 60px 0 20px;
-            margin-top: 40px;
-            border-top: 2px solid var(--gold);
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            text-align: center;
-        }
-        .footer-brand .logo { justify-content: center; }
-        .footer-brand p {
-            font-size: 14px;
-            max-width: 300px;
-            margin: 0 auto 16px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .footer-social {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .footer-social a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c8c8d4;
-            transition: var(--transition);
-        }
-        .footer-social a:hover {
-            background: var(--gold);
-            color: #fff;
-        }
-        .footer-links h4,
-        .footer-contact h4,
-        .footer-trust h4 {
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 16px;
-        }
-        .footer-links ul,
-        .footer-contact ul {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-        .footer-links a,
-        .footer-contact li {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-        .footer-links a:hover { color: var(--gold); }
-        .footer-contact li {
-            display: flex;
+        .cta-btn {
+            display: inline-flex;
             align-items: center;
             gap: 10px;
-        }
-        .footer-contact li i {
-            color: var(--gold);
-            width: 20px;
-        }
-        .trust-icons {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .trust-icons span {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 22, 40, 0.85);
-            backdrop-filter: blur(16px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-        .modal {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 40px 36px;
-            max-width: 480px;
-            width: 100%;
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 40px rgba(212, 163, 115, 0.15);
-            position: relative;
-            transform: scale(0.9) translateY(30px);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .modal-overlay.active .modal {
-            transform: scale(1) translateY(0);
-        }
-        .modal-close {
-            position: absolute;
-            top: 14px;
-            left: 18px;
-            background: none;
-            border: none;
-            font-size: 22px;
-            color: var(--text-muted);
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-        .modal-close:hover {
-            color: var(--gold);
-            background: rgba(212, 163, 115, 0.1);
-            transform: rotate(90deg);
-        }
-        .modal-tabs {
-            display: flex;
-            gap: 6px;
-            background: var(--bg-body);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 28px;
-        }
-        .modal-tab {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 10px;
+            padding: 15px 32px;
+            border-radius: 60px;
             font-weight: 700;
-            font-size: 15px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: 0.3s;
+            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid transparent;
         }
-        .modal-tab.active {
+        .cta-btn.gold {
             background: var(--gold-gradient);
             color: #fff;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.35);
         }
-        .modal-tab:hover:not(.active) {
-            color: var(--gold);
+        .cta-btn.gold:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.55);
         }
-        .modal-form.hidden {
-            display: none;
+        .cta-btn.white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
         }
-        .modal-form .form-group {
-            margin-bottom: 18px;
-        }
-        .modal-form label {
-            display: block;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .modal-form input {
-            width: 100%;
-            padding: 13px 18px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg-body);
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 14px;
-            transition: all 0.4s;
-            outline: none;
-        }
-        .modal-form input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15);
-        }
-        .modal-form .btn {
-            width: 100%;
-            background: var(--gold-gradient);
-            border-color: var(--gold);
+        .cta-btn.white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(255, 255, 255, 0.3);
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .blog-grid-4 {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 18px;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+        /* ============================================================
+        RESPONSIVE
+        ============================================================ */
+        @media (max-width: 1100px) {
+            .blog-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
         }
-
         @media (max-width: 768px) {
-            .nav-desktop { display: none; }
-            .menu-toggle { display: block; }
-            .blog-grid-4 {
-                grid-template-columns: 1fr;
-                gap: 14px;
-            }
-            .blog-search-wrapper {
-                max-width: 100%;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 0 16px; }
+            .page-hero { padding: 50px 0 120px; }
+            .page-hero h1 { font-size: 28px; }
+            .page-hero p { font-size: 14px; }
+            .blog-section { margin-top: -70px; }
+            .blog-grid { grid-template-columns: 1fr; gap: 18px; }
+            .blog-image { height: 200px; }
+            .search-submit span { display: none; }
+            .search-submit { padding: 0 16px; }
+            .cta h2 { font-size: 26px; }
             .cta { padding: 60px 0; }
         }
-
         @media (max-width: 480px) {
-            .blog-image {
-                height: 140px;
-            }
-            .blog-content {
-                padding: 14px;
-            }
-            .blog-content h3 {
-                font-size: 15px;
-            }
+            .page-hero h1 { font-size: 24px; }
+            .search-icon { width: 42px; height: 42px; }
+            .search-box { padding: 6px; }
+            .search-submit { height: 42px; }
+            .blog-image { height: 180px; }
+            .cta-buttons { flex-direction: column; }
+            .cta-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    HEADER
-    ============================================================ -->
-    <header class="header" id="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-            </a>
-            <nav class="nav-desktop" id="navDesktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}" class="active">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="{{ route('home') }}">خانه</a></li>
-                <li><a href="{{ route('about') }}">درباره ما</a></li>
-                <li><a href="{{ route('services') }}">خدمات</a></li>
-                <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                <li><a href="{{ route('contact') }}">تماس</a></li>
-            </ul>
-            <div class="mobile-auth">
-                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
-            </div>
-        </div>
-    </header>
+    @include('partials.header')
 
-    <!-- ============================================================
-    MODAL
-    ============================================================ -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="login">ورود</button>
-                <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+    <!-- ===== PAGE HERO ===== -->
+    <section class="page-hero">
+        <div class="container page-hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-newspaper"></i>
+                <span>اخبار و مقالات</span>
             </div>
-            <form class="modal-form" id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">ایمیل</label>
-                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">رمز عبور</label>
-                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ورود</button>
-            </form>
-            <form class="modal-form hidden" id="registerForm">
-                <div class="form-group">
-                    <label for="regName">نام و نام خانوادگی</label>
-                    <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regEmail">ایمیل</label>
-                    <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">رمز عبور</label>
-                    <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPasswordConfirm">تکرار رمز عبور</label>
-                    <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ثبت‌نام</button>
-            </form>
+            <h1>
+                آخرین مطالب <span class="gold-line">GRAFIUM</span>
+            </h1>
+            <p>
+                جدیدترین مقالات آموزشی، اخبار و رویدادهای دنیای گرافیک را دنبال کنید
+            </p>
         </div>
-    </div>
+    </section>
 
-    <!-- ============================================================
-    BLOG PAGE
-    ============================================================ -->
-    <section class="section blog-page">
+    <!-- ===== BLOG SECTION ===== -->
+    <section class="blog-section">
         <div class="container">
-            <div class="section-header">
-                <span class="gradient-badge"><i class="fas fa-newspaper"></i> اخبار و مقالات</span>
-                <h2 class="purple-text">آخرین مطالب GRAFIUM</h2>
-                <p>جدیدترین مقالات آموزشی، اخبار و رویدادهای دنیای گرافیک را دنبال کنید</p>
-            </div>
 
-            <!-- باکس جستجو -->
-            <div class="blog-search-wrapper">
-                <form action="{{ route('blog.search') }}" method="GET" style="position:relative;width:100%;">
-                    <input type="text" name="q" class="blog-search-input" placeholder="جستجو در مقالات... (مثلاً: فتوشاپ)" value="{{ request('q') }}" />
-                    <button type="submit" class="blog-search-btn" aria-label="جستجو">
-                        <i class="fas fa-search"></i>
-                    </button>
+            <!-- ===== SEARCH BOX ===== -->
+            <div class="search-wrapper">
+                <form action="{{ route('blog.search') }}" method="GET">
+                    <div class="search-box">
+                        <div class="search-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <input
+                            type="text"
+                            name="q"
+                            class="search-input"
+                            placeholder="جستجو در مقالات... (مثلاً: فتوشاپ)"
+                            value="{{ request('q') }}"
+                        />
+                        <button type="submit" class="search-submit">
+                            <i class="fas fa-search"></i>
+                            <span>جستجو</span>
+                        </button>
+                    </div>
                 </form>
             </div>
 
-            <!-- نمایش تعداد نتایج -->
+            <!-- ===== RESULTS INFO ===== -->
             @if(request('q'))
-                <p class="text-center text-gray-500 dark:text-gray-400 mb-4">نتایج جستجو برای: <span class="font-bold text-gold">{{ request('q') }}</span></p>
+                <div class="results-info">
+                    <span>
+                        نتایج جستجو برای: 
+                        <span class="highlight">«{{ request('q') }}»</span>
+                    </span>
+                    <a href="{{ route('blog') }}" class="clear-search">
+                        <i class="fas fa-times"></i>
+                        پاک کردن
+                    </a>
+                </div>
             @endif
 
-            <!-- گرید مقالات -->
-            <div id="blogGrid" class="blog-grid-4">
+            <!-- ===== BLOG GRID ===== -->
+            <div class="blog-grid">
                 @forelse($posts as $post)
-                    <article class="blog-card" onclick="window.location.href='{{ route('blog.post', $post->id) }}'">
-                        <div class="blog-image" style="background-image: url('{{ $post->media ? asset('storage/' . $post->media) : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop' }}');">
-                            <span class="blog-badge">{{ $post->category->name ?? 'عمومی' }}</span>
+                    @php
+                        $imageUrl = $post->media 
+                            ? asset('storage/' . $post->media) 
+                            : 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop';
+                        
+                        $firstTag = null;
+                        if ($post->tags) {
+                            $tagsArray = explode(',', $post->tags);
+                            $firstTag = trim($tagsArray[0]);
+                        }
+                    @endphp
+
+                    <a href="{{ route('blog.post', $post->id) }}" class="blog-card">
+                        <!-- IMAGE -->
+                        <div class="blog-image">
+                            <img src="{{ $imageUrl }}" alt="{{ $post->title }}" loading="lazy" onerror="this.style.display='none'" />
+                            
+                            <!-- Category badge -->
+                            @if($post->category)
+                                <span class="blog-badge">
+                                    <i class="fas fa-folder"></i>
+                                    {{ $post->category->name }}
+                                </span>
+                            @else
+                                <span class="blog-badge">
+                                    <i class="fas fa-folder"></i>
+                                    عمومی
+                                </span>
+                            @endif
+
+                            <!-- Date overlay -->
+                            <span class="blog-date-overlay">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}
+                            </span>
                         </div>
+
+                        <!-- CONTENT -->
                         <div class="blog-content">
-                            <div class="blog-meta">
-                                <span><i class="fas fa-calendar-alt"></i> {{ $post->created_at ? $post->created_at->format('Y/m/d') : '—' }}</span>
-                                <span><i class="fas fa-tag"></i> {{ $post->tags ? explode(',', $post->tags)[0] : 'عمومی' }}</span>
+                            <h3 class="blog-title">{{ $post->title }}</h3>
+
+                            <p class="blog-desc">
+                                {{ Str::limit(strip_tags($post->summary ?? $post->text), 110) }}
+                            </p>
+
+                            <!-- Tags -->
+                            @if($firstTag)
+                                <div class="blog-tags">
+                                    <span class="blog-tag">
+                                        <i class="fas fa-tag"></i> {{ $firstTag }}
+                                    </span>
+                                </div>
+                            @endif
+
+                            <!-- Footer -->
+                            <div class="blog-footer">
+                                <span class="blog-author">
+                                    <i class="fas fa-user"></i>
+                                    {{ $post->author->name ?? 'GRAFIUM' }}
+                                </span>
+                                <span class="blog-read-more">
+                                    ادامه مطلب
+                                    <i class="fas fa-arrow-left"></i>
+                                </span>
                             </div>
-                            <h3>{{ $post->title }}</h3>
-                            <p>{{ Str::limit($post->summary ?? $post->text, 100) }}</p>
-                            <a href="{{ route('blog.post', $post->id) }}" class="gold-link">
-                                ادامه مطلب <i class="fas fa-arrow-left"></i>
-                            </a>
                         </div>
-                    </article>
+                    </a>
                 @empty
-                    <div class="no-results">
-                        <i class="fas fa-search-minus"></i>
-                        <p>هیچ مقاله‌ای یافت نشد.</p>
-                        <a href="{{ route('blog') }}" class="btn btn-gold-outline" style="margin-top:12px;">
-                            <i class="fas fa-arrow-right"></i> بازگشت به بلاگ
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-search-minus"></i>
+                        </div>
+                        <h3>هیچ مقاله‌ای یافت نشد</h3>
+                        <p>
+                            @if(request('q'))
+                                متأسفانه مقاله‌ای برای «{{ request('q') }}» پیدا نشد.
+                            @else
+                                هنوز هیچ مقاله‌ای منتشر نشده است.
+                            @endif
+                        </p>
+                        <a href="{{ route('blog') }}" class="btn-gold-outline">
+                            <i class="fas fa-arrow-right"></i>
+                            بازگشت به بلاگ
                         </a>
                     </div>
                 @endforelse
             </div>
 
-            <!-- Pagination -->
+            <!-- ===== PAGINATION ===== -->
             @if($posts->hasPages())
                 <div class="pagination-wrapper">
-                    {{ $posts->links() }}
+                    {{ $posts->appends(request()->query())->links() }}
                 </div>
             @endif
+
         </div>
     </section>
 
-    <!-- ============================================================
-    CTA
-    ============================================================ -->
-    <section class="cta" id="cta">
+    <!-- ===== CTA ===== -->
+    <section class="cta">
         <div class="container">
-            <span class="gradient-badge" style="background:rgba(212,163,115,0.12);color:var(--gold);">شروع کنید</span>
-            <h2 class="section-title">فضای کاری <span style="color:var(--gold);">خود را امروز رزرو کنید</span></h2>
-            <p class="section-subtitle" style="color:rgba(255,255,255,0.35);max-width:600px;margin:0 auto 36px;">به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.</p>
-            <div class="btn-group">
-                <a href="{{ route('services') }}" class="btn btn-gold">رزرو میز <i class="fas fa-arrow-left"></i></a>
-                <a href="{{ route('contact') }}" class="btn btn-white">تماس با ما</a>
+            <h2>
+                فضای کاری <span class="gold-line">خود را امروز رزرو کنید</span>
+            </h2>
+            <p>
+                به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.
+            </p>
+            <div class="cta-buttons">
+                <a href="{{ route('services') }}" class="cta-btn gold">
+                    <i class="fas fa-rocket"></i>
+                    <span>رزرو میز</span>
+                </a>
+                <a href="{{ route('contact') }}" class="cta-btn white">
+                    <i class="fas fa-headset"></i>
+                    <span>تماس با ما</span>
+                </a>
             </div>
         </div>
     </section>
-
-    <!-- ============================================================
-    FOOTER
-    ============================================================ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-                    </a>
-                    <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
-                    <div class="footer-social">
-                        <a href="#"><i class="fas fa-comment"></i></a>
-                        <a href="#"><i class="fas fa-check-circle"></i></a>
-                        <a href="#"><i class="fas fa-video"></i></a>
-                        <a href="#"><i class="fas fa-share-alt"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="{{ route('home') }}">خانه</a></li>
-                        <li><a href="{{ route('about') }}">درباره ما</a></li>
-                        <li><a href="{{ route('services') }}">خدمات</a></li>
-                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                        <li><a href="{{ route('contact') }}">تماس</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>اطلاعات تماس</h4>
-                    <ul>
-                        <li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li>
-                        <li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li>
-                        <li><i class="fas fa-envelope"></i> info@grafium.ir</li>
-                    </ul>
-                </div>
-                <div class="footer-trust">
-                    <h4>نمادهای اعتماد</h4>
-                    <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
-    <script>
-        // ============================================================
-        // 1. THEME TOGGLE
-        // ============================================================
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle?.querySelector('i');
-        let darkMode = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : true;
-
-        function applyTheme() {
-            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-            if (themeIcon) themeIcon.className = darkMode ? 'fas fa-moon' : 'fas fa-sun';
-            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-        }
-        applyTheme();
-
-        themeToggle?.addEventListener('click', () => {
-            darkMode = !darkMode;
-            applyTheme();
-        });
-
-        // ============================================================
-        // 2. MOBILE MENU
-        // ============================================================
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        menuToggle?.addEventListener('click', () => {
-            mobileMenu?.classList.toggle('open');
-            const icon = menuToggle.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-bars');
-                icon.classList.toggle('fa-times');
-            }
-        });
-
-        document.querySelectorAll('.mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu?.classList.remove('open');
-                const icon = menuToggle?.querySelector('i');
-                if (icon) {
-                    icon.classList.add('fa-bars');
-                    icon.classList.remove('fa-times');
-                }
-            });
-        });
-
-        // ============================================================
-        // 3. HEADER SHADOW
-        // ============================================================
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (!header) return;
-            if (window.scrollY > 50) header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
-            else header.style.boxShadow = 'none';
-        });
-
-        // ============================================================
-        // 4. MODAL
-        // ============================================================
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const openModalBtns = document.querySelectorAll('#openModalBtn, #openModalBtnMobile');
-        const modalTabs = document.querySelectorAll('.modal-tab');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-
-        function openModal(tab = 'login') {
-            modalOverlay?.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchTab(tab);
-        }
-
-        function closeModal() {
-            modalOverlay?.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function switchTab(tab) {
-            modalTabs.forEach(t => t.classList.remove('active'));
-            document.querySelector(`.modal-tab[data-tab="${tab}"]`)?.classList.add('active');
-            loginForm?.classList.toggle('hidden', tab !== 'login');
-            registerForm?.classList.toggle('hidden', tab !== 'register');
-        }
-
-        openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal('login');
-        }));
-
-        modalClose?.addEventListener('click', closeModal);
-        modalOverlay?.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeModal();
-        });
-
-        modalTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        console.log('✅ Blog page loaded successfully!');
-    </script>
 
 </body>
 </html>

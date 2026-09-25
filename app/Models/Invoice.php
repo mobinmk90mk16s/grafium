@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
@@ -27,6 +28,23 @@ class Invoice extends Model
         'due_date',
         'issued_at',
     ];
+
+    // ✅ این بخش رو اضافه کن
+    protected $casts = [
+        'amount' => 'integer',
+        'tax' => 'integer',
+        'discount' => 'integer',
+        'final_amount' => 'integer',
+        'payment_date' => 'datetime',
+        'due_date' => 'date',
+        'issued_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    // ============================================================
+    // روابط
+    // ============================================================
 
     public function user()
     {

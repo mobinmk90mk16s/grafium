@@ -7,17 +7,69 @@
     /* ===== STATS BANNER ===== */
     .stats-banner {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 12px;
-        padding: 16px 20px;
-        background: #0f1f33;
-        border-radius: 12px;
-        border: 1px solid #1a2f4a;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-bottom: 24px;
     }
-    .stats-banner .stat-item { text-align: center; }
-    .stats-banner .stat-item .num { font-size: 20px; font-weight: 700; color: #60a5fa; }
-    .stats-banner .stat-item .label { font-size: 11px; color: #64748b; }
+    .stat-box {
+        background: #0f1f33;
+        border: 1px solid #1a2f4a;
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+    }
+    .stat-box::before {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 80px; height: 80px;
+        background: radial-gradient(circle, var(--accent), transparent 70%);
+        opacity: 0.08;
+        transition: transform 0.5s;
+    }
+    .stat-box:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .stat-box:hover::before { transform: scale(1.4); opacity: 0.15; }
+    .stat-box.all { --accent: #60a5fa; }
+    .stat-box.pending { --accent: #fbbf24; }
+    .stat-box.paid { --accent: #34d399; }
+    .stat-box.cancelled { --accent: #fb7185; }
+    .stat-box.income { --accent: #f59e0b; }
+
+    .stat-icon {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--accent) 15%, transparent);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    .stat-info { flex: 1; min-width: 0; }
+    .stat-num {
+        font-size: 22px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+    }
+    .stat-label {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 600;
+        margin-top: 2px;
+    }
 
     /* ===== FILTER BAR ===== */
     .filter-bar {
@@ -31,20 +83,66 @@
         border: 1px solid #1a2f4a;
         margin-bottom: 20px;
     }
-    .filter-bar input, .filter-bar select {
+    .filter-bar input,
+    .filter-bar select {
         background: #0f1f33;
         border: 1px solid #1a2f4a;
-        border-radius: 8px;
-        padding: 8px 14px;
+        border-radius: 10px;
+        padding: 10px 14px;
         color: #e2e8f0;
         font-size: 13px;
         font-family: 'Vazirmatn', sans-serif;
+        min-width: 160px;
     }
-    .filter-bar input:focus, .filter-bar select:focus {
+    .filter-bar input:focus,
+    .filter-bar select:focus {
         outline: none;
         border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
-    .filter-bar .w-48 { width: 12rem; }
+    .filter-bar select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: left 12px center;
+        padding-right: 36px;
+        cursor: pointer;
+    }
+    .filter-bar select option { background: #0a1628; color: #e2e8f0; }
+
+    .btn-blue {
+        background: #1a2f4a;
+        color: #60a5fa;
+        border: 1px solid #2a4a6a;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Vazirmatn', sans-serif;
+        text-decoration: none;
+    }
+    .btn-blue:hover { background: #2a4a6a; }
+
+    .btn-rose {
+        background: rgba(244, 63, 94, 0.08);
+        color: #fb7185;
+        border: 1px solid rgba(244, 63, 94, 0.2);
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Vazirmatn', sans-serif;
+        text-decoration: none;
+    }
+    .btn-rose:hover { background: rgba(244, 63, 94, 0.15); }
 
     /* ===== TABLE ===== */
     .table-wrap {
@@ -53,196 +151,473 @@
         border: 1px solid #1a2f4a;
         background: #0f1f33;
     }
-    .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .table-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
     .table-wrap thead {
         background: #0a1628;
         border-bottom: 1px solid #1a2f4a;
     }
     .table-wrap thead th {
         padding: 14px 16px;
-        text-align: center;
+        text-align: right;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: #94a3b8;
-        border-bottom: 1px solid #1a2f4a;
         white-space: nowrap;
     }
     .table-wrap tbody td {
-        padding: 12px 16px;
+        padding: 16px;
         border-bottom: 1px solid #132238;
         color: #cbd5e1;
         vertical-align: middle;
-        text-align: center;
+        text-align: right;
     }
-    .table-wrap tbody tr { transition: background 0.15s; }
-    .table-wrap tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-    /* ===== BADGE ===== */
-    .badge {
-        padding: 4px 14px;
-        border-radius: 9999px;
-        font-size: 11px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-    }
-    .badge-active { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
-    .badge-pending { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
-    .badge-cancelled { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
-    .badge-completed { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-    .badge-expired { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
-    .badge-paid { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
-    .badge-unpaid { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
-    .badge-refunded { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
-
-    /* ===== BUTTONS ===== */
-    .btn-blue {
-        background: #1a2f4a;
-        color: #60a5fa;
-        border: 1px solid #2a4a6a;
-        padding: 8px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 13px;
-        transition: all 0.2s;
+    .table-wrap tbody tr {
+        transition: background 0.15s;
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
     }
-    .btn-blue:hover { background: #2a4a6a; border-color: #3a5a7a; }
+    .table-wrap tbody tr:hover {
+        background: rgba(59, 130, 246, 0.05);
+    }
+    .table-wrap tbody tr:last-child td { border-bottom: none; }
 
-    .btn-rose {
-        background: rgba(244, 63, 94, 0.08);
-        color: #fb7185;
-        border: 1px solid rgba(244, 63, 94, 0.2);
-        padding: 8px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 13px;
-        transition: all 0.2s;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .btn-rose:hover { background: rgba(244, 63, 94, 0.15); }
-
-    .btn-emerald {
-        background: rgba(52, 211, 153, 0.08);
-        color: #34d399;
-        border: 1px solid rgba(52, 211, 153, 0.2);
-        padding: 8px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 13px;
-        transition: all 0.2s;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .btn-emerald:hover { background: rgba(52, 211, 153, 0.15); }
-
-    /* ===== ACTION BUTTONS ===== */
-    .action-buttons {
-        display: flex;
-        gap: 6px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .action-buttons button {
-        padding: 4px 10px;
-        border-radius: 6px;
-        border: 1px solid transparent;
-        font-size: 12px;
-        cursor: pointer;
-        transition: 0.2s;
-        font-family: 'Vazirmatn', sans-serif;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    /* ===== ALERT ===== */
-    .alert {
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 16px;
+    /* User cell */
+    .user-cell {
         display: flex;
         align-items: center;
         gap: 10px;
-        font-size: 14px;
     }
-    .alert-success {
-        background: rgba(52, 211, 153, 0.12);
-        border: 1px solid rgba(52, 211, 153, 0.2);
-        color: #34d399;
-    }
-    .alert-error {
-        background: rgba(244, 63, 94, 0.12);
-        border: 1px solid rgba(244, 63, 94, 0.2);
-        color: #fb7185;
-    }
-
-    .avatar-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #1a2f4a;
+    .user-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #60a5fa;
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+    .user-info { min-width: 0; }
+    .user-name {
+        font-weight: 700;
+        color: #fff;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .user-phone {
+        font-size: 11px;
+        color: #64748b;
+        direction: ltr;
+        text-align: right;
+        font-family: monospace;
     }
 
-    /* ===== PAGINATION ===== */
-    .pagination-bar {
-        display: flex;
-        justify-content: space-between;
+    .service-name {
+        font-weight: 700;
+        color: #e2e8f0;
+        font-size: 13px;
+    }
+    .service-items {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 2px;
+    }
+
+    .amount-cell {
+        font-weight: 800;
+        color: #34d399;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+    .amount-cell.empty { color: #475569; }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
         align-items: center;
-        padding: 12px 20px;
+        gap: 5px;
+        white-space: nowrap;
+    }
+    .badge-pending { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+    .badge-paid { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .badge-cancelled { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 13px;
+    }
+    .action-btn:hover {
+        background: #3b82f6;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    .pagination-wrap {
+        padding: 16px 20px;
         background: #0a1628;
         border-radius: 12px;
         border: 1px solid #1a2f4a;
         margin-top: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
         gap: 12px;
     }
-    .pagination-bar .page-info { color: #64748b; font-size: 13px; }
-    .pagination-bar .page-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-    .pagination-bar .page-btns button {
-        padding: 6px 14px;
-        border-radius: 6px;
+    .pagination-wrap .info { color: #64748b; font-size: 13px; }
+
+    /* ============================================================
+    MODAL
+    ============================================================ */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(4, 10, 20, 0.85);
+        backdrop-filter: blur(12px);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+        padding: 20px;
+    }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-box {
+        background: #0f1f33;
         border: 1px solid #1a2f4a;
-        background: transparent;
+        border-radius: 22px;
+        max-width: 720px;
+        width: 100%;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transform: scale(0.9);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    }
+    .modal-overlay.active .modal-box { transform: scale(1); }
+
+    .modal-header {
+        background: linear-gradient(135deg, #0a1628, #1a2f4a);
+        padding: 22px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #1a2f4a;
+        flex-shrink: 0;
+    }
+    .modal-header h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .modal-header h3 i { color: #60a5fa; }
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         color: #94a3b8;
         cursor: pointer;
-        transition: 0.2s;
-        font-family: 'Vazirmatn', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .modal-close:hover {
+        background: rgba(244, 63, 94, 0.2);
+        color: #fb7185;
+        border-color: #fb7185;
+        transform: rotate(90deg);
+    }
+
+    .modal-body {
+        padding: 24px 28px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .modal-section { margin-bottom: 24px; }
+    .modal-section-title {
+        font-size: 12px;
+        font-weight: 800;
+        color: #60a5fa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .modal-section-title i { font-size: 14px; }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #0a1628;
+        border: 1px solid #1a2f4a;
+        border-radius: 10px;
+        margin-bottom: 8px;
         font-size: 13px;
     }
-    .pagination-bar .page-btns button:hover { background: #1a2f4a; color: #fff; }
-    .pagination-bar .page-btns button.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .info-row .label { color: #94a3b8; }
+    .info-row .value { font-weight: 700; color: #e2e8f0; }
+    .info-row .value.ltr { direction: ltr; font-family: monospace; }
+
+    .user-block {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px;
+        background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02));
+        border: 1px solid rgba(59,130,246,0.2);
+        border-radius: 14px;
+        margin-bottom: 8px;
+    }
+    .user-block-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
+        flex-shrink: 0;
+        box-shadow: 0 8px 20px rgba(59,130,246,0.3);
+    }
+    .user-block-info h4 {
+        font-size: 16px;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+    .user-block-info p {
+        font-size: 12px;
+        color: #64748b;
+        direction: ltr;
+        text-align: right;
+        font-family: monospace;
+    }
+
+    .item-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: #0a1628;
+        border: 1px solid #1a2f4a;
+        border-radius: 12px;
+        margin-bottom: 8px;
+    }
+    .item-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-service {
+        font-size: 11px;
+        color: #60a5fa;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+    .item-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin-bottom: 3px;
+    }
+    .item-time {
+        font-size: 11px;
+        color: #64748b;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .item-time i { color: #475569; font-size: 10px; margin-left: 3px; }
+    .item-price {
+        font-size: 13px;
+        font-weight: 800;
+        color: #34d399;
+        white-space: nowrap;
+    }
+
+    .status-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+    }
+    .status-btn {
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid;
+        font-weight: 700;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'Vazirmatn', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .status-btn.paid {
+        background: rgba(52, 211, 153, 0.08);
+        color: #34d399;
+        border-color: rgba(52, 211, 153, 0.3);
+    }
+    .status-btn.paid:hover { background: #34d399; color: #fff; }
+    .status-btn.pending {
+        background: rgba(251, 191, 36, 0.08);
+        color: #fbbf24;
+        border-color: rgba(251, 191, 36, 0.3);
+    }
+    .status-btn.pending:hover { background: #fbbf24; color: #fff; }
+    .status-btn.cancel {
+        background: rgba(244, 63, 94, 0.08);
+        color: #fb7185;
+        border-color: rgba(244, 63, 94, 0.3);
+    }
+    .status-btn.cancel:hover { background: #f43f5e; color: #fff; }
+    .status-btn.delete {
+        background: rgba(100, 116, 139, 0.1);
+        color: #94a3b8;
+        border-color: rgba(100, 116, 139, 0.3);
+    }
+    .status-btn.delete:hover { background: #475569; color: #fff; }
+
+    .total-box {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(52, 211, 153, 0.02));
+        border: 2px solid rgba(52, 211, 153, 0.3);
+        border-radius: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+    }
+    .total-box .label { color: #94a3b8; font-size: 13px; font-weight: 700; }
+    .total-box .value { color: #34d399; font-size: 22px; font-weight: 900; }
+
+    .modal-loading {
+        padding: 60px 20px;
+        text-align: center;
+        color: #94a3b8;
+    }
+    .modal-spinner {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        border: 3px solid rgba(59, 130, 246, 0.15);
+        border-top-color: #60a5fa;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+        text-align: center;
+        padding: 70px 20px;
+        color: #64748b;
+    }
+    .empty-state i {
+        font-size: 56px;
+        color: #334155;
+        margin-bottom: 16px;
+    }
+    .empty-state h3 {
+        font-size: 18px;
+        color: #94a3b8;
+        margin-bottom: 6px;
+    }
+    .empty-state p { font-size: 13px; }
+
+    .toast-container {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .toast-item {
+        padding: 14px 20px;
+        border-radius: 12px;
+        min-width: 280px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        animation: slideIn 0.4s ease forwards;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid rgba(255,255,255,0.08);
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .toast-success { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+    .toast-error { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+    .toast-info { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-60px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .toast-item.hiding { animation: slideOut 0.3s ease forwards; }
+    @keyframes slideOut {
+        to { opacity: 0; transform: translateX(-60px); }
+    }
 
     @media (max-width: 768px) {
-        .filter-bar { flex-direction: column; align-items: stretch; }
-        .filter-bar .w-48 { width: 100%; }
         .stats-banner { grid-template-columns: repeat(2, 1fr); }
+        .filter-bar { flex-direction: column; align-items: stretch; }
+        .filter-bar input, .filter-bar select { width: 100%; }
         .table-wrap { overflow-x: auto; }
         .table-wrap table { font-size: 11px; }
-        .table-wrap thead th, .table-wrap tbody td { padding: 8px 6px; }
-        .pagination-bar { flex-direction: column; align-items: center; }
-    }
-    @media (max-width: 480px) {
-        .table-wrap table { font-size: 10px; }
-        .table-wrap thead th, .table-wrap tbody td { padding: 6px 4px; }
-        .stats-banner { grid-template-columns: 1fr; }
+        .table-wrap thead th, .table-wrap tbody td { padding: 10px 8px; }
+        .modal-body { padding: 18px; }
+        .modal-header { padding: 18px; }
+        .user-block { flex-direction: column; text-align: center; }
     }
 </style>
 
@@ -250,253 +625,472 @@
 <div class="flex flex-wrap justify-between items-center pb-4 border-b border-[#1a2f4a] mb-6">
     <div>
         <div class="flex items-center gap-3">
-            <i data-lucide="calendar-check" class="w-6 h-6 text-emerald-400"></i>
+            <i data-lucide="calendar-check" class="w-6 h-6 text-cyan-400"></i>
             <h1 class="text-2xl font-extrabold text-white">مدیریت رزروها</h1>
         </div>
-        <p class="text-sm text-[#475569] mt-0.5 mr-9">مدیریت همه رزروهای سیستم</p>
+        <p class="text-sm text-[#475569] mt-0.5 mr-9">مدیریت رزروهای پرداخت‌شده و در انتظار</p>
     </div>
     <div class="flex items-center gap-4">
         <span class="text-sm text-[#64748b]">{{ Auth::guard('admin')->user()->name ?? 'ادمین' }}</span>
-        <div class="avatar-icon"><i data-lucide="user-circle" class="w-5 h-5"></i></div>
+        <div class="w-9 h-9 rounded-full bg-[#1a2f4a] flex items-center justify-center text-[#60a5fa]">
+            <i data-lucide="user-circle" class="w-5 h-5"></i>
+        </div>
     </div>
 </div>
 
-<!-- ===== ALERT MESSAGES ===== -->
 @if(session('success'))
-    <div class="alert alert-success">
+    <div style="padding:12px 16px;border-radius:10px;margin-bottom:16px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.2);color:#34d399;display:flex;align-items:center;gap:10px;font-size:14px;">
         <i data-lucide="check-circle" class="w-5 h-5"></i>
         {{ session('success') }}
     </div>
 @endif
 
-@if(session('error'))
-    <div class="alert alert-error">
-        <i data-lucide="alert-circle" class="w-5 h-5"></i>
-        {{ session('error') }}
-    </div>
-@endif
-
 <!-- ===== STATS BANNER ===== -->
 <div class="stats-banner">
-    <div class="stat-item">
-        <span class="num">{{ $stats['total'] ?? 0 }}</span>
-        <span class="label">کل رزروها</span>
-    </div>
-    <div class="stat-item">
-        <span class="num" style="color: #34d399;">{{ $stats['active'] ?? 0 }}</span>
-        <span class="label">فعال</span>
-    </div>
-    <div class="stat-item">
-        <span class="num" style="color: #fbbf24;">{{ $stats['pending'] ?? 0 }}</span>
-        <span class="label">در انتظار</span>
-    </div>
-    <div class="stat-item">
-        <span class="num" style="color: #60a5fa;">{{ $stats['completed'] ?? 0 }}</span>
-        <span class="label">تکمیل شده</span>
-    </div>
-    <div class="stat-item">
-        <span class="num" style="color: #fb7185;">{{ $stats['cancelled'] ?? 0 }}</span>
-        <span class="label">لغو شده</span>
-    </div>
-    <div class="stat-item">
-        <span class="num" style="color: #60a5fa;">{{ $stats['today'] ?? 0 }}</span>
-        <span class="label">رزرو امروز</span>
+    <a href="{{ route('admin.reservations.index') }}" class="stat-box all">
+        <div class="stat-icon"><i data-lucide="layers" class="w-5 h-5"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ $stats['total'] }}</div>
+            <div class="stat-label">کل رزروها</div>
+        </div>
+    </a>
+    <a href="{{ route('admin.reservations.index', ['status' => 'pending']) }}" class="stat-box pending">
+        <div class="stat-icon"><i data-lucide="clock" class="w-5 h-5"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ $stats['pending'] }}</div>
+            <div class="stat-label">در انتظار پرداخت</div>
+        </div>
+    </a>
+    <a href="{{ route('admin.reservations.index', ['status' => 'paid']) }}" class="stat-box paid">
+        <div class="stat-icon"><i data-lucide="badge-check" class="w-5 h-5"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ $stats['paid'] }}</div>
+            <div class="stat-label">پرداخت شده</div>
+        </div>
+    </a>
+    <a href="{{ route('admin.reservations.index', ['status' => 'cancelled']) }}" class="stat-box cancelled">
+        <div class="stat-icon"><i data-lucide="x-circle" class="w-5 h-5"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ $stats['cancelled'] }}</div>
+            <div class="stat-label">لغو شده</div>
+        </div>
+    </a>
+    <div class="stat-box income">
+        <div class="stat-icon"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ number_format($stats['total_income']) }}</div>
+            <div class="stat-label">درآمد کل (تومان)</div>
+        </div>
     </div>
 </div>
 
 <!-- ===== FILTER BAR ===== -->
-<div class="filter-bar">
-    <input type="text" id="searchInput" placeholder="جستجو در رزروها..." onkeyup="filterTable()" class="w-48" />
-    <select id="statusFilter" onchange="filterTable()" class="filter-select">
-        <option value="all">همه وضعیت‌ها</option>
-        <option value="active">فعال</option>
-        <option value="pending">در انتظار</option>
-        <option value="completed">تکمیل شده</option>
-        <option value="cancelled">لغو شده</option>
-        <option value="expired">منقضی</option>
+<form method="GET" action="{{ route('admin.reservations.index') }}" class="filter-bar">
+    <input type="text" name="search" placeholder="جستجو: نام، شماره، ایمیل..." value="{{ request('search') }}" />
+
+    <select name="status">
+        <option value="all" {{ request('status', 'all') == 'all' ? 'selected' : '' }}>همه وضعیت‌ها</option>
+        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>در انتظار پرداخت</option>
+        <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>پرداخت شده</option>
+        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>لغو شده</option>
     </select>
-    <button class="btn-blue" onclick="filterTable()">
+
+    <button type="submit" class="btn-blue">
         <i data-lucide="search" class="w-4 h-4"></i> جستجو
     </button>
-    <button class="btn-rose" onclick="resetFilters()">
+
+    <a href="{{ route('admin.reservations.index') }}" class="btn-rose">
         <i data-lucide="refresh-cw" class="w-4 h-4"></i> بازنشانی
-    </button>
-</div>
+    </a>
+</form>
 
 <!-- ===== TABLE ===== -->
 <div class="table-wrap">
-    <div class="overflow-x-auto">
-        <table id="reservationsTable">
-            <thead>
-                <tr>
-                    <th style="min-width:40px;">#</th>
-                    <th style="min-width:100px;">کاربر</th>
-                    <th style="min-width:120px;">خدمت</th>
-                    <th style="min-width:100px;">تاریخ</th>
-                    <th style="min-width:80px;">شیفت</th>
-                    <th style="min-width:100px;">قیمت</th>
-                    <th style="min-width:80px;">وضعیت</th>
-                    <th style="min-width:80px;">پرداخت</th>
-                    <th style="min-width:120px;">عملیات</th>
+    <table>
+        <thead>
+            <tr>
+                <th style="width:60px;">#</th>
+                <th>کاربر</th>
+                <th>خدمت</th>
+                <th>تاریخ ثبت</th>
+                <th>مبلغ</th>
+                <th>وضعیت</th>
+                <th style="width:80px;">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($bookings as $booking)
+                @php
+                    $firstItem = $booking->items->first();
+                    $serviceTitle = $firstItem?->scheduling?->serviceItem?->service?->title ?? '—';
+                    $itemsCount = $booking->items->count();
+
+                    $badgeClass = match($booking->status) {
+                        'pending' => 'badge-pending',
+                        'paid' => 'badge-paid',
+                        'cancelled' => 'badge-cancelled',
+                        default => 'badge-pending',
+                    };
+                    $badgeLabel = match($booking->status) {
+                        'pending' => 'در انتظار پرداخت',
+                        'paid' => 'پرداخت شده',
+                        'cancelled' => 'لغو شده',
+                        default => $booking->status,
+                    };
+                @endphp
+                <tr onclick="openDetails({{ $booking->id }})" data-id="{{ $booking->id }}">
+                    <td style="color:#64748b;font-weight:700;">{{ $bookings->firstItem() + $loop->index }}</td>
+
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">
+                                {{ mb_substr($booking->user->name ?? '?', 0, 1) }}
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name">{{ $booking->user->name ?? 'کاربر حذف شده' }}</div>
+                                <div class="user-phone">{{ $booking->user->phone ?? '—' }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="service-name">{{ $serviceTitle }}</div>
+                        <div class="service-items">{{ $itemsCount }} آیتم</div>
+                    </td>
+
+                    <td>
+                        <div style="font-size:12px;color:#94a3b8;">
+                            {{ $booking->created_at ? $booking->created_at->format('Y/m/d') : '—' }}
+                        </div>
+                        <div style="font-size:11px;color:#475569;">
+                            {{ $booking->created_at ? $booking->created_at->format('H:i') : '' }}
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="amount-cell {{ $booking->total_amount > 0 ? '' : 'empty' }}">
+                            {{ number_format($booking->total_amount) }} ت
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="badge {{ $badgeClass }}">
+                            {{ $badgeLabel }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <button type="button" class="action-btn" onclick="event.stopPropagation(); openDetails({{ $booking->id }})" title="جزئیات">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse($reservations as $reservation)
-                <tr data-status="{{ $reservation->status }}" data-search="{{ $reservation->user->name ?? '' }} {{ $reservation->service->title ?? '' }}">
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $reservation->user->name ?? 'کاربر حذف شده' }}</td>
-                    <td>{{ $reservation->service->title ?? 'بدون خدمت' }}</td>
-                    <td>{{ $reservation->reservation_date ?? '—' }}</td>
-                    <td>{{ $reservation->shift_persian ?? '—' }}</td>
-                    <td class="font-bold text-emerald-400">{{ number_format($reservation->total_price) }} تومان</td>
-                    <td>
-                        <span class="badge badge-{{ $reservation->status }}">
-                            {{ $reservation->status_persian ?? $reservation->status }}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge badge-{{ $reservation->payment_status }}">
-                            {{ $reservation->payment_status_persian ?? $reservation->payment_status }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button onclick="updateStatus({{ $reservation->id }})" class="text-amber-400 hover:text-amber-300 transition">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteReservation({{ $reservation->id }})" class="text-rose-400 hover:text-rose-300 transition">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+            @empty
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i data-lucide="inbox" class="w-14 h-14"></i>
+                            <h3>هیچ رزروی یافت نشد</h3>
+                            <p>هنوز هیچ رزرو واقعی ثبت نشده است.</p>
                         </div>
                     </td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="9" class="text-center py-12 text-[#475569]">
-                        <i data-lucide="calendar-check" class="w-12 h-12 mx-auto text-[#475569] mb-3"></i>
-                        <p>هیچ رزروی یافت نشد</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+            @endforelse
+        </tbody>
+    </table>
 </div>
 
 <!-- ===== PAGINATION ===== -->
-@if($reservations->hasPages())
-<div class="pagination-bar">
-    <span class="page-info">نمایش {{ $reservations->firstItem() ?? 0 }} - {{ $reservations->lastItem() ?? 0 }} از {{ $reservations->total() }} رزرو</span>
-    <div class="page-btns">
-        {{ $reservations->links() }}
-    </div>
+@if($bookings->hasPages())
+<div class="pagination-wrap">
+    <span class="info">
+        نمایش {{ $bookings->firstItem() ?? 0 }} تا {{ $bookings->lastItem() ?? 0 }} از {{ $bookings->total() }} رزرو
+    </span>
+    <div>{{ $bookings->appends(request()->query())->links() }}</div>
 </div>
 @endif
 
 <!-- ============================================================
-SCRIPTS
+MODAL
 ============================================================ -->
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+                جزئیات رزرو
+            </h3>
+            <button type="button" class="modal-close" onclick="closeModal()">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" id="modalBody">
+            <div class="modal-loading">
+                <div class="modal-spinner"></div>
+                <div>در حال بارگذاری...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
     lucide.createIcons();
 
-    // ===== FILTER TABLE =====
-    function filterTable() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const status = document.getElementById('statusFilter').value;
-        const rows = document.querySelectorAll('#reservationsTable tbody tr');
+    let currentBookingId = null;
 
-        rows.forEach(row => {
-            const title = row.dataset.search?.toLowerCase() || '';
-            const rowStatus = row.dataset.status || '';
-            let show = true;
+    async function openDetails(id) {
+        currentBookingId = id;
+        const modal = document.getElementById('detailsModal');
+        const body = document.getElementById('modalBody');
 
-            if (search && !title.includes(search)) {
-                show = false;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        body.innerHTML = `
+            <div class="modal-loading">
+                <div class="modal-spinner"></div>
+                <div>در حال بارگذاری...</div>
+            </div>
+        `;
+
+        try {
+            const res = await fetch(`/admin/reservations/${id}/details`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                renderDetails(data);
+            } else {
+                body.innerHTML = `<div class="empty-state"><i data-lucide="alert-circle" class="w-14 h-14"></i><h3>خطا</h3><p>${data.message || 'خطا در دریافت اطلاعات'}</p></div>`;
+                lucide.createIcons();
             }
-            if (status !== 'all' && rowStatus !== status) {
-                show = false;
-            }
-
-            row.style.display = show ? '' : 'none';
-        });
+        } catch (err) {
+            console.error(err);
+            body.innerHTML = `<div class="empty-state"><i data-lucide="wifi-off" class="w-14 h-14"></i><h3>خطای شبکه</h3><p>اتصال به سرور برقرار نشد.</p></div>`;
+            lucide.createIcons();
+        }
     }
 
-    function resetFilters() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('statusFilter').value = 'all';
-        filterTable();
-        showToast('فیلترها بازنشانی شدند', 'info');
-    }
+    function renderDetails(data) {
+        const body = document.getElementById('modalBody');
+        const { booking, user, items } = data;
 
-    // ===== UPDATE STATUS =====
-    function updateStatus(id) {
-        const statuses = ['pending', 'active', 'completed', 'cancelled', 'expired'];
-        const labels = ['در انتظار', 'فعال', 'تکمیل شده', 'لغو شده', 'منقضی'];
+        let html = '';
 
-        const choice = prompt('وضعیت جدید را وارد کنید:\n1. در انتظار\n2. فعال\n3. تکمیل شده\n4. لغو شده\n5. منقضی', '2');
+        // User
+        html += `
+            <div class="modal-section">
+                <div class="modal-section-title">
+                    <i data-lucide="user"></i> اطلاعات کاربر
+                </div>
+                <div class="user-block">
+                    <div class="user-block-avatar">${(user.name || '?').charAt(0)}</div>
+                    <div class="user-block-info">
+                        <h4>${user.name}</h4>
+                        <p>${user.phone}</p>
+                        ${user.email && user.email !== '—' ? `<p style="margin-top:2px;color:#475569;font-size:11px;">${user.email}</p>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
 
-        if (!choice) return;
+        // Booking Info
+        html += `
+            <div class="modal-section">
+                <div class="modal-section-title">
+                    <i data-lucide="info"></i> اطلاعات رزرو
+                </div>
+                <div class="info-row">
+                    <span class="label">شماره رزرو</span>
+                    <span class="value ltr">#${booking.id}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">وضعیت</span>
+                    <span class="value">${booking.status_label}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">تاریخ ثبت</span>
+                    <span class="value">${booking.created_at}</span>
+                </div>
+                ${booking.paid_at ? `
+                <div class="info-row">
+                    <span class="label">تاریخ پرداخت</span>
+                    <span class="value">${booking.paid_at}</span>
+                </div>
+                ` : ''}
+            </div>
+        `;
 
-        const index = parseInt(choice) - 1;
-        if (index < 0 || index >= statuses.length) {
-            showToast('وضعیت نامعتبر', 'error');
-            return;
+        // Items
+        if (items && items.length > 0) {
+            html += `
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <i data-lucide="package"></i> آیتم‌های رزرو (${items.length})
+                    </div>
+            `;
+
+            items.forEach(item => {
+                const icon = item.service_type === 'shift' ? 'clock' : 'hourglass';
+                html += `
+                    <div class="item-row">
+                        <div class="item-icon">
+                            <i data-lucide="${icon}"></i>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-service">${item.service_title}</div>
+                            <div class="item-title">${item.item_title}</div>
+                            <div class="item-time">
+                                <span><i data-lucide="calendar"></i>${item.jalali_date || '—'}</span>
+                                <span><i data-lucide="clock"></i>${item.time_start} - ${item.time_end}</span>
+                                ${item.item_place ? `<span><i data-lucide="map-pin"></i>${item.item_place}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="item-price">${item.price_formatted} ت</div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
         }
 
-        const newStatus = statuses[index];
+        // Total
+        html += `
+            <div class="total-box">
+                <span class="label">مبلغ کل</span>
+                <span class="value">${booking.total_formatted} تومان</span>
+            </div>
+        `;
 
-        fetch(`/admin/reservations/${id}/status`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: newStatus })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast('وضعیت رزرو با موفقیت تغییر کرد', 'success');
-                setTimeout(() => location.reload(), 1000);
-            }
-        })
-        .catch(() => showToast('خطا در تغییر وضعیت', 'error'));
+        // Actions
+        html += `
+            <div class="modal-section" style="margin-top:24px;">
+                <div class="modal-section-title">
+                    <i data-lucide="settings"></i> عملیات
+                </div>
+                <div class="status-actions">
+                    ${booking.status !== 'paid' ? `
+                        <button type="button" class="status-btn paid" onclick="updateStatus(${booking.id}, 'paid')">
+                            <i data-lucide="badge-check" class="w-4 h-4"></i> تایید پرداخت
+                        </button>
+                    ` : ''}
+                    ${booking.status !== 'pending' ? `
+                        <button type="button" class="status-btn pending" onclick="updateStatus(${booking.id}, 'pending')">
+                            <i data-lucide="clock" class="w-4 h-4"></i> در انتظار پرداخت
+                        </button>
+                    ` : ''}
+                    ${booking.status !== 'cancelled' ? `
+                        <button type="button" class="status-btn cancel" onclick="updateStatus(${booking.id}, 'cancelled')">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i> لغو رزرو
+                        </button>
+                    ` : ''}
+                    <button type="button" class="status-btn delete" onclick="deleteReservation(${booking.id})">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> حذف کامل
+                    </button>
+                </div>
+            </div>
+        `;
+
+        body.innerHTML = html;
+        lucide.createIcons();
     }
 
-    // ===== DELETE RESERVATION =====
-    function deleteReservation(id) {
-        if (!confirm('آیا از حذف این رزرو اطمینان دارید؟')) return;
+    function closeModal() {
+        document.getElementById('detailsModal').classList.remove('active');
+        document.body.style.overflow = '';
+        currentBookingId = null;
+    }
 
-        fetch(`/admin/reservations/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
+    document.getElementById('detailsModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'detailsModal') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    async function updateStatus(id, status) {
+        const labels = {
+            paid: 'تایید پرداخت',
+            pending: 'در انتظار پرداخت',
+            cancelled: 'لغو رزرو',
+        };
+
+        if (!confirm(`آیا از «${labels[status] || status}» اطمینان دارید؟`)) return;
+
+        try {
+            const res = await fetch(`/admin/reservations/${id}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify({ status }),
+            });
+
+            const data = await res.json();
+
             if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                showToast(data.message || 'خطا در تغییر وضعیت', 'error');
+            }
+        } catch (err) {
+            showToast('خطا در ارتباط با سرور', 'error');
+        }
+    }
+
+    async function deleteReservation(id) {
+        if (!confirm('آیا از حذف کامل این رزرو اطمینان دارید؟')) return;
+
+        try {
+            const res = await fetch(`/admin/reservations/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+            });
+
+            if (res.ok || res.redirected) {
                 showToast('رزرو با موفقیت حذف شد', 'success');
-                setTimeout(() => location.reload(), 1000);
+                setTimeout(() => window.location.href = '{{ route("admin.reservations.index") }}', 900);
+            } else {
+                showToast('خطا در حذف رزرو', 'error');
             }
-        })
-        .catch(() => showToast('خطا در حذف رزرو', 'error'));
+        } catch (err) {
+            showToast('خطا در ارتباط با سرور', 'error');
+        }
     }
 
-    // ===== TOAST =====
-    function showToast(message, type = 'info', duration = 3000) {
+    function showToast(message, type = 'info') {
         const container = document.getElementById('toastContainer');
+        const icons = {
+            success: 'check-circle',
+            error: 'alert-circle',
+            info: 'info',
+        };
         const toast = document.createElement('div');
         toast.className = `toast-item toast-${type}`;
-        const icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
-        toast.innerHTML = `
-            <i data-lucide="${icons[type] || 'info'}" class="w-5 h-5 flex-shrink-0"></i>
-            <span class="text-sm font-medium">${message}</span>
-        `;
+        toast.innerHTML = `<i data-lucide="${icons[type]}" class="w-5 h-5"></i><span>${message}</span>`;
         container.appendChild(toast);
         lucide.createIcons();
-        setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, duration);
+        setTimeout(() => {
+            toast.classList.add('hiding');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 </script>
 @endsection

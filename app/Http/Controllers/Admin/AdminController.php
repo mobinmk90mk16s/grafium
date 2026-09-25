@@ -9,66 +9,69 @@ use App\Models\Admin;
 use App\Models\Desk;
 use App\Models\Reservation;
 use App\Models\Invoice;
+use App\Models\Booking;
 
 class AdminController extends Controller
 {
     /**
      * نمایش صفحه اصلی پنل ادمین (داشبورد)
-     * داده‌ها به صورت یکجا و ترکیبی ارسال می‌شوند
      */
     public function index()
     {
         // ============================================================
-        // همه داده‌های مورد نیاز را یکجا جمع کن
+        // آمار واقعی از دیتابیس
         // ============================================================
-        $data = [
-            // ===== 1. کاربران با صفحه‌بندی (پاگینیشن) =====
-            'users' => User::latest()->paginate(10),
+        $stats = [
+            // کاربران و مدیران
+            'total_users' => User::count(),
+            'total_admins' => Admin::count(),
 
-            // ===== 2. مدیران =====
-            'admins' => Admin::all(),
+            // رزروها
+            'total_reservations' => Reservation::count(),
+            'active_reservations' => Reservation::where('status', 'active')->count(),
+            'pending_reservations' => Reservation::where('status', 'pending')->count(),
+            'completed_reservations' => Reservation::where('status', 'completed')->count(),
+            'cancelled_reservations' => Reservation::where('status', 'cancelled')->count(),
 
-            // ===== 3. آمارها (Stats) =====
-            'stats' => [
-                'total_users' => User::count(),
-                'total_admins' => Admin::count(),
-                'total_reservations' => Reservation::count(),
-                'total_invoices' => Invoice::count(),
-                'total_desks' => Desk::count(),
-                'active_reservations' => Reservation::where('status', 'active')->count(),
-                'pending_reservations' => Reservation::where('status', 'pending')->count(),
-                'cancelled_reservations' => Reservation::where('status', 'cancelled')->count(),
-                'completed_reservations' => Reservation::where('status', 'completed')->count(),
-                'expired_reservations' => Reservation::where('status', 'expired')->count(),
-                'paid_invoices' => Invoice::where('status', 'paid')->count(),
-                'pending_invoices' => Invoice::where('status', 'pending')->count(),
-                'cancelled_invoices' => Invoice::where('status', 'cancelled')->count(),
-                'refunded_invoices' => Invoice::where('status', 'refunded')->count(),
-            ],
+            // فاکتورها
+            'total_invoices' => Invoice::count(),
+            'paid_invoices' => Invoice::where('status', 'paid')->count(),
+            'pending_invoices' => Invoice::where('status', 'pending')->count(),
 
-            // ===== 4. آخرین رزروها با Eager Loading =====
-            'recent_reservations' => Reservation::with(['user', 'desk'])
-                ->latest()
-                ->limit(5)
-                ->get(),
+            // درآمد
+            'total_income' => Invoice::where('status', 'paid')->sum('final_amount'),
 
-            // ===== 5. آخرین فاکتورها =====
-            'recent_invoices' => Invoice::with('user')
-                ->latest()
-                ->limit(5)
-                ->get(),
-
-            // ===== 6. جمع کل فروش =====
-            'total_sales' => Invoice::where('status', 'paid')->sum('final_amount'),
-
-            // ===== 7. مجموع رزروهای امروز =====
+            // رزروهای امروز
             'today_reservations' => Reservation::whereDate('created_at', today())->count(),
 
-            // ===== 8. مجموع کاربران جدید امروز =====
+            // کاربران جدید امروز
             'today_new_users' => User::whereDate('created_at', today())->count(),
+
+            // کل bookings پرداخت‌شده
+            'total_bookings_paid' => Booking::where('status', 'paid')->count(),
         ];
 
-        return view('admin.panel', $data);
+        // ============================================================
+        // آخرین رزروها (از جدول reservations)
+        // ============================================================
+        $recentReservations = Reservation::with(['user', 'service', 'desk'])
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get();
+
+        // ============================================================
+        // آخرین فاکتورها (اختیاری)
+        // ============================================================
+        $recentInvoices = Invoice::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.panel', compact(
+            'stats',
+            'recentReservations',
+            'recentInvoices'
+        ));
     }
 
     /**
@@ -80,18 +83,12 @@ class AdminController extends Controller
         return view('admin.admins', compact('admins'));
     }
 
-    /**
-     * نمایش فرم ایجاد مدیر جدید
-     */
     public function create()
     {
         $admins = Admin::all();
         return view('admin.admins', compact('admins'));
     }
 
-    /**
-     * ذخیره مدیر جدید در دیتابیس
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -115,9 +112,6 @@ class AdminController extends Controller
             ->with('success', 'مدیر جدید با موفقیت ایجاد شد.');
     }
 
-    /**
-     * نمایش اطلاعات یک مدیر
-     */
     public function show($id)
     {
         $admin = Admin::findOrFail($id);
@@ -125,9 +119,6 @@ class AdminController extends Controller
         return view('admin.admins', compact('admin', 'admins'));
     }
 
-    /**
-     * نمایش فرم ویرایش مدیر
-     */
     public function edit($id)
     {
         $admin = Admin::findOrFail($id);
@@ -135,9 +126,6 @@ class AdminController extends Controller
         return view('admin.admins', compact('admin', 'admins'));
     }
 
-    /**
-     * به‌روزرسانی مدیر
-     */
     public function update(Request $request, $id)
     {
         $admin = Admin::findOrFail($id);
@@ -166,9 +154,6 @@ class AdminController extends Controller
             ->with('success', 'مدیر با موفقیت به‌روزرسانی شد.');
     }
 
-    /**
-     * حذف مدیر
-     */
     public function destroy($id)
     {
         $admin = Admin::findOrFail($id);

@@ -10,18 +10,17 @@ class Service extends Model
     use HasFactory;
 
     protected $table = 'services';
-
-    protected $fillable = [
-        'title',
-        'type',
-        'status',
-        'config',
-        'place',
-        'description',
-        'price',
-        'icon',
-    ];
-
+protected $fillable = [
+    'title',
+    'type',
+    'status',
+    'config',
+    'place',
+    'description',
+    'price',
+    'icon',
+    'image',  // ← این خط
+];
     protected $casts = [
         'config' => 'array',
         'price' => 'integer',

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>درباره ما | GRAFIUM</title>
-    
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -12,16 +12,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
 
     <style>
-        /* ===== تمام CSS در اینجا ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --deep-navy: #0a1628;
-            --deep-navy-light: #132238;
+            --navy-800: #0f1f33;
+            --navy-700: #132238;
+            --navy-600: #1a2f4a;
             --gold: #d4a373;
             --gold-dark: #b8874a;
             --gold-light: #f0d5b0;
@@ -29,28 +27,33 @@
             --navy-gradient: linear-gradient(135deg, #0a1628, #1a2f4a);
             --bg-body: #f5f7fa;
             --bg-card: #ffffff;
+            --bg-soft: #fafbfc;
             --text: #0a1628;
             --text-muted: #6b7a8a;
             --border: #e4e7ec;
-            --shadow: 0 4px 30px rgba(10, 22, 40, 0.08);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.04);
+            --shadow: 0 8px 30px rgba(10, 22, 40, 0.08);
+            --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.15);
+            --shadow-gold: 0 20px 50px rgba(212, 163, 115, 0.25);
+            --radius: 24px;
+            --radius-sm: 16px;
+            --transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             --font: "Vazirmatn", "Inter", sans-serif;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a1628;
-            --bg-card: #132238;
+            --bg-card: #0f1f33;
+            --bg-soft: #132238;
             --text: #f0f0f0;
-            --text-muted: #a0a0a0;
+            --text-muted: #94a3b8;
             --border: #1a2f4a;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font);
@@ -60,110 +63,390 @@
             transition: background 0.4s, color 0.4s;
             line-height: 1.7;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        ::selection {
-            background: var(--gold);
+        ::selection { background: var(--gold); color: #fff; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+        /* ============================================================
+        PAGE HERO
+        ============================================================ */
+        .page-hero {
+            background: var(--deep-navy);
+            padding: 70px 0 140px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 85% 20%, rgba(212, 163, 115, 0.18), transparent 45%),
+                radial-gradient(circle at 15% 80%, rgba(212, 163, 115, 0.1), transparent 50%);
+            animation: heroGlow 15s ease-in-out infinite alternate;
+        }
+        @keyframes heroGlow {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 163, 115, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 163, 115, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
             color: #fff;
+            animation: fadeUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(212, 163, 115, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.35);
+            backdrop-filter: blur(10px);
+            color: var(--gold-light);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
         }
-        ul {
-            list-style: none;
+        .hero-badge::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: badgeShine 3s ease-in-out infinite;
         }
-        img {
-            max-width: 100%;
-            display: block;
+        @keyframes badgeShine {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .page-hero h1 {
+            font-size: 46px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
         }
-
-        /* ===== TEXT & BADGE ===== */
-        .gold-text {
+        .page-hero h1 .gold-line {
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        .purple-text {
-            color: var(--deep-navy);
+        .page-hero p {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 600px;
+            margin: 0 auto;
         }
-        [data-theme="dark"] .purple-text {
-            color: #f0f0f0;
+
+        /* ============================================================
+        ABOUT SECTION
+        ============================================================ */
+        .about-section {
+            margin-top: -80px;
+            position: relative;
+            z-index: 2;
+            padding-bottom: 60px;
         }
 
-        .gradient-badge {
-            display: inline-block;
-            background: var(--gold-gradient);
+        .about-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            animation: fadeUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
+        }
+
+        /* ===== HERO IMAGE ===== */
+        .about-hero-image {
+            width: 100%;
+            height: 340px;
+            position: relative;
+            overflow: hidden;
+            background: var(--navy-gradient);
+        }
+        .about-hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .about-card:hover .about-hero-image img {
+            transform: scale(1.05);
+        }
+        .about-hero-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(10, 22, 40, 0.85) 100%);
+            pointer-events: none;
+        }
+
+        /* Title overlay on image */
+        .about-title-overlay {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            left: 40px;
+            z-index: 2;
             color: #fff;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
         }
-
-        /* ===== BUTTONS ===== */
-        .btn {
+        .about-title-overlay .title-badge {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-            background: var(--gold-gradient);
+            background: rgba(212, 163, 115, 0.9);
+            backdrop-filter: blur(10px);
             color: #fff;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
         }
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3);
+        .about-title-overlay h1 {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -1px;
         }
-        .btn-gold {
+        .about-title-overlay h1 .gold-line {
             background: var(--gold-gradient);
-            border-color: var(--gold);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .btn-gold:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 8px 35px rgba(212, 163, 115, 0.35);
-        }
-        .btn-gold-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-        }
-        .btn-gold-outline:hover {
-            background: var(--gold-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+        .about-title-overlay p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 8px;
         }
 
-        /* ===== SECTION HEADER ===== */
-        .section {
-            padding: 60px 0;
+        /* ===== BODY ===== */
+        .about-body {
+            padding: 50px 48px;
+        }
+
+        /* Intro paragraph */
+        .about-intro {
+            font-size: 17px;
+            line-height: 2.1;
+            color: var(--text);
+            text-align: justify;
+            margin-bottom: 40px;
+            padding: 24px 28px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-sm);
+            border-right: 4px solid var(--gold);
+            position: relative;
+        }
+        [data-theme="dark"] .about-intro {
+            background: var(--navy-700);
+        }
+        .about-intro::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 80px;
+            color: rgba(212, 163, 115, 0.15);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        .about-intro strong {
+            color: var(--gold-dark);
+            font-weight: 800;
+        }
+        [data-theme="dark"] .about-intro strong { color: var(--gold); }
+
+        /* Feature paragraph */
+        .about-text {
+            font-size: 16px;
+            line-height: 2;
+            color: var(--text-muted);
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+
+        /* ===== INLINE IMAGE ===== */
+        .about-inline {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+            align-items: center;
+            margin: 40px 0;
+            padding: 24px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .about-inline {
+            background: var(--navy-700);
+        }
+        .about-inline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gold-gradient);
+            opacity: 0.5;
+        }
+        .about-inline:hover {
+            border-color: var(--gold);
+            box-shadow: var(--shadow-gold);
+            transform: translateX(-6px);
+        }
+        .about-inline:hover::before { opacity: 1; }
+
+        .about-inline.reverse {
+            grid-template-columns: 1fr 280px;
+        }
+        .about-inline.reverse .about-inline-image { order: 2; }
+        .about-inline.reverse .about-inline-text { order: 1; }
+
+        .about-inline-image {
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            height: 200px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        .about-inline-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.8s;
+        }
+        .about-inline:hover .about-inline-image img {
+            transform: scale(1.08);
+        }
+
+        .about-inline-text {
+            font-size: 15px;
+            line-height: 2;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+        .about-inline-text strong {
+            color: var(--text);
+            font-weight: 800;
+            display: block;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* ===== FEATURE LIST ===== */
+        .about-features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+        .feature-item {
+            text-align: center;
+            padding: 24px 16px;
+            background: var(--bg-soft);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .feature-item {
+            background: var(--navy-700);
+        }
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: var(--gold-gradient);
+            transition: width 0.5s;
+        }
+        .feature-item:hover::before { width: 60%; }
+        .feature-item:hover {
+            transform: translateY(-6px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-gold);
+        }
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.3);
+            transition: transform 0.4s;
+        }
+        .feature-item:hover .feature-icon {
+            transform: scale(1.1) rotate(-8deg);
+        }
+        .feature-item h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .feature-item p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* ============================================================
+        RELATED LINKS
+        ============================================================ */
+        .related-section {
+            padding: 20px 0 80px;
         }
         .section-header {
             text-align: center;
@@ -171,241 +454,22 @@
             margin: 0 auto 50px;
         }
         .section-header h2 {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             margin-bottom: 12px;
+            color: var(--text);
+        }
+        .section-header h2 .gold-line {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .section-header p {
             color: var(--text-muted);
             font-size: 16px;
         }
 
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
-            padding: 8px 0;
-            transition: background 0.4s, border-color 0.4s;
-        }
-        [data-theme="dark"] .header {
-            background: rgba(10, 22, 40, 0.95);
-        }
-        [data-theme="light"] .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .logo-img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .nav-desktop ul {
-            display: flex;
-            gap: 28px;
-        }
-        .nav-desktop a {
-            font-weight: 500;
-            font-size: 15px;
-            position: relative;
-            transition: color 0.3s;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        [data-theme="light"] .nav-desktop a {
-            color: var(--deep-navy);
-        }
-        .nav-desktop a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            right: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold-gradient);
-            transition: width 0.3s;
-        }
-        .nav-desktop a:hover::after {
-            width: 100%;
-        }
-        .nav-desktop a:hover {
-            color: var(--gold);
-        }
-        .nav-desktop a.active {
-            color: var(--gold);
-        }
-        .nav-desktop a.active::after {
-            width: 100%;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: transparent;
-            color: #fff;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        [data-theme="light"] .theme-toggle {
-            border-color: var(--border);
-            color: var(--deep-navy);
-        }
-        .theme-toggle:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-        }
-        [data-theme="light"] .menu-toggle {
-            color: var(--deep-navy);
-        }
-
-        /* ===== MOBILE MENU ===== */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-        }
-        .mobile-menu.open {
-            display: flex;
-        }
-        .mobile-menu ul {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .mobile-menu a {
-            font-weight: 500;
-            font-size: 16px;
-        }
-        .mobile-auth {
-            display: flex;
-            gap: 12px;
-        }
-
-        /* ===== ABOUT PAGE ===== */
-        .about-page {
-            padding: 60px 0 40px;
-        }
-        .about-box {
-            border-radius: var(--radius);
-            padding: 40px 36px;
-            max-width: 900px;
-            margin: 0 auto;
-            transition: transform 0.4s, box-shadow 0.4s;
-            background: var(--bg-card);
-            box-shadow: var(--shadow);
-        }
-        .about-box:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(10, 22, 40, 0.08);
-        }
-        .about-box-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-        .about-box-header h1 {
-            font-size: 36px;
-            font-weight: 800;
-        }
-        .about-box-body p {
-            color: var(--text-muted);
-            font-size: 16px;
-            line-height: 1.9;
-            margin-bottom: 16px;
-            text-align: justify;
-        }
-        .about-hero-image {
-            width: 100%;
-            height: 220px;
-            overflow: hidden;
-            border-radius: var(--radius) var(--radius) 0 0;
-            margin-bottom: 20px;
-        }
-        .about-hero-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s;
-        }
-        .about-hero-image img:hover {
-            transform: scale(1.02);
-        }
-        .about-inline-image {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            margin: 24px 0;
-            background: var(--bg-body);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-        .about-inline-image:hover {
-            border-color: var(--gold);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.06);
-        }
-        .about-inline-image img {
-            width: 180px;
-            height: 140px;
-            object-fit: cover;
-            border-radius: var(--radius-sm);
-            flex-shrink: 0;
-        }
-        .about-inline-image p {
-            margin: 0;
-            flex: 1;
-            font-size: 15px;
-            line-height: 1.9;
-            color: var(--text-muted);
-        }
-        .about-inline-image.left {
-            flex-direction: row-reverse;
-        }
-
-        /* ===== RELATED LINKS ===== */
-        .related-links {
-            padding: 40px 0 80px;
-        }
         .related-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -414,34 +478,91 @@
         .related-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 32px 24px;
+            padding: 36px 28px;
             text-align: center;
             border: 1px solid var(--border);
-            transition: all 0.4s;
-            box-shadow: var(--shadow);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
         }
+        .related-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(212, 163, 115, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .related-card:hover::before { opacity: 1; }
         .related-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-10px);
             border-color: var(--gold);
-            box-shadow: 0 12px 40px rgba(212, 163, 115, 0.08);
+            box-shadow: var(--shadow-gold);
         }
+        .related-card > * { position: relative; z-index: 1; }
+
         .related-icon {
-            font-size: 40px;
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(212, 163, 115, 0.15), rgba(212, 163, 115, 0.05));
+            border: 1px solid rgba(212, 163, 115, 0.2);
             color: var(--gold);
-            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px;
+            transition: all 0.4s;
+        }
+        .related-card:hover .related-icon {
+            background: var(--gold-gradient);
+            color: #fff;
+            border-color: transparent;
+            transform: scale(1.1) rotate(-8deg);
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.4);
         }
         .related-card h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px;
         }
         .related-card p {
             color: var(--text-muted);
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            line-height: 1.8;
         }
+        .related-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 60px;
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 13px;
+            font-family: var(--font);
+            transition: all 0.35s;
+        }
+        .related-btn:hover {
+            background: var(--gold-gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 8px 24px rgba(212, 163, 115, 0.35);
+            transform: translateY(-2px);
+        }
+        .related-btn i { transition: transform 0.3s; }
+        .related-btn:hover i { transform: translateX(-4px); }
 
-        /* ===== CTA ===== */
+        /* ============================================================
+        CTA
+        ============================================================ */
         .cta {
             background: var(--navy-gradient);
             color: #fff;
@@ -455,633 +576,306 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.04), transparent 60%);
+            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.08), transparent 60%);
         }
-        .cta .section-title {
-            color: #fff;
+        .cta::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(212, 163, 115, 0.06), transparent 60%);
         }
-        .cta .section-subtitle {
-            color: rgba(255, 255, 255, 0.35);
+        .cta .container { position: relative; z-index: 1; }
+        .cta h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .cta h2 .gold-line {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cta p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            max-width: 600px;
             margin: 0 auto 36px;
         }
-        .cta .btn-group {
+        .cta-buttons {
             display: flex;
             gap: 18px;
             justify-content: center;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
         }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--deep-navy);
-            color: #c8c8d4;
-            padding: 60px 0 20px;
-            margin-top: 40px;
-            border-top: 2px solid var(--gold);
-        }
-        [data-theme="light"] .footer {
-            background: var(--deep-navy);
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            text-align: center;
-        }
-        .footer-brand .logo {
-            justify-content: center;
-        }
-        .footer-brand p {
-            font-size: 14px;
-            max-width: 300px;
-            margin: 0 auto 16px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .footer-social {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .footer-social a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c8c8d4;
-            transition: var(--transition);
-        }
-        .footer-social a:hover {
-            background: var(--gold);
-            color: #fff;
-        }
-        .footer-links h4,
-        .footer-contact h4,
-        .footer-trust h4 {
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 16px;
-        }
-        .footer-links ul,
-        .footer-contact ul {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-        .footer-links a,
-        .footer-contact li {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-        .footer-links a:hover {
-            color: var(--gold);
-        }
-        .footer-contact li {
-            display: flex;
+        .cta-btn {
+            display: inline-flex;
             align-items: center;
             gap: 10px;
-        }
-        .footer-contact li i {
-            color: var(--gold);
-            width: 20px;
-        }
-        .trust-icons {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .trust-icons span {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 22, 40, 0.85);
-            backdrop-filter: blur(16px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-        .modal {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 40px 36px;
-            max-width: 480px;
-            width: 100%;
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 40px rgba(212, 163, 115, 0.15);
-            position: relative;
-            transform: scale(0.9) translateY(30px);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .modal-overlay.active .modal {
-            transform: scale(1) translateY(0);
-        }
-        .modal-close {
-            position: absolute;
-            top: 14px;
-            left: 18px;
-            background: none;
-            border: none;
-            font-size: 22px;
-            color: var(--text-muted);
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-        .modal-close:hover {
-            color: var(--gold);
-            background: rgba(212, 163, 115, 0.1);
-            transform: rotate(90deg);
-        }
-        .modal-tabs {
-            display: flex;
-            gap: 6px;
-            background: var(--bg-body);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 28px;
-        }
-        .modal-tab {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 10px;
+            padding: 15px 32px;
+            border-radius: 60px;
             font-weight: 700;
-            font-size: 15px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: 0.3s;
+            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid transparent;
         }
-        .modal-tab.active {
+        .cta-btn.gold {
             background: var(--gold-gradient);
             color: #fff;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.35);
         }
-        .modal-tab:hover:not(.active) {
-            color: var(--gold);
+        .cta-btn.gold:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.55);
         }
-        .modal-form.hidden {
-            display: none;
+        .cta-btn.gold:hover i { transform: translateX(-5px); }
+        .cta-btn.gold i { transition: transform 0.3s; }
+        .cta-btn.white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
         }
-        .modal-form .form-group {
-            margin-bottom: 18px;
-        }
-        .modal-form label {
-            display: block;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .modal-form input {
-            width: 100%;
-            padding: 13px 18px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg-body);
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 14px;
-            transition: all 0.4s;
-            outline: none;
-        }
-        .modal-form input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15);
-        }
-        .modal-form .btn {
-            width: 100%;
-            background: var(--gold-gradient);
-            border-color: var(--gold);
+        .cta-btn.white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(255, 255, 255, 0.3);
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* ============================================================
+        RESPONSIVE
+        ============================================================ */
         @media (max-width: 992px) {
-            .related-grid {
-                grid-template-columns: 1fr 1fr;
+            .about-body { padding: 40px 32px; }
+            .about-inline,
+            .about-inline.reverse {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
+            .about-inline.reverse .about-inline-image,
+            .about-inline.reverse .about-inline-text {
+                order: initial;
             }
+            .about-inline-image { height: 220px; }
+            .about-features { grid-template-columns: repeat(3, 1fr); }
+            .related-grid { grid-template-columns: 1fr 1fr; }
         }
-
         @media (max-width: 768px) {
-            .nav-desktop {
-                display: none;
-            }
-            .menu-toggle {
-                display: block;
-            }
-            .about-inline-image {
-                flex-direction: column !important;
-            }
-            .about-inline-image img {
-                width: 100%;
-                height: 160px;
-            }
-            .about-hero-image {
-                height: 150px;
-            }
-            .about-box {
-                padding: 20px 16px;
-            }
-            .about-box-header h1 {
-                font-size: 28px;
-            }
-            .related-grid {
-                grid-template-columns: 1fr;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
-            .cta {
-                padding: 60px 0;
-            }
+            .container { padding: 0 16px; }
+            .page-hero { padding: 50px 0 120px; }
+            .page-hero h1 { font-size: 28px; }
+            .page-hero p { font-size: 14px; }
+            .about-section { margin-top: -70px; }
+            .about-hero-image { height: 240px; }
+            .about-title-overlay { bottom: 20px; right: 24px; left: 24px; }
+            .about-title-overlay h1 { font-size: 28px; }
+            .about-title-overlay p { font-size: 13px; }
+            .about-body { padding: 30px 24px; }
+            .about-intro { font-size: 15px; padding: 20px 22px; }
+            .about-features { grid-template-columns: 1fr; gap: 12px; }
+            .related-grid { grid-template-columns: 1fr; gap: 18px; }
+            .cta h2 { font-size: 26px; }
+            .cta { padding: 60px 0; }
         }
-
         @media (max-width: 480px) {
-            .about-hero-image {
-                height: 120px;
-            }
-            .about-box {
-                padding: 16px 12px;
-            }
-            .about-box-header h1 {
-                font-size: 24px;
-            }
-            .about-box-body p {
-                font-size: 14px;
-            }
+            .page-hero h1 { font-size: 24px; }
+            .about-hero-image { height: 200px; }
+            .about-title-overlay h1 { font-size: 22px; }
+            .about-body { padding: 24px 18px; }
+            .about-intro { font-size: 14px; padding: 18px 18px; }
+            .about-inline { padding: 16px; }
+            .about-inline-image { height: 180px; }
+            .feature-item { padding: 20px 14px; }
+            .related-card { padding: 28px 22px; }
+            .cta-buttons { flex-direction: column; }
+            .cta-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    HEADER
-    ============================================================ -->
-    <header class="header" id="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-            </a>
-            <nav class="nav-desktop" id="navDesktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}" class="active">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="{{ route('home') }}">خانه</a></li>
-                <li><a href="{{ route('about') }}">درباره ما</a></li>
-                <li><a href="{{ route('services') }}">خدمات</a></li>
-                <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                <li><a href="{{ route('contact') }}">تماس</a></li>
-            </ul>
-            <div class="mobile-auth">
-                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
-            </div>
-        </div>
-    </header>
+    @include('partials.header')
 
-    <!-- ============================================================
-    MODAL
-    ============================================================ -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="login">ورود</button>
-                <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+    <!-- ===== PAGE HERO ===== -->
+    <section class="page-hero">
+        <div class="container page-hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-info-circle"></i>
+                <span>درباره ما</span>
             </div>
-            <form class="modal-form" id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">ایمیل</label>
-                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">رمز عبور</label>
-                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ورود</button>
-            </form>
-            <form class="modal-form hidden" id="registerForm">
-                <div class="form-group">
-                    <label for="regName">نام و نام خانوادگی</label>
-                    <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regEmail">ایمیل</label>
-                    <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">رمز عبور</label>
-                    <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPasswordConfirm">تکرار رمز عبور</label>
-                    <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ثبت‌نام</button>
-            </form>
+            <h1>
+                با <span class="gold-line">GRAFIUM</span> بیشتر آشنا شوید
+            </h1>
+            <p>
+                جایی که خلاقیت با فناوری ملاقات می‌کند و ایده‌ها به واقعیت تبدیل می‌شوند
+            </p>
         </div>
-    </div>
+    </section>
 
-    <!-- ============================================================
-    ABOUT PAGE CONTENT
-    ============================================================ -->
-    <section class="section about-page" id="about">
+    <!-- ===== ABOUT SECTION ===== -->
+    <section class="about-section">
         <div class="container">
-            <div class="about-box">
+            <div class="about-card">
+
+                <!-- ===== HERO IMAGE ===== -->
                 <div class="about-hero-image">
-                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=400&fit=crop&crop=center" alt="فضای کار اشتراکی گرافیکی" />
-                </div>
-                <div class="about-box-header">
-                    <span class="gradient-badge">درباره ما</span>
-                    <h1 class="purple-text">GRAFIUM</h1>
-                </div>
-                <div class="about-box-body">
-                    <p><strong>GRAFIUM</strong> اولین سالن کار اشتراکی گرافیکی در شهر است. فضایی که طراحان، هنرمندان و علاقه‌مندان به گرافیک می‌توانند در آن دور هم جمع شوند، ایده‌های خود را به اشتراک بگذارند و با استفاده از تجهیزات و سیستم‌های قدرتمند، پروژه‌های خود را بدون محدودیت اجرا کنند.</p>
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1400&h=600&fit=crop&crop=center" alt="GRAFIUM Coworking Space" onerror="this.style.display='none'" />
 
-                    <div class="about-inline-image">
-                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop&crop=center" alt="فضای کاری حرفه‌ای" />
-                        <p>ما با فراهم کردن محیطی حرفه‌ای، ارگونومیک و الهام‌بخش، بستری برای رشد و خلاقیت فراهم کرده‌ایم. از میزهای کار استاندارد گرفته تا سیستم‌های i9 و کارت‌های گرافیک RTX، همه چیز برای خلق آثار بی‌نظیر در دسترس شماست.</p>
+                    <div class="about-title-overlay">
+                        <div class="title-badge">
+                            <i class="fas fa-star"></i>
+                            <span>اولین سالن کار اشتراکی گرافیکی</span>
+                        </div>
+                        <h1>
+                            <span class="gold-line">GRAFIUM</span>
+                        </h1>
+                        <p>
+                            فضایی برای خلاقیت، هم‌افزایی و رشد حرفه‌ای
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ===== BODY ===== -->
+                <div class="about-body">
+
+                    <!-- Intro -->
+                    <div class="about-intro">
+                        <strong>GRAFIUM</strong> اولین سالن کار اشتراکی گرافیکی در شهر است. فضایی که طراحان، هنرمندان و علاقه‌مندان به گرافیک می‌توانند در آن دور هم جمع شوند، ایده‌های خود را به اشتراک بگذارند و با استفاده از تجهیزات و سیستم‌های قدرتمند، پروژه‌های خود را بدون محدودیت اجرا کنند.
                     </div>
 
-                    <p>تیم ما متشکل از طراحان، برنامه‌نویسان و مربیان مجرب است که همواره در کنار شما هستند تا بهترین تجربه ممکن را داشته باشید.</p>
-
-                    <p>هدف ما ایجاد یک جامعه‌ی پویا و خلاق است که در آن هنرمندان بتوانند از تجربیات یکدیگر بیاموزند، هم‌افزایی کنند و پروژه‌های بزرگ را با تکیه بر توانایی‌های جمعی به انجام برسانند. در GRAFIUM، شما نه تنها به یک فضای کار دسترسی دارید، بلکه به یک شبکه‌ی حمایتی از طراحان و هنرمندان حرفه‌ای متصل می‌شوید.</p>
-
-                    <div class="about-inline-image left">
-                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=300&fit=crop&crop=center" alt="همکاری و خلاقیت" />
-                        <p>ما به‌طور مداوم در حال برگزاری کارگاه‌های تخصصی، دوره‌های آموزشی و رویدادهای شبکه‌سازی هستیم تا اعضای خود را در مسیر رشد حرفه‌ای یاری کنیم. از جلسات نقد و بررسی آثار تا همکاری در پروژه‌های مشترک، همه چیز در GRAFIUM برای پیشرفت شما طراحی شده است.</p>
+                    <!-- Inline 1 -->
+                    <div class="about-inline">
+                        <div class="about-inline-image">
+                            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop&crop=center" alt="فضای کاری حرفه‌ای" onerror="this.style.display='none'" />
+                        </div>
+                        <div class="about-inline-text">
+                            <strong>محیطی حرفه‌ای و الهام‌بخش</strong>
+                            ما با فراهم کردن محیطی حرفه‌ای، ارگونومیک و الهام‌بخش، بستری برای رشد و خلاقیت فراهم کرده‌ایم. از میزهای کار استاندارد گرفته تا سیستم‌های i9 و کارت‌های گرافیک RTX، همه چیز برای خلق آثار بی‌نظیر در دسترس شماست.
+                        </div>
                     </div>
 
-                    <p>با ما همراه شوید و تجربه‌ای متفاوت از کار و خلاقیت را آغاز کنید. GRAFIUM، جایی که هنر و تکنولوژی در کنار هم قرار می‌گیرند.</p>
+                    <!-- Text -->
+                    <p class="about-text">
+                        تیم ما متشکل از طراحان، برنامه‌نویسان و مربیان مجرب است که همواره در کنار شما هستند تا بهترین تجربه ممکن را داشته باشید. هدف ما ایجاد یک جامعه‌ی پویا و خلاق است که در آن هنرمندان بتوانند از تجربیات یکدیگر بیاموزند، هم‌افزایی کنند و پروژه‌های بزرگ را با تکیه بر توانایی‌های جمعی به انجام برسانند. در GRAFIUM، شما نه تنها به یک فضای کار دسترسی دارید، بلکه به یک شبکه‌ی حمایتی از طراحان و هنرمندان حرفه‌ای متصل می‌شوید.
+                    </p>
+
+                    <!-- Inline 2 (reverse) -->
+                    <div class="about-inline reverse">
+                        <div class="about-inline-image">
+                            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=400&fit=crop&crop=center" alt="همکاری و خلاقیت" onerror="this.style.display='none'" />
+                        </div>
+                        <div class="about-inline-text">
+                            <strong>جامعه‌ای پویا و خلاق</strong>
+                            ما به‌طور مداوم در حال برگزاری کارگاه‌های تخصصی، دوره‌های آموزشی و رویدادهای شبکه‌سازی هستیم تا اعضای خود را در مسیر رشد حرفه‌ای یاری کنیم. از جلسات نقد و بررسی آثار تا همکاری در پروژه‌های مشترک، همه چیز در GRAFIUM برای پیشرفت شما طراحی شده است.
+                        </div>
+                    </div>
+
+                    <!-- Closing text -->
+                    <p class="about-text">
+                        با ما همراه شوید و تجربه‌ای متفاوت از کار و خلاقیت را آغاز کنید. <strong style="color:var(--gold-dark);">GRAFIUM</strong>، جایی که هنر و تکنولوژی در کنار هم قرار می‌گیرند.
+                    </p>
+
+                    <!-- Features -->
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h4>سیستم‌های فوق‌قدرتمند</h4>
+                            <p>i9 + RTX برای پروژه‌های سنگین</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4>جامعه‌ی خلاقان</h4>
+                            <p>شبکه‌ای از طراحان حرفه‌ای</p>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <h4>کیفیت تضمین‌شده</h4>
+                            <p>تجهیزات مدرن و اینترنت پرسرعت</p>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-    RELATED LINKS
-    ============================================================ -->
-    <section class="section related-links">
+    <!-- ===== RELATED LINKS ===== -->
+    <section class="related-section">
         <div class="container">
             <div class="section-header">
-                <span class="gradient-badge">مطالب مرتبط</span>
-                <h2 class="purple-text">پیشنهادهای ویژه</h2>
+                <h2>
+                    <span class="gold-line">پیشنهادهای</span> ویژه
+                </h2>
                 <p>صفحات مرتبط با ما را مشاهده کنید</p>
             </div>
+
             <div class="related-grid">
-                <div class="related-card">
-                    <div class="related-icon"><i class="fas fa-calendar-check"></i></div>
+                <a href="{{ route('services') }}" class="related-card">
+                    <div class="related-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
                     <h3>رزرو میز عمومی</h3>
                     <p>فضای کاری باز با میزهای اختصاصی و اینترنت پرسرعت</p>
-                    <a href="{{ route('services') }}" class="btn btn-gold-outline">مشاهده</a>
-                </div>
-                <div class="related-card">
-                    <div class="related-icon"><i class="fas fa-headset"></i></div>
+                    <span class="related-btn">
+                        مشاهده
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                </a>
+
+                <a href="{{ route('contact') }}" class="related-card">
+                    <div class="related-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
                     <h3>تماس با ما</h3>
                     <p>پشتیبانی ۲۴/۷، مشاوره رایگان و پاسخ به سوالات شما</p>
-                    <a href="{{ route('contact') }}" class="btn btn-gold-outline">مشاهده</a>
-                </div>
-                <div class="related-card">
-                    <div class="related-icon"><i class="fas fa-newspaper"></i></div>
+                    <span class="related-btn">
+                        مشاهده
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                </a>
+
+                <a href="{{ route('blog') }}" class="related-card">
+                    <div class="related-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
                     <h3>بلاگ و اخبار</h3>
                     <p>آخرین مقالات، آموزش‌ها و رویدادهای گرافیکی دنیا</p>
-                    <a href="{{ route('blog') }}" class="btn btn-gold-outline">مشاهده</a>
-                </div>
+                    <span class="related-btn">
+                        مشاهده
+                        <i class="fas fa-arrow-left"></i>
+                    </span>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-    CTA
-    ============================================================ -->
-    <section class="cta" id="cta">
+    <!-- ===== CTA ===== -->
+    <section class="cta">
         <div class="container">
-            <span class="gradient-badge" style="background:rgba(212,163,115,0.12);color:var(--gold);">شروع کنید</span>
-            <h2 class="section-title">فضای کاری <span style="color:var(--gold);">خود را امروز رزرو کنید</span></h2>
-            <p class="section-subtitle" style="color:rgba(255,255,255,0.35);max-width:600px;margin:0 auto 36px;">به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.</p>
-            <div class="btn-group">
-                <a href="{{ route('services') }}" class="btn btn-gold">رزرو میز <i class="fas fa-arrow-left"></i></a>
-                <a href="{{ route('contact') }}" class="btn btn-white">تماس با ما</a>
+            <h2>
+                فضای کاری <span class="gold-line">خود را امروز رزرو کنید</span>
+            </h2>
+            <p>
+                به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.
+            </p>
+            <div class="cta-buttons">
+                <a href="{{ route('services') }}" class="cta-btn gold">
+                    <i class="fas fa-rocket"></i>
+                    <span>رزرو میز</span>
+                </a>
+                <a href="{{ route('contact') }}" class="cta-btn white">
+                    <i class="fas fa-headset"></i>
+                    <span>تماس با ما</span>
+                </a>
             </div>
         </div>
     </section>
-
-    <!-- ============================================================
-    FOOTER
-    ============================================================ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-                    </a>
-                    <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
-                    <div class="footer-social">
-                        <a href="#"><i class="fas fa-comment"></i></a>
-                        <a href="#"><i class="fas fa-check-circle"></i></a>
-                        <a href="#"><i class="fas fa-video"></i></a>
-                        <a href="#"><i class="fas fa-share-alt"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="{{ route('home') }}">خانه</a></li>
-                        <li><a href="{{ route('about') }}">درباره ما</a></li>
-                        <li><a href="{{ route('services') }}">خدمات</a></li>
-                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                        <li><a href="{{ route('contact') }}">تماس</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>اطلاعات تماس</h4>
-                    <ul>
-                        <li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li>
-                        <li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li>
-                        <li><i class="fas fa-envelope"></i> info@grafium.ir</li>
-                    </ul>
-                </div>
-                <div class="footer-trust">
-                    <h4>نمادهای اعتماد</h4>
-                    <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
-    <script>
-        // ============================================================
-        // 1. THEME TOGGLE
-        // ============================================================
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle?.querySelector('i');
-        let darkMode = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : true;
-
-        function applyTheme() {
-            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-            if (themeIcon) themeIcon.className = darkMode ? 'fas fa-moon' : 'fas fa-sun';
-            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-        }
-        applyTheme();
-
-        themeToggle?.addEventListener('click', () => {
-            darkMode = !darkMode;
-            applyTheme();
-        });
-
-        // ============================================================
-        // 2. MOBILE MENU
-        // ============================================================
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        menuToggle?.addEventListener('click', () => {
-            mobileMenu?.classList.toggle('open');
-            const icon = menuToggle.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-bars');
-                icon.classList.toggle('fa-times');
-            }
-        });
-
-        document.querySelectorAll('.mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu?.classList.remove('open');
-                const icon = menuToggle?.querySelector('i');
-                if (icon) {
-                    icon.classList.add('fa-bars');
-                    icon.classList.remove('fa-times');
-                }
-            });
-        });
-
-        // ============================================================
-        // 3. MODAL
-        // ============================================================
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const openModalBtns = document.querySelectorAll('#openModalBtn, #openModalBtnMobile');
-        const modalTabs = document.querySelectorAll('.modal-tab');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-
-        function openModal(tab = 'login') {
-            modalOverlay?.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchTab(tab);
-        }
-
-        function closeModal() {
-            modalOverlay?.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function switchTab(tab) {
-            modalTabs.forEach(t => t.classList.remove('active'));
-            document.querySelector(`.modal-tab[data-tab="${tab}"]`)?.classList.add('active');
-            loginForm?.classList.toggle('hidden', tab !== 'login');
-            registerForm?.classList.toggle('hidden', tab !== 'register');
-        }
-
-        openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal('login');
-        }));
-
-        modalClose?.addEventListener('click', closeModal);
-        modalOverlay?.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeModal();
-        });
-
-        modalTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // ============================================================
-        // 4. SMOOTH SCROLL
-        // ============================================================
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                const target = document.querySelector(targetId);
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // ============================================================
-        // 5. HEADER SHADOW
-        // ============================================================
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (!header) return;
-            if (window.scrollY > 50) header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
-            else header.style.boxShadow = 'none';
-        });
-
-        console.log('✅ About page loaded successfully!');
-    </script>
 
 </body>
 </html>

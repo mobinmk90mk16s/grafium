@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Scheduling extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'scheduling';
 
@@ -17,6 +19,7 @@ class Scheduling extends Model
         'end_time',
         'status',
         'reservation_id',
+        'booking_id',      // برای tracking موقت سبد
         'note',
         'created_by',
     ];
@@ -45,6 +48,11 @@ class Scheduling extends Model
         return $this->belongsTo(Admin::class, 'created_by');
     }
 
+    public function bookingItems()
+    {
+        return $this->hasMany(BookingItem::class);
+    }
+
     // ============================================================
     // متدهای کمکی
     // ============================================================
@@ -53,11 +61,24 @@ class Scheduling extends Model
     {
         $statuses = [
             'available' => 'قابل رزرو',
+            'pending' => 'در حال رزرو',
             'reserved' => 'رزرو شده',
             'maintenance' => 'در حال تعمیر',
             'blocked' => 'مسدود',
         ];
         return $statuses[$this->status] ?? $this->status;
+    }
+
+    public function getStatusBadgeClassAttribute()
+    {
+        $classes = [
+            'available' => 'badge-success',
+            'pending' => 'badge-warning',
+            'reserved' => 'badge-danger',
+            'maintenance' => 'badge-danger',
+            'blocked' => 'badge-secondary',
+        ];
+        return $classes[$this->status] ?? 'badge-secondary';
     }
 
     /**
@@ -74,9 +95,6 @@ class Scheduling extends Model
         return $this->gregorianToJalali($gy, $gm, $gd);
     }
 
-    /**
-     * تبدیل میلادی به شمسی
-     */
     private function gregorianToJalali($gy, $gm, $gd)
     {
         $g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
@@ -100,17 +118,6 @@ class Scheduling extends Model
         return $jd . ' ' . $months[$jm - 1] . ' ' . $jy;
     }
 
-    public function getStatusBadgeClassAttribute()
-    {
-        $classes = [
-            'available' => 'badge-success',
-            'reserved' => 'badge-warning',
-            'maintenance' => 'badge-danger',
-            'blocked' => 'badge-secondary',
-        ];
-        return $classes[$this->status] ?? 'badge-secondary';
-    }
-
     // ============================================================
     // اسکوپ‌ها
     // ============================================================
@@ -123,6 +130,11 @@ class Scheduling extends Model
     public function scopeReserved($query)
     {
         return $query->where('status', 'reserved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
     }
 
     public function scopeForItem($query, $itemId)

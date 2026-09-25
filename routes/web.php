@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Auth\OtpController;
+use App\Http\Controllers\BaleWebhookController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
@@ -28,13 +31,8 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
-// صفحه لیست خدمات
 Route::get('/services', [App\Http\Controllers\ServiceController::class, 'index'])->name('services');
-
-// صفحه جزئیات خدمت (لیست میزها)
 Route::get('/services/{id}', [App\Http\Controllers\ServiceController::class, 'show'])->name('services.show');
-
-// صفحه رزرو (جدول شیفت‌ها)
 Route::get('/services/{serviceId}/items/{itemId}', [App\Http\Controllers\ServiceController::class, 'reserve'])->name('services.reserve');
 
 Route::get('/contact', function () {
@@ -46,6 +44,24 @@ Route::get('/invoice', function () {
 })->name('invoice');
 
 // ============================================================
+// 🔐 OTP Authentication
+// ============================================================
+
+Route::prefix('auth/otp')->name('otp.')->group(function () {
+    Route::post('/send', [OtpController::class, 'send'])->name('send');
+    Route::post('/verify', [OtpController::class, 'verify'])->name('verify');
+    Route::post('/check-chat-id', [OtpController::class, 'checkChatId'])->name('check-chat-id');
+});
+
+// ============================================================
+// 🤖 Bale Webhook
+// ============================================================
+
+Route::post('/bale/webhook', [BaleWebhookController::class, 'handle'])
+    ->name('bale.webhook')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+// ============================================================
 // 📝 بلاگ عمومی
 // ============================================================
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
@@ -54,11 +70,9 @@ Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('
 Route::get('/blog/{id}', [BlogController::class, 'show'])->name('blog.post');
 
 // ============================================================
-// 🔐 لاگین کاربران عادی
+// 🚪 خروج کاربران
 // ============================================================
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // ============================================================
@@ -67,8 +81,23 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
 
+    // ===== پنل کاربری =====
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/reservations/{id}/cancel', [DashboardController::class, 'cancelReservation'])
+        ->name('dashboard.reservations.cancel');
 
+    // ============================================================
+    // 🛒 سبد خرید
+    // ============================================================
+    Route::prefix('cart')->name('cart.')->group(function () {
+        Route::post('/add', [CartController::class, 'add'])->name('add');
+        Route::post('/remove', [CartController::class, 'remove'])->name('remove');
+        Route::get('/items', [CartController::class, 'items'])->name('items');
+        Route::post('/check', [CartController::class, 'checkAvailability'])->name('check');
+        Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+    });
+
+    // ===== رزروها =====
     Route::prefix('reservations')->name('reservations.')->group(function () {
         Route::get('/', [ReservationController::class, 'index'])->name('index');
         Route::get('/create', [ReservationController::class, 'create'])->name('create');
@@ -78,6 +107,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [ReservationController::class, 'destroy'])->name('destroy');
     });
 
+    // ===== فاکتورها =====
     Route::prefix('invoices')->name('invoices.')->group(function () {
         Route::get('/', [InvoiceController::class, 'index'])->name('index');
         Route::get('/{id}', [InvoiceController::class, 'show'])->name('show');
@@ -85,6 +115,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{id}/pay', [InvoiceController::class, 'pay'])->name('pay');
     });
 
+    // ===== پروفایل =====
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/', [ProfileController::class, 'update'])->name('update');
@@ -144,13 +175,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::get('/{id}/edit', [AdminController::class, 'deskEdit'])->name('edit');
         Route::put('/{id}', [AdminController::class, 'deskUpdate'])->name('update');
         Route::delete('/{id}', [AdminController::class, 'deskDestroy'])->name('destroy');
-    });
-
-    // ===== مدیریت رزروها =====
-    Route::prefix('reservations')->name('reservations.')->group(function () {
-        Route::get('/', [AdminController::class, 'reservations'])->name('index');
-        Route::put('/{id}/status', [AdminController::class, 'updateReservationStatus'])->name('status');
-        Route::delete('/{id}', [AdminController::class, 'deleteReservation'])->name('destroy');
     });
 
     // ===== مدیریت فاکتورها =====
@@ -226,6 +250,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
         Route::get('/{id}/edit', [ServiceController::class, 'edit'])->name('edit');
         Route::put('/{id}', [ServiceController::class, 'update'])->name('update');
         Route::post('/{id}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{id}/delete-image', [ServiceController::class, 'deleteImage'])->name('delete-image');
     });
 
     // ============================================================
@@ -254,10 +279,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     });
 
     // ============================================================
-    // 📅 مدیریت رزروها
+    // 📅 مدیریت رزروها (Bookings)
     // ============================================================
     Route::prefix('reservations')->name('reservations.')->group(function () {
         Route::get('/', [ServiceController::class, 'reservations'])->name('index');
+        Route::get('/{id}/details', [ServiceController::class, 'reservationDetails'])->name('details');
         Route::post('/{id}/status', [ServiceController::class, 'updateReservationStatus'])->name('status');
         Route::delete('/{id}', [ServiceController::class, 'deleteReservation'])->name('destroy');
     });
@@ -282,7 +308,7 @@ Route::get('/admin/calendar', [CalendarController::class, 'index'])
     ->name('admin.calendar')
     ->middleware(['auth:admin']);
 
-// Scheduling Routes (Admin)
+// Scheduling Routes (Admin)php
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/scheduling', [App\Http\Controllers\Admin\SchedulingController::class, 'index'])
         ->name('admin.scheduling.index');

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>رزرو {{ $item->title }} | GRAFIUM</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>رزرو {{ $item->title }} | GRAFIUM</title>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
@@ -13,6 +13,7 @@
 
         :root {
             --deep-navy: #0a1628;
+            --navy-800: #0f1f33;
             --gold: #d4a373;
             --gold-dark: #b8874a;
             --gold-light: #f0d5b0;
@@ -25,15 +26,14 @@
             --border: #e4e7ec;
             --shadow: 0 4px 30px rgba(10, 22, 40, 0.08);
             --radius: 16px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --font: "Vazirmatn", sans-serif;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a1628;
-            --bg-card: #132238;
+            --bg-card: #0f1f33;
             --text: #f0f0f0;
-            --text-muted: #a0a0a0;
+            --text-muted: #94a3b8;
             --border: #1a2f4a;
             --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
         }
@@ -43,9 +43,10 @@
             background: var(--bg-body);
             color: var(--text);
             direction: rtl;
-            transition: background 0.4s, color 0.4s;
             line-height: 1.7;
             min-height: 100vh;
+            transition: background 0.4s, color 0.4s;
+            -webkit-font-smoothing: antialiased;
         }
 
         a { text-decoration: none; color: inherit; }
@@ -53,43 +54,6 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .container-wide { max-width: 1600px; margin: 0 auto; padding: 0 20px; }
-
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
-            padding: 8px 0;
-        }
-        [data-theme="light"] .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border);
-        }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; }
-        .logo { display: flex; align-items: center; gap: 10px; }
-        .logo-img { height: 50px; width: auto; }
-        .nav-desktop ul { display: flex; gap: 28px; }
-        .nav-desktop a {
-            font-weight: 500; font-size: 15px;
-            color: rgba(255, 255, 255, 0.7);
-            transition: color 0.3s;
-        }
-        [data-theme="light"] .nav-desktop a { color: var(--deep-navy); }
-        .nav-desktop a:hover, .nav-desktop a.active { color: var(--gold); }
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .theme-toggle {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: transparent; color: #fff; cursor: pointer;
-            font-size: 18px; display: flex; align-items: center; justify-content: center;
-        }
-        [data-theme="light"] .theme-toggle { border-color: var(--border); color: var(--deep-navy); }
-        .theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
-        .menu-toggle { display: none; font-size: 24px; background: none; border: none; color: #fff; cursor: pointer; }
-        [data-theme="light"] .menu-toggle { color: var(--deep-navy); }
 
         /* ===== BREADCRUMB ===== */
         .breadcrumb-bar {
@@ -187,7 +151,6 @@
             background: rgba(212, 163, 115, 0.4);
             border-radius: 4px;
         }
-        .table-scroll::-webkit-scrollbar-thumb:hover { background: rgba(212, 163, 115, 0.7); }
 
         .reserve-table {
             width: 100%;
@@ -214,7 +177,6 @@
         }
         .reserve-table tbody tr:hover { background: rgba(212, 163, 115, 0.04); }
 
-        /* جدول ساعتی */
         .reserve-table.hourly-table { table-layout: fixed; }
         .reserve-table.hourly-table th:first-child,
         .reserve-table.hourly-table td:first-child { width: 135px; }
@@ -227,7 +189,6 @@
             border-width: 1.5px;
         }
 
-        /* جدول شیفتی */
         .reserve-table.shift-table { table-layout: fixed; }
         .reserve-table.shift-table th:first-child,
         .reserve-table.shift-table td:first-child { width: 160px; }
@@ -286,7 +247,7 @@
             text-overflow: ellipsis;
         }
 
-        /* STATUS */
+        /* ===== STATUS ===== */
         .status-available {
             background: rgba(52, 211, 153, 0.1);
             color: #34d399;
@@ -296,12 +257,31 @@
             background: rgba(52, 211, 153, 0.2);
             transform: scale(1.04);
         }
-        .status-reserved {
-            background: rgba(251, 191, 36, 0.15);
-            color: #fbbf24;
-            border-color: rgba(251, 191, 36, 0.3);
+
+        /* در حال رزرو توسط دیگران - نارنجی */
+        .status-pending-other {
+            background: rgba(251, 146, 60, 0.15);
+            color: #fb923c;
+            border-color: rgba(251, 146, 60, 0.3);
             cursor: not-allowed;
         }
+
+        /* در حال رزرو برای شما - زرد */
+        .status-pending-mine {
+            background: rgba(250, 204, 21, 0.18);
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.4);
+            cursor: not-allowed;
+        }
+
+        /* رزرو شده نهایی */
+        .status-reserved {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border-color: rgba(244, 63, 94, 0.3);
+            cursor: not-allowed;
+        }
+
         .status-maintenance {
             background: rgba(251, 113, 133, 0.15);
             color: #fb7185;
@@ -336,7 +316,7 @@
             box-shadow: 0 4px 15px rgba(212, 163, 115, 0.4);
         }
 
-        /* SUMMARY */
+        /* ===== SUMMARY BOX ===== */
         .summary-box {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -378,17 +358,107 @@
             background: var(--gold-gradient); color: #fff;
             font-family: var(--font);
             font-size: 15px; font-weight: 700;
-            cursor: pointer; transition: var(--transition);
+            cursor: pointer; transition: all 0.3s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             margin-top: 8px;
+            box-shadow: 0 8px 24px rgba(212, 163, 115, 0.3);
         }
         .summary-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(212, 163, 115, 0.35);
+            box-shadow: 0 12px 32px rgba(212, 163, 115, 0.45);
         }
         .summary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .summary-btn.loading { pointer-events: none; opacity: 0.7; }
 
-        /* RESPONSIVE */
+        /* ===== GUEST OVERLAY ===== */
+        .guest-overlay {
+            position: fixed; inset: 0;
+            background: rgba(10, 22, 40, 0.4);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .guest-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .guest-modal {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 40px 32px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid var(--gold);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .guest-overlay.active .guest-modal { transform: scale(1); }
+
+        .guest-icon {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            color: #fff; font-size: 34px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 22px;
+            box-shadow: 0 15px 40px rgba(212, 163, 115, 0.4);
+        }
+        .guest-modal h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .guest-modal p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.8;
+        }
+        .guest-modal .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 14px;
+            background: var(--gold-gradient);
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.35);
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        .guest-modal .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 45px rgba(212, 163, 115, 0.5);
+        }
+        .guest-modal .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            box-shadow: none;
+            font-size: 13px;
+            padding: 10px;
+        }
+        .guest-modal .btn-secondary:hover {
+            color: var(--gold);
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .reserve-wrapper,
             .reserve-wrapper.hourly-layout { grid-template-columns: 1fr 260px; }
@@ -403,8 +473,6 @@
         }
         @media (max-width: 768px) {
             .container, .container-wide { padding: 0 12px; }
-            .nav-desktop { display: none; }
-            .menu-toggle { display: block; }
             .reserve-header { padding: 18px; }
             .reserve-icon { width: 56px; height: 56px; font-size: 24px; }
             .reserve-info h1 { font-size: 20px; }
@@ -420,27 +488,7 @@
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium" class="logo-img" />
-            </a>
-            <nav class="nav-desktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}" class="active">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
-        </div>
-    </header>
+    @include('partials.header')
 
     <!-- ===== BREADCRUMB ===== -->
     <div class="breadcrumb-bar">
@@ -461,6 +509,7 @@
     <section class="reserve-page">
         <div class="container-wide">
 
+            <!-- ===== HEADER ===== -->
             <div class="reserve-header">
                 <div class="reserve-icon">
                     <i class="fas fa-desktop"></i>
@@ -483,8 +532,10 @@
                 </div>
             </div>
 
+            <!-- ===== WRAPPER ===== -->
             <div class="reserve-wrapper {{ $service->type === 'hourly' ? 'hourly-layout' : '' }}">
 
+                <!-- ===== TABLE ===== -->
                 <div class="table-box">
                     <div class="table-box-header">
                         <h3>
@@ -536,7 +587,6 @@
                                                         }
                                                     }
 
-                                                    // ✅ فقط از دیتابیس
                                                     $sch = $scheduleMap[$dateKey][$shiftKey] ?? null;
 
                                                     if ($day['is_holiday']) {
@@ -544,42 +594,58 @@
                                                         $cellText = 'تعطیل';
                                                         $cellTime = '';
                                                         $selectable = false;
+                                                        $schedulingId = null;
+                                                        $status = 'holiday';
                                                     } elseif ($expired) {
                                                         $cellClass = 'status-expired';
                                                         $cellText = 'منقضی';
                                                         $cellTime = '';
                                                         $selectable = false;
+                                                        $schedulingId = null;
+                                                        $status = 'expired';
                                                     } elseif ($sch === null) {
                                                         $cellClass = 'status-blocked';
                                                         $cellText = '—';
                                                         $cellTime = '';
                                                         $selectable = false;
+                                                        $schedulingId = null;
+                                                        $status = 'none';
                                                     } else {
                                                         $status = $sch['status'];
+                                                        $schedulingId = $sch['id'];
+                                                        $isMine = $sch['is_mine'] ?? false;
 
-                                                        switch ($status) {
-                                                            case 'available':
-                                                                $cellClass = 'status-available';
-                                                                $cellText = 'قابل رزرو';
-                                                                break;
-                                                            case 'reserved':
-                                                                $cellClass = 'status-reserved';
-                                                                $cellText = 'رزرو شده';
-                                                                break;
-                                                            case 'maintenance':
-                                                                $cellClass = 'status-maintenance';
-                                                                $cellText = 'تعمیرات';
-                                                                break;
-                                                            case 'blocked':
-                                                                $cellClass = 'status-blocked';
-                                                                $cellText = 'مسدود';
-                                                                break;
-                                                            default:
-                                                                $cellClass = 'status-blocked';
-                                                                $cellText = '—';
+                                                        if ($status === 'available') {
+                                                            $cellClass = 'status-available';
+                                                            $cellText = 'قابل رزرو';
+                                                            $selectable = true;
+                                                        } elseif ($status === 'pending') {
+                                                            if ($isMine) {
+                                                                $cellClass = 'status-pending-mine';
+                                                                $cellText = 'در حال رزرو برای شما';
+                                                            } else {
+                                                                $cellClass = 'status-pending-other';
+                                                                $cellText = 'در حال رزرو';
+                                                            }
+                                                            $selectable = false;
+                                                        } elseif ($status === 'reserved') {
+                                                            $cellClass = 'status-reserved';
+                                                            $cellText = 'رزرو شده';
+                                                            $selectable = false;
+                                                        } elseif ($status === 'maintenance') {
+                                                            $cellClass = 'status-maintenance';
+                                                            $cellText = 'تعمیرات';
+                                                            $selectable = false;
+                                                        } elseif ($status === 'blocked') {
+                                                            $cellClass = 'status-blocked';
+                                                            $cellText = 'مسدود';
+                                                            $selectable = false;
+                                                        } else {
+                                                            $cellClass = 'status-blocked';
+                                                            $cellText = '—';
+                                                            $selectable = false;
                                                         }
                                                         $cellTime = $shift['time'];
-                                                        $selectable = ($status === 'available');
                                                     }
                                                 @endphp
                                                 <td>
@@ -588,7 +654,7 @@
                                                         data-date="{{ $day['iso'] }}"
                                                         data-shift="{{ $shift['key'] }}"
                                                         data-type="shift"
-                                                        data-price="{{ $shiftPrice }}"
+                                                        data-scheduling-id="{{ $schedulingId }}"
                                                         data-selectable="{{ $selectable ? '1' : '0' }}"
                                                     >
                                                         <span class="label">{{ $cellText }}</span>
@@ -633,46 +699,61 @@
                                                         }
                                                     }
 
-                                                    // ✅ فقط از دیتابیس
                                                     $sch = $scheduleMap[$dateKey][$hour] ?? null;
 
                                                     if ($day['is_holiday']) {
                                                         $cellClass = 'status-holiday';
                                                         $cellText = '—';
                                                         $selectable = false;
+                                                        $schedulingId = null;
+                                                        $status = 'holiday';
                                                     } elseif ($expired) {
                                                         $cellClass = 'status-expired';
                                                         $cellText = '—';
                                                         $selectable = false;
+                                                        $schedulingId = null;
+                                                        $status = 'expired';
                                                     } elseif ($sch === null) {
                                                         $cellClass = 'status-blocked';
                                                         $cellText = '—';
                                                         $selectable = false;
+                                                        $schedulingId = null;
+                                                        $status = 'none';
                                                     } else {
                                                         $status = $sch['status'];
+                                                        $schedulingId = $sch['id'];
+                                                        $isMine = $sch['is_mine'] ?? false;
 
-                                                        switch ($status) {
-                                                            case 'available':
-                                                                $cellClass = 'status-available';
-                                                                $cellText = 'آزاد';
-                                                                break;
-                                                            case 'reserved':
-                                                                $cellClass = 'status-reserved';
-                                                                $cellText = 'پر';
-                                                                break;
-                                                            case 'maintenance':
-                                                                $cellClass = 'status-maintenance';
-                                                                $cellText = 'تعمیر';
-                                                                break;
-                                                            case 'blocked':
-                                                                $cellClass = 'status-blocked';
-                                                                $cellText = '×';
-                                                                break;
-                                                            default:
-                                                                $cellClass = 'status-blocked';
-                                                                $cellText = '—';
+                                                        if ($status === 'available') {
+                                                            $cellClass = 'status-available';
+                                                            $cellText = 'آزاد';
+                                                            $selectable = true;
+                                                        } elseif ($status === 'pending') {
+                                                            if ($isMine) {
+                                                                $cellClass = 'status-pending-mine';
+                                                                $cellText = 'برای شما';
+                                                            } else {
+                                                                $cellClass = 'status-pending-other';
+                                                                $cellText = 'در حال رزرو';
+                                                            }
+                                                            $selectable = false;
+                                                        } elseif ($status === 'reserved') {
+                                                            $cellClass = 'status-reserved';
+                                                            $cellText = 'پر';
+                                                            $selectable = false;
+                                                        } elseif ($status === 'maintenance') {
+                                                            $cellClass = 'status-maintenance';
+                                                            $cellText = 'تعمیر';
+                                                            $selectable = false;
+                                                        } elseif ($status === 'blocked') {
+                                                            $cellClass = 'status-blocked';
+                                                            $cellText = '×';
+                                                            $selectable = false;
+                                                        } else {
+                                                            $cellClass = 'status-blocked';
+                                                            $cellText = '—';
+                                                            $selectable = false;
                                                         }
-                                                        $selectable = ($status === 'available');
                                                     }
                                                 @endphp
                                                 <td>
@@ -681,7 +762,7 @@
                                                         data-date="{{ $day['iso'] }}"
                                                         data-hour="{{ $hour }}"
                                                         data-type="hourly"
-                                                        data-price="{{ $hourlyPrice }}"
+                                                        data-scheduling-id="{{ $schedulingId }}"
                                                         data-selectable="{{ $selectable ? '1' : '0' }}"
                                                     >
                                                         {{ $cellText }}
@@ -696,6 +777,7 @@
                     </div>
                 </div>
 
+                <!-- ===== SUMMARY ===== -->
                 <div class="summary-box">
                     <h3 class="summary-title">
                         <i class="fas fa-receipt"></i>
@@ -738,9 +820,9 @@
                         <span class="value gold" id="totalPrice">۰ تومان</span>
                     </div>
 
-                    <button class="summary-btn" id="payBtn" disabled>
-                        <i class="fas fa-credit-card"></i>
-                        پرداخت و رزرو
+                    <button class="summary-btn" id="addToCartBtn" disabled>
+                        <i class="fas fa-cart-plus"></i>
+                        <span>افزودن به سبد خرید</span>
                     </button>
                 </div>
 
@@ -748,40 +830,73 @@
         </div>
     </section>
 
+    <!-- ===== GUEST OVERLAY ===== -->
+    @guest
+    <div class="guest-overlay" id="guestOverlay">
+        <div class="guest-modal">
+            <div class="guest-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3>ورود به حساب کاربری</h3>
+            <p>برای مشاهده و رزرو زمان‌های موجود، لطفاً ابتدا وارد حساب کاربری خود شوید.</p>
+            <button type="button" class="btn" id="guestLoginBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>ورود / ثبت‌نام</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="guestCancelBtn">
+                بازگشت به صفحه قبل
+            </button>
+        </div>
+    </div>
+    @endguest
+
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle?.querySelector('i');
-        let darkMode = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : true;
-
-        function applyTheme() {
-            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-            if (themeIcon) themeIcon.className = darkMode ? 'fas fa-moon' : 'fas fa-sun';
-            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-        }
-        applyTheme();
-
-        themeToggle?.addEventListener('click', () => {
-            darkMode = !darkMode;
-            applyTheme();
-        });
-
         (function() {
+            'use strict';
+
+            const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
             const serviceType = "{{ $service->type }}";
             const unitPrice = serviceType === 'shift' ? Number("{{ $shiftPrice }}") : Number("{{ $hourlyPrice }}");
+
             const selectedCells = new Set();
+            const selectedSchedulingIds = new Map(); // key -> scheduling_id
 
             const selectedCountEl = document.getElementById('selectedCount');
             const totalPriceEl = document.getElementById('totalPrice');
-            const payBtn = document.getElementById('payBtn');
+            const addToCartBtn = document.getElementById('addToCartBtn');
 
-            function formatNumber(n) { return n.toLocaleString('fa-IR'); }
+            // ============================================================
+            // GUEST OVERLAY
+            // ============================================================
+            @guest
+            const guestOverlay = document.getElementById('guestOverlay');
+            const guestLoginBtn = document.getElementById('guestLoginBtn');
+            const guestCancelBtn = document.getElementById('guestCancelBtn');
 
-            function updateSummary() {
-                const count = selectedCells.size;
-                const total = count * unitPrice;
-                selectedCountEl.textContent = formatNumber(count);
-                totalPriceEl.textContent = formatNumber(total) + ' تومان';
-                payBtn.disabled = count === 0;
+            // نمایش overlay بعد از ۵۰۰ میلی‌ثانیه
+            setTimeout(() => {
+                guestOverlay?.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }, 500);
+
+            guestLoginBtn?.addEventListener('click', () => {
+                window.location.href = '{{ route("home") }}?open_login=1';
+            });
+
+            guestCancelBtn?.addEventListener('click', () => {
+                if (document.referrer) {
+                    window.location.href = document.referrer;
+                } else {
+                    window.location.href = '{{ route("services.show", $service->id) }}';
+                }
+            });
+            @endguest
+
+            // ============================================================
+            // HELPERS
+            // ============================================================
+            function formatNumber(n) {
+                return Number(n).toLocaleString('fa-IR');
             }
 
             function getCellKey(cell) {
@@ -791,11 +906,30 @@
                 return cell.dataset.date + '|hourly|' + cell.dataset.hour;
             }
 
+            function updateSummary() {
+                const count = selectedCells.size;
+                const total = count * unitPrice;
+
+                selectedCountEl.textContent = formatNumber(count);
+                totalPriceEl.textContent = formatNumber(total) + ' تومان';
+                addToCartBtn.disabled = count === 0;
+            }
+
+            // ============================================================
+            // CELL SELECTION
+            // ============================================================
             function toggleCell(cell) {
+                if (!isAuthenticated) {
+                    // برای مهمان، کلیک روی سلول هم overlay رو نشون میده
+                    return;
+                }
+
                 const key = getCellKey(cell);
+                const schedulingId = parseInt(cell.dataset.schedulingId);
 
                 if (selectedCells.has(key)) {
                     selectedCells.delete(key);
+                    selectedSchedulingIds.delete(key);
                     cell.classList.remove('status-selected');
                     cell.classList.add('status-available');
                     if (cell.dataset.type === 'shift') {
@@ -805,6 +939,7 @@
                     }
                 } else {
                     selectedCells.add(key);
+                    selectedSchedulingIds.set(key, schedulingId);
                     cell.classList.remove('status-available');
                     cell.classList.add('status-selected');
                     if (cell.dataset.type === 'shift') {
@@ -817,32 +952,92 @@
                 updateSummary();
             }
 
+            // اتصال کلیک به سلول‌های انتخابی
             document.querySelectorAll('.shift-cell[data-selectable="1"], .hour-cell[data-selectable="1"]').forEach(cell => {
                 cell.addEventListener('click', () => toggleCell(cell));
             });
 
-            payBtn.addEventListener('click', () => {
+            // ============================================================
+            // ADD TO CART
+            // ============================================================
+            addToCartBtn?.addEventListener('click', async () => {
+                if (!isAuthenticated) {
+                    window.location.href = '{{ route("home") }}?open_login=1';
+                    return;
+                }
+
                 if (selectedCells.size === 0) return;
 
-                const cells = Array.from(selectedCells).map(k => {
-                    const [date, type, value] = k.split('|');
-                    return { date, type, value };
-                });
+                const schedulingIds = Array.from(selectedSchedulingIds.values());
 
-                alert(
-                    'رزرو شما آماده ثبت است!\n\n' +
-                    'تعداد: ' + selectedCells.size + '\n' +
-                    'مبلغ کل: ' + formatNumber(selectedCells.size * unitPrice) + ' تومان\n\n' +
-                    '⚠️ این بخش در فاز بعدی به درگاه پرداخت متصل می‌شود.'
-                );
+                addToCartBtn.disabled = true;
+                addToCartBtn.classList.add('loading');
+                addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>در حال افزودن...</span>';
 
-                console.log('Selected cells:', cells);
+                try {
+                    const res = await fetch('{{ route("cart.add") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ scheduling_ids: schedulingIds }),
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        window.showAuthToast(data.message || 'به سبد خرید اضافه شد', 'success');
+
+                        // بروزرسانی badge سبد
+                        if (window.CartAPI) {
+                            window.CartAPI.updateCartBadge(data.cart_count);
+                        }
+
+                        // پاک کردن انتخاب‌ها
+                        selectedCells.clear();
+                        selectedSchedulingIds.clear();
+
+                        // رفرش سلول‌ها
+                        document.querySelectorAll('.shift-cell, .hour-cell').forEach(cell => {
+                            cell.classList.remove('status-selected');
+                        });
+
+                        // بعد از ۱ ثانیه، صفحه reload تا وضعیت درست بشه
+                        setTimeout(() => window.location.reload(), 800);
+
+                    } else {
+                        window.showAuthToast(data.message || 'خطا در افزودن به سبد', 'error');
+
+                        // اگه بعضی آیتم‌ها رزرو شدن، reload کن
+                        if (res.status === 409) {
+                            setTimeout(() => window.location.reload(), 1500);
+                        }
+                    }
+                } catch (err) {
+                    window.showAuthToast('خطا در ارتباط با سرور', 'error');
+                } finally {
+                    addToCartBtn.disabled = false;
+                    addToCartBtn.classList.remove('loading');
+                    addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i><span>افزودن به سبد خرید</span>';
+                }
             });
 
-            updateSummary();
-        })();
+            // ============================================================
+            // CANCEL HANDLER (وقتی آیتم از سبد حذف شد)
+            // ============================================================
+            window.onCartItemRemoved = function(schedulingId) {
+                // پیدا کردن سلول مربوطه و رفرش
+                setTimeout(() => window.location.reload(), 500);
+            };
 
-        console.log('✅ Reserve page loaded successfully!');
+            // ============================================================
+            // INIT
+            // ============================================================
+            updateSummary();
+
+        })();
     </script>
 
 </body>

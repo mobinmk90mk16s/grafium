@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceItem;
 use App\Models\Scheduling;
+use App\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
@@ -37,7 +39,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * نمایش صفحه جزئیات خدمت
+     * نمایش صفحه جزئیات خدمت (لیست آیتم‌ها / میزها)
      */
     public function show($id)
     {
@@ -63,7 +65,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * نمایش صفحه رزرو
+     * نمایش صفحه رزرو (جدول شیفت‌ها / ساعت‌ها)
      */
     public function reserve($serviceId, $itemId)
     {
@@ -72,12 +74,10 @@ class ServiceController extends Controller
             ->where('status', 'active')
             ->findOrFail($itemId);
 
-        // ============================================================
         // خودکار: اگه اسلات نبود، بساز
-        // ============================================================
         $this->ensureSlotsForItem($item, $service, 30);
 
-        // پلن قیمت‌گذاری
+        // پلن قیمت‌گذاری پیش‌فرض
         $pricingPlan = $service->pricingPlans()
             ->where('status', 'active')
             ->where('is_default', 1)
@@ -95,7 +95,7 @@ class ServiceController extends Controller
         $now = Carbon::now();
 
         // ============================================================
-        // ساخت آرایه روزها (۳۰ روز)
+        // ساخت آرایه روزها (۳۰ روز آینده)
         // ============================================================
         $days = [];
         $persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
@@ -153,6 +153,17 @@ class ServiceController extends Controller
         $hourlySlots = [8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20];
 
         // ============================================================
+        // پیدا کردن سبد فعال کاربر (اگه لاگینه)
+        // ============================================================
+        $userCart = null;
+        if (Auth::check()) {
+            $userCart = Booking::where('user_id', Auth::id())
+                ->where('status', 'cart')
+                ->latest()
+                ->first();
+        }
+
+        // ============================================================
         // دریافت زمان‌بندی‌ها از دیتابیس
         // ============================================================
         $schedulings = Scheduling::where('service_item_id', $itemId)
@@ -168,6 +179,9 @@ class ServiceController extends Controller
             $startHour = (int) $sch->date_time->format('H');
             $endHour = (int) $sch->end_time->format('H');
 
+            // تشخیص اینکه آیا این اسلات توی سبد خود کاربره؟
+            $isMine = $userCart && $sch->booking_id == $userCart->id;
+
             if ($service->type === 'shift') {
                 foreach ($shifts as $shift) {
                     if ($startHour >= $shift['start_hour'] && $startHour < $shift['end_hour']) {
@@ -176,6 +190,7 @@ class ServiceController extends Controller
                             'start_hour' => $startHour,
                             'end_hour' => $endHour,
                             'id' => $sch->id,
+                            'is_mine' => $isMine,
                         ];
                         break;
                     }
@@ -187,6 +202,7 @@ class ServiceController extends Controller
                         'start_hour' => $startHour,
                         'end_hour' => $endHour,
                         'id' => $sch->id,
+                        'is_mine' => $isMine,
                     ];
                 }
             }
@@ -212,7 +228,6 @@ class ServiceController extends Controller
     private function ensureSlotsForItem($item, $service, $daysCount = 30)
     {
         $startDate = Carbon::today();
-        $created = 0;
 
         for ($i = 0; $i < $daysCount; $i++) {
             $date = $startDate->copy()->addDays($i);
@@ -247,12 +262,9 @@ class ServiceController extends Controller
                         'end_time' => $dateStr . ' ' . $slot['end'] . ':00',
                         'status' => 'available',
                     ]);
-                    $created++;
                 }
             }
         }
-
-        return $created;
     }
 
     /**

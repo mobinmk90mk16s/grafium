@@ -1,3 +1,7 @@
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -17,31 +21,41 @@
 
         :root {
             --deep-navy: #0a1628;
-            --deep-navy-light: #132238;
+            --navy-800: #0f1f33;
+            --navy-700: #132238;
+            --navy-600: #1a2f4a;
             --gold: #d4a373;
             --gold-dark: #b8874a;
             --gold-light: #f0d5b0;
             --gold-gradient: linear-gradient(135deg, #d4a373, #b8874a);
+            --gold-gradient-hover: linear-gradient(135deg, #f0d5b0, #d4a373);
             --navy-gradient: linear-gradient(135deg, #0a1628, #1a2f4a);
             --bg-body: #f5f7fa;
             --bg-card: #ffffff;
+            --bg-soft: #fafbfc;
             --text: #0a1628;
             --text-muted: #6b7a8a;
             --border: #e4e7ec;
-            --shadow: 0 4px 30px rgba(10, 22, 40, 0.08);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.04);
+            --shadow: 0 8px 30px rgba(10, 22, 40, 0.08);
+            --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.15);
+            --shadow-gold: 0 20px 50px rgba(212, 163, 115, 0.25);
+            --radius: 24px;
+            --radius-sm: 16px;
+            --transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             --font: "Vazirmatn", "Inter", sans-serif;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a1628;
-            --bg-card: #132238;
+            --bg-card: #0f1f33;
+            --bg-soft: #132238;
             --text: #f0f0f0;
-            --text-muted: #a0a0a0;
+            --text-muted: #94a3b8;
             --border: #1a2f4a;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         html { scroll-behavior: smooth; }
@@ -54,6 +68,7 @@
             transition: background 0.4s, color 0.4s;
             line-height: 1.7;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         ::selection { background: var(--gold); color: #fff; }
@@ -61,271 +76,230 @@
         ul { list-style: none; }
         img { max-width: 100%; display: block; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
 
-        /* ===== TEXT & BADGE ===== */
-        .gold-text {
+        /* ===== HERO HEADER ===== */
+        .page-hero {
+            background: var(--deep-navy);
+            padding: 70px 0 140px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 85% 20%, rgba(212, 163, 115, 0.18), transparent 45%),
+                radial-gradient(circle at 15% 80%, rgba(212, 163, 115, 0.1), transparent 50%);
+            animation: heroGlow 15s ease-in-out infinite alternate;
+        }
+        @keyframes heroGlow {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 163, 115, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 163, 115, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #fff;
+            animation: fadeUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(212, 163, 115, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.35);
+            backdrop-filter: blur(10px);
+            color: var(--gold-light);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-badge::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: badgeShine 3s ease-in-out infinite;
+        }
+        @keyframes badgeShine {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .page-hero h1 {
+            font-size: 46px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .page-hero h1 .gold-line {
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .purple-text { color: var(--deep-navy); }
-        [data-theme="dark"] .purple-text { color: #f0f0f0; }
-
-        .gradient-badge {
-            display: inline-block;
-            background: var(--gold-gradient);
-            color: #fff;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
+        .page-hero p {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-            background: var(--gold-gradient);
-            color: #fff;
-            font-family: var(--font);
-        }
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3);
-        }
-        .btn-gold {
-            background: var(--gold-gradient);
-            border-color: var(--gold);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.2);
-        }
-        .btn-gold:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 8px 35px rgba(212, 163, 115, 0.35);
-        }
-        .btn-gold-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-        }
-        .btn-gold-outline:hover {
-            background: var(--gold-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
-
-        /* ===== SECTION ===== */
-        .section { padding: 60px 0; }
-        .section-header {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto 50px;
-        }
-        .section-header h2 {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
-            padding: 8px 0;
-            transition: background 0.4s, border-color 0.4s;
-        }
-        [data-theme="dark"] .header { background: rgba(10, 22, 40, 0.95); }
-        [data-theme="light"] .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .logo-img { height: 50px; width: auto; object-fit: contain; }
-
-        .nav-desktop ul { display: flex; gap: 28px; }
-        .nav-desktop a {
-            font-weight: 500;
-            font-size: 15px;
+        /* ===== SERVICES SECTION ===== */
+        .services-section {
+            margin-top: -80px;
             position: relative;
-            transition: color 0.3s;
-            color: rgba(255, 255, 255, 0.7);
+            z-index: 2;
+            padding-bottom: 80px;
         }
-        [data-theme="light"] .nav-desktop a { color: var(--deep-navy); }
-        .nav-desktop a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            right: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold-gradient);
-            transition: width 0.3s;
-        }
-        .nav-desktop a:hover::after { width: 100%; }
-        .nav-desktop a:hover { color: var(--gold); }
-        .nav-desktop a.active { color: var(--gold); }
-        .nav-desktop a.active::after { width: 100%; }
-
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: transparent;
-            color: #fff;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        [data-theme="light"] .theme-toggle {
-            border-color: var(--border);
-            color: var(--deep-navy);
-        }
-        .theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
-
-        .menu-toggle {
-            display: none;
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-        }
-        [data-theme="light"] .menu-toggle { color: var(--deep-navy); }
-
-        /* ===== MOBILE MENU ===== */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-        }
-        .mobile-menu.open { display: flex; }
-        .mobile-menu ul { display: flex; flex-direction: column; gap: 12px; }
-        .mobile-menu a { font-weight: 500; font-size: 16px; }
-        .mobile-auth { display: flex; gap: 12px; }
-
-        /* ===== SERVICES PAGE ===== */
-        .services-page { padding: 60px 0; }
 
         /* ===== FILTER TABS ===== */
-        .filter-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        .filter-wrapper {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
             margin-bottom: 40px;
-            flex-wrap: wrap;
+            display: inline-flex;
+            gap: 6px;
+            position: relative;
+            left: 50%;
+            transform: translateX(50%);
+            animation: fadeUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
         }
         .filter-tab {
-            padding: 10px 24px;
-            border-radius: 40px;
-            border: 2px solid var(--border);
-            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
             color: var(--text-muted);
             font-family: var(--font);
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            position: relative;
+            white-space: nowrap;
+            text-decoration: none;
         }
         .filter-tab:hover {
-            border-color: var(--gold);
             color: var(--gold);
+            background: rgba(212, 163, 115, 0.08);
         }
         .filter-tab.active {
             background: var(--gold-gradient);
-            border-color: var(--gold);
             color: #fff;
+            box-shadow: 0 8px 24px rgba(212, 163, 115, 0.35);
         }
         .filter-tab .count {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.15);
             padding: 2px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            min-width: 22px;
+            text-align: center;
         }
-        .filter-tab.active .count { background: rgba(255,255,255,0.3); }
+        .filter-tab.active .count {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
         /* ===== SERVICES GRID ===== */
         .services-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-top: 20px;
+            gap: 28px;
         }
 
+        /* ===== SERVICE CARD ===== */
         .service-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            border: 2px solid var(--border);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: var(--shadow);
-            position: relative;
             overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-sm);
+            position: relative;
             display: flex;
             flex-direction: column;
             cursor: pointer;
+            text-decoration: none;
+            animation: cardFadeIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
         }
-        .service-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--gold);
-            box-shadow: 0 12px 40px rgba(212, 163, 115, 0.15);
+        .service-card:nth-child(1) { animation-delay: 0.05s; }
+        .service-card:nth-child(2) { animation-delay: 0.1s; }
+        .service-card:nth-child(3) { animation-delay: 0.15s; }
+        .service-card:nth-child(4) { animation-delay: 0.2s; }
+        .service-card:nth-child(5) { animation-delay: 0.25s; }
+        .service-card:nth-child(6) { animation-delay: 0.3s; }
+        .service-card:nth-child(7) { animation-delay: 0.35s; }
+        .service-card:nth-child(8) { animation-delay: 0.4s; }
+        .service-card:nth-child(9) { animation-delay: 0.45s; }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* ===== IMAGE BOX (جایگزین مربع طلایی) ===== */
+        .service-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(212, 163, 115, 0.12),
+                transparent
+            );
+            transition: left 0.8s;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .service-card:hover::after { left: 150%; }
+
+        /* ===== IMAGE BOX ===== */
         .service-image-box {
             width: 100%;
-            height: 200px;
+            height: 220px;
             position: relative;
             overflow: hidden;
             background: var(--navy-gradient);
@@ -335,22 +309,90 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .service-card:hover .service-image-box img {
-            transform: scale(1.06);
+            transform: scale(1.1);
         }
         .service-image-box::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, transparent 50%, rgba(10, 22, 40, 0.3) 100%);
+            background: linear-gradient(180deg, transparent 40%, rgba(10, 22, 40, 0.7) 100%);
             pointer-events: none;
         }
 
-        /* ===== CARD CONTENT ===== */
+        /* ===== SERVICE ICON BIG (مرکز عکس) ===== */
+        .service-icon-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            border-radius: 24px;
+            background: rgba(10, 22, 40, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid rgba(212, 163, 115, 0.4);
+            color: #fff;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        .service-icon-center i {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(212, 163, 115, 0.5));
+        }
+        .service-card:hover .service-icon-center {
+            transform: translate(-50%, -50%) scale(1.15) rotate(-8deg);
+            background: rgba(212, 163, 115, 0.3);
+            border-color: var(--gold);
+            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.6);
+        }
+
+        /* Type badge (top) */
+        .service-type-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: rgba(10, 22, 40, 0.7);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.4s;
+        }
+        .service-type-badge.shift {
+            background: rgba(96, 165, 250, 0.9);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+        .service-type-badge.hourly {
+            background: rgba(167, 139, 250, 0.9);
+            border-color: rgba(167, 139, 250, 0.4);
+        }
+        .service-card:hover .service-type-badge {
+            transform: translateY(-2px);
+        }
+
+        /* ===== CONTENT ===== */
         .service-content {
-            padding: 24px;
+            padding: 28px 26px 24px;
             display: flex;
             flex-direction: column;
             flex: 1;
@@ -361,13 +403,21 @@
             font-weight: 800;
             color: var(--text);
             margin-bottom: 10px;
+            line-height: 1.35;
+            transition: color 0.3s;
+        }
+        .service-card:hover .service-title {
+            color: var(--gold-dark);
+        }
+        [data-theme="dark"] .service-card:hover .service-title {
+            color: var(--gold);
         }
 
         .service-desc {
             font-size: 14px;
             color: var(--text-muted);
-            line-height: 1.8;
-            margin-bottom: 18px;
+            line-height: 1.9;
+            margin-bottom: 20px;
             flex: 1;
         }
 
@@ -375,32 +425,37 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         .meta-badge {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(212, 163, 115, 0.1);
-            color: var(--gold-dark);
-            border: 1px solid rgba(212, 163, 115, 0.2);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--bg-soft);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
         }
-        [data-theme="dark"] .meta-badge {
-            background: rgba(212, 163, 115, 0.15);
+        .meta-badge i {
+            font-size: 10px;
             color: var(--gold);
         }
-        .meta-badge i { font-size: 11px; }
+        .service-card:hover .meta-badge {
+            border-color: rgba(212, 163, 115, 0.3);
+            background: rgba(212, 163, 115, 0.05);
+        }
 
         .service-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 18px;
+            padding-top: 20px;
             border-top: 1px solid var(--border);
+            margin-top: auto;
         }
         .service-price {
             display: flex;
@@ -409,94 +464,74 @@
         .service-price .price-label {
             font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
+            font-weight: 500;
         }
         .service-price .price-value {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 800;
             color: var(--gold-dark);
+            transition: all 0.3s;
         }
-        [data-theme="dark"] .service-price .price-value { color: var(--gold); }
+        [data-theme="dark"] .service-price .price-value {
+            color: var(--gold);
+        }
 
         .service-arrow {
-            width: 40px;
-            height: 40px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            background: var(--gold-gradient);
-            color: #fff;
+            background: var(--bg-soft);
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.4s;
-            box-shadow: 0 4px 15px rgba(212, 163, 115, 0.25);
+            font-size: 14px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--border);
         }
         .service-card:hover .service-arrow {
-            transform: translateX(-6px) scale(1.1);
+            background: var(--gold-gradient);
+            color: #fff;
+            border-color: transparent;
+            transform: translateX(-8px) rotate(-15deg);
+            box-shadow: 0 10px 28px rgba(212, 163, 115, 0.5);
         }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
+            padding: 100px 20px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 2px dashed var(--border);
         }
-        .empty-state i {
-            font-size: 64px;
-            color: var(--border);
-            margin-bottom: 20px;
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(212, 163, 115, 0.1), rgba(212, 163, 115, 0.03));
+            border: 2px dashed rgba(212, 163, 115, 0.3);
+            color: var(--gold);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            margin-bottom: 22px;
+            animation: emptyFloat 3s ease-in-out infinite;
+        }
+        @keyframes emptyFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         .empty-state h3 {
-            font-size: 22px;
-            color: var(--text);
-            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
         }
-
-        /* ===== TRUST BAR ===== */
-        .trust-bar {
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 24px 0;
-            overflow: hidden;
-            position: relative;
-        }
-        .trust-bar::before,
-        .trust-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 80px;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-        }
-        .trust-bar::before {
-            right: 0;
-            background: linear-gradient(270deg, var(--bg-card), transparent);
-        }
-        .trust-bar::after {
-            left: 0;
-            background: linear-gradient(90deg, var(--bg-card), transparent);
-        }
-        .trust-track {
-            display: flex;
-            gap: 60px;
-            animation: scrollTrust 25s linear infinite;
-            width: max-content;
-        }
-        .trust-track .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
+        .empty-state p {
             font-size: 14px;
-            white-space: nowrap;
-        }
-        .trust-track .trust-item i { color: var(--gold); font-size: 20px; }
-        @keyframes scrollTrust {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            color: var(--text-muted);
         }
 
         /* ===== CTA ===== */
@@ -513,353 +548,158 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.04), transparent 60%);
+            background: radial-gradient(circle at 20% 50%, rgba(212, 163, 115, 0.08), transparent 60%);
         }
-        .cta .section-title {
-            color: #fff;
-            font-size: 36px;
+        .cta::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(212, 163, 115, 0.06), transparent 60%);
+        }
+        .cta .container { position: relative; z-index: 1; }
+        .cta h2 {
+            font-size: 40px;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            line-height: 1.3;
         }
-        .cta .section-subtitle {
-            color: rgba(255, 255, 255, 0.35);
-            margin: 0 auto 36px;
+        .cta h2 .gold-line {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cta p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
             max-width: 600px;
+            margin: 0 auto 36px;
         }
-        .cta .btn-group {
+        .cta-buttons {
             display: flex;
             gap: 18px;
             justify-content: center;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
         }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--deep-navy);
-            color: #c8c8d4;
-            padding: 60px 0 20px;
-            margin-top: 40px;
-            border-top: 2px solid var(--gold);
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            text-align: center;
-        }
-        .footer-brand .logo { justify-content: center; }
-        .footer-brand p {
-            font-size: 14px;
-            max-width: 300px;
-            margin: 0 auto 16px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .footer-social { display: flex; gap: 12px; justify-content: center; }
-        .footer-social a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            display: flex;
+        .cta-btn {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            color: #c8c8d4;
-            transition: var(--transition);
-        }
-        .footer-social a:hover { background: var(--gold); color: #fff; }
-        .footer-links h4,
-        .footer-contact h4,
-        .footer-trust h4 {
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 16px;
-        }
-        .footer-links ul,
-        .footer-contact ul {
-            display: flex;
-            flex-direction: column;
             gap: 10px;
-            align-items: center;
-        }
-        .footer-links a,
-        .footer-contact li {
-            font-size: 14px;
-            color: #94a3b8;
-        }
-        .footer-links a:hover { color: var(--gold); }
-        .footer-contact li { display: flex; align-items: center; gap: 10px; }
-        .footer-contact li i { color: var(--gold); width: 20px; }
-        .trust-icons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-        .trust-icons span {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        /* ===== MODAL ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 22, 40, 0.85);
-            backdrop-filter: blur(16px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 40px 36px;
-            max-width: 480px;
-            width: 100%;
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 40px rgba(212, 163, 115, 0.15);
-            position: relative;
-            transform: scale(0.9) translateY(30px);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
-        .modal-close {
-            position: absolute;
-            top: 14px;
-            left: 18px;
-            background: none;
-            border: none;
-            font-size: 22px;
-            color: var(--text-muted);
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-        .modal-close:hover { color: var(--gold); background: rgba(212, 163, 115, 0.1); transform: rotate(90deg); }
-        .modal-tabs {
-            display: flex;
-            gap: 6px;
-            background: var(--bg-body);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 28px;
-        }
-        .modal-tab {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 10px;
+            padding: 15px 32px;
+            border-radius: 60px;
             font-weight: 700;
-            font-size: 15px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: 0.3s;
-            font-family: var(--font);
-        }
-        .modal-tab.active { background: var(--gold-gradient); color: #fff; }
-        .modal-tab:hover:not(.active) { color: var(--gold); }
-        .modal-form.hidden { display: none; }
-        .modal-form .form-group { margin-bottom: 18px; }
-        .modal-form label {
-            display: block;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .modal-form input {
-            width: 100%;
-            padding: 13px 18px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg-body);
-            color: var(--text);
-            font-family: var(--font);
             font-size: 14px;
-            transition: all 0.4s;
-            outline: none;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid transparent;
         }
-        .modal-form input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15);
+        .cta-btn.gold {
+            background: var(--gold-gradient);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.35);
         }
-        .modal-form .btn { width: 100%; }
+        .cta-btn.gold:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(212, 163, 115, 0.55);
+        }
+        .cta-btn.gold:hover i { transform: translateX(-5px); }
+        .cta-btn.gold i { transition: transform 0.3s; }
+        .cta-btn.white {
+            background: #fff;
+            color: var(--deep-navy);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+        }
+        .cta-btn.white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(255, 255, 255, 0.3);
+        }
 
         /* ===== RESPONSIVE ===== */
+        @media (max-width: 1100px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+        }
         @media (max-width: 992px) {
-            .services-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .page-hero h1 { font-size: 36px; }
         }
-
         @media (max-width: 768px) {
-            .nav-desktop { display: none; }
-            .menu-toggle { display: block; }
-            .services-grid { grid-template-columns: 1fr; gap: 16px; }
-            .section-header h2 { font-size: 28px; }
-            .footer-grid { grid-template-columns: 1fr; }
-            .cta { padding: 60px 0; }
-            .cta .section-title { font-size: 28px; }
-            .service-content { padding: 20px; }
-            .service-image-box { height: 180px; }
-        }
-
-        @media (max-width: 480px) {
-            .filter-tabs { gap: 6px; }
-            .filter-tab { padding: 8px 16px; font-size: 12px; }
+            .container { padding: 0 16px; }
+            .page-hero { padding: 50px 0 120px; }
+            .page-hero h1 { font-size: 28px; }
+            .page-hero p { font-size: 14px; }
+            .services-section { margin-top: -70px; }
+            .services-grid { grid-template-columns: 1fr; gap: 18px; }
+            .filter-wrapper {
+                padding: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+                left: 0;
+                transform: none;
+                display: flex;
+                width: 100%;
+            }
+            .filter-tab {
+                padding: 10px 16px;
+                font-size: 12px;
+                flex: 1;
+                justify-content: center;
+            }
+            .filter-tab .count { font-size: 10px; padding: 2px 8px; }
+            .service-image-box { height: 190px; }
+            .service-icon-center { width: 72px; height: 72px; font-size: 32px; }
+            .service-content { padding: 22px 20px 20px; }
             .service-title { font-size: 18px; }
-            .service-image-box { height: 160px; }
+            .cta h2 { font-size: 26px; }
+            .cta { padding: 60px 0; }
+        }
+        @media (max-width: 480px) {
+            .page-hero h1 { font-size: 24px; }
+            .service-image-box { height: 170px; }
+            .service-icon-center { width: 64px; height: 64px; font-size: 28px; border-radius: 18px; }
+            .service-price .price-value { font-size: 16px; }
+            .service-arrow { width: 40px; height: 40px; }
+            .cta-buttons { flex-direction: column; }
+            .cta-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    HEADER
-    ============================================================ -->
-    <header class="header" id="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-            </a>
-            <nav class="nav-desktop" id="navDesktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}" class="active">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                <a href="#" class="btn btn-gold" id="openModalBtn">ورود</a>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-            </div>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="{{ route('home') }}">خانه</a></li>
-                <li><a href="{{ route('about') }}">درباره ما</a></li>
-                <li><a href="{{ route('services') }}">خدمات</a></li>
-                <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                <li><a href="{{ route('contact') }}">تماس</a></li>
-            </ul>
-            <div class="mobile-auth">
-                <a href="#" class="btn btn-gold" id="openModalBtnMobile">ورود</a>
-            </div>
-        </div>
-    </header>
+    @include('partials.header')
 
-    <!-- ============================================================
-    MODAL
-    ============================================================ -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="login">ورود</button>
-                <button class="modal-tab" data-tab="register">ثبت‌نام</button>
+    <!-- ===== PAGE HERO ===== -->
+    <section class="page-hero">
+        <div class="container page-hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                <span>خدمات گرافیوم</span>
             </div>
-            <form class="modal-form" id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">ایمیل</label>
-                    <input type="email" id="loginEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">رمز عبور</label>
-                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ورود</button>
-            </form>
-            <form class="modal-form hidden" id="registerForm">
-                <div class="form-group">
-                    <label for="regName">نام و نام خانوادگی</label>
-                    <input type="text" id="regName" placeholder="نام خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regEmail">ایمیل</label>
-                    <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">رمز عبور</label>
-                    <input type="password" id="regPassword" placeholder="رمز عبور خود را وارد کنید" />
-                </div>
-                <div class="form-group">
-                    <label for="regPasswordConfirm">تکرار رمز عبور</label>
-                    <input type="password" id="regPasswordConfirm" placeholder="رمز عبور را تکرار کنید" />
-                </div>
-                <button type="submit" class="btn btn-gold">ثبت‌نام</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ============================================================
-    TRUST BAR
-    ============================================================ -->
-    <section class="trust-bar">
-        <div class="container" style="overflow:hidden;">
-            <div class="trust-track">
-                <span class="trust-item"><i class="fas fa-check-circle"></i> ۱۰۰+ عضو فعال</span>
-                <span class="trust-item"><i class="fas fa-star"></i> ۹۸٪ رضایت</span>
-                <span class="trust-item"><i class="fas fa-wifi"></i> اینترنت پرسرعت</span>
-                <span class="trust-item"><i class="fas fa-coffee"></i> نوشیدنی رایگان</span>
-                <span class="trust-item"><i class="fas fa-clock"></i> دسترسی ۲۴/۷</span>
-                <span class="trust-item"><i class="fas fa-print"></i> چاپ حرفه‌ای</span>
-                <span class="trust-item"><i class="fas fa-check-circle"></i> ۱۰۰+ عضو فعال</span>
-                <span class="trust-item"><i class="fas fa-star"></i> ۹۸٪ رضایت</span>
-                <span class="trust-item"><i class="fas fa-wifi"></i> اینترنت پرسرعت</span>
-                <span class="trust-item"><i class="fas fa-coffee"></i> نوشیدنی رایگان</span>
-                <span class="trust-item"><i class="fas fa-clock"></i> دسترسی ۲۴/۷</span>
-                <span class="trust-item"><i class="fas fa-print"></i> چاپ حرفه‌ای</span>
-            </div>
+            <h1>
+                انتخاب <span class="gold-line">نوع خدمت</span>
+            </h1>
+            <p>
+                نوع خدمت مورد نظر خود را انتخاب کنید تا وارد مرحله رزرو شوید
+            </p>
         </div>
     </section>
 
-    <!-- ============================================================
-    SERVICES PAGE
-    ============================================================ -->
-    <section class="section services-page">
+    <!-- ===== SERVICES SECTION ===== -->
+    <section class="services-section">
         <div class="container">
-            <div class="section-header">
-                <span class="gradient-badge">خدمات گرافیوم</span>
-                <h2 class="purple-text">انتخاب نوع خدمت</h2>
-                <p>نوع خدمت مورد نظر خود را انتخاب کنید تا وارد مرحله رزرو شوید</p>
-            </div>
 
             <!-- ===== FILTER TABS ===== -->
-            <div class="filter-tabs">
+            <div class="filter-wrapper">
                 <a href="{{ route('services') }}" class="filter-tab {{ $type === 'all' ? 'active' : '' }}">
                     <i class="fas fa-th-large"></i>
-                    همه خدمات
+                    <span>همه</span>
                     <span class="count">{{ $stats['total'] }}</span>
                 </a>
                 <a href="{{ route('services', ['type' => 'shift']) }}" class="filter-tab {{ $type === 'shift' ? 'active' : '' }}">
                     <i class="fas fa-clock"></i>
-                    شیفتی
+                    <span>شیفتی</span>
                     <span class="count">{{ $stats['shift'] }}</span>
                 </a>
                 <a href="{{ route('services', ['type' => 'hourly']) }}" class="filter-tab {{ $type === 'hourly' ? 'active' : '' }}">
                     <i class="fas fa-hourglass-half"></i>
-                    ساعتی
+                    <span>ساعتی</span>
                     <span class="count">{{ $stats['hourly'] }}</span>
                 </a>
             </div>
@@ -869,19 +709,76 @@
                 <div class="services-grid">
                     @foreach($services as $service)
                         @php
-                            // ترجمه نوع خدمت
                             $typeLabel = $service->type === 'shift' ? 'شیفتی' : 'ساعتی';
+                            $typeIcon = $service->type === 'shift' ? 'fa-clock' : 'fa-hourglass-half';
+                            $typeClass = $service->type === 'shift' ? 'shift' : 'hourly';
 
-                            // عکس پیش‌فرض
-                            $imagePath = 'images/services/default.jpg';
-                            if (!empty($service->image) && file_exists(public_path('images/services/' . $service->image))) {
-                                $imagePath = 'images/services/' . $service->image;
+                            // ============================================================
+                            // عکس: اول از storage، بعد پیش‌فرض
+                            // ============================================================
+                            $imageUrl = null;
+
+                            if (!empty($service->image) && Storage::disk('public')->exists($service->image)) {
+                                $imageUrl = asset('storage/' . $service->image);
+                            }
+
+                            // اگه عکس نبود، از پیش‌فرض استفاده کن
+                            if (!$imageUrl) {
+                                $defaultImages = [
+                                    'shift' => 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
+                                    'hourly' => 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop',
+                                ];
+                                $imageUrl = $defaultImages[$service->type] ?? 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&h=600&fit=crop';
+                            }
+
+                            // ============================================================
+                            // آیکون: اول از service، بعد بر اساس عنوان
+                            // ============================================================
+                            $serviceIcon = $service->icon;
+                            if (empty($serviceIcon)) {
+                                $titleLower = mb_strtolower($service->title);
+                                $serviceIcon = 'fa-concierge-bell';
+                                
+                                if (str_contains($titleLower, 'vip') || str_contains($titleLower, 'ویژه')) {
+                                    $serviceIcon = 'fa-crown';
+                                } elseif (str_contains($titleLower, 'cip')) {
+                                    $serviceIcon = 'fa-shield-alt';
+                                } elseif (str_contains($titleLower, 'رندر') || str_contains($titleLower, 'render')) {
+                                    $serviceIcon = 'fa-microchip';
+                                } elseif (str_contains($titleLower, 'استودیو') || str_contains($titleLower, 'studio')) {
+                                    $serviceIcon = 'fa-camera-retro';
+                                } elseif (str_contains($titleLower, 'میز') || str_contains($titleLower, 'desk')) {
+                                    $serviceIcon = 'fa-desktop';
+                                } elseif (str_contains($titleLower, 'اتاق') || str_contains($titleLower, 'room')) {
+                                    $serviceIcon = 'fa-door-open';
+                                } elseif (str_contains($titleLower, 'چاپ') || str_contains($titleLower, 'print')) {
+                                    $serviceIcon = 'fa-print';
+                                } elseif (str_contains($titleLower, 'کافه') || str_contains($titleLower, 'coffee')) {
+                                    $serviceIcon = 'fa-coffee';
+                                } elseif (str_contains($titleLower, 'طراحی') || str_contains($titleLower, 'design')) {
+                                    $serviceIcon = 'fa-paint-brush';
+                                } elseif (str_contains($titleLower, 'عکاس') || str_contains($titleLower, 'photo')) {
+                                    $serviceIcon = 'fa-camera';
+                                } elseif (str_contains($titleLower, 'ویدیو') || str_contains($titleLower, 'video')) {
+                                    $serviceIcon = 'fa-video';
+                                }
                             }
                         @endphp
                         <a href="{{ route('services.show', $service->id) }}" class="service-card">
                             <!-- ===== IMAGE BOX ===== -->
                             <div class="service-image-box">
-                                <img src="{{ asset($imagePath) }}" alt="{{ $service->title }}" />
+                                <img src="{{ $imageUrl }}" alt="{{ $service->title }}" loading="lazy" />
+
+                                <!-- Type Badge -->
+                                <div class="service-type-badge {{ $typeClass }}">
+                                    <i class="fas {{ $typeIcon }}"></i>
+                                    {{ $typeLabel }}
+                                </div>
+
+                                <!-- Icon Center (روی عکس) -->
+                                <div class="service-icon-center">
+                                    <i class="fas {{ $serviceIcon }}"></i>
+                                </div>
                             </div>
 
                             <!-- ===== CONTENT ===== -->
@@ -890,19 +787,21 @@
 
                                 @if($service->description)
                                     <p class="service-desc">{{ Str::limit($service->description, 100) }}</p>
+                                @else
+                                    <p class="service-desc">خدمات حرفه‌ای و باکیفیت در محیطی الهام‌بخش</p>
                                 @endif
 
                                 <div class="service-meta">
-                                    <span class="meta-badge">
-                                        <i class="fas fa-tag"></i>
-                                        {{ $typeLabel }}
-                                    </span>
                                     @if($service->place)
                                         <span class="meta-badge">
                                             <i class="fas fa-map-marker-alt"></i>
                                             {{ $service->place }}
                                         </span>
                                     @endif
+                                    <span class="meta-badge">
+                                        <i class="fas fa-check-circle"></i>
+                                        فعال
+                                    </span>
                                 </div>
 
                                 <div class="service-footer">
@@ -920,181 +819,38 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <i class="fas fa-inbox"></i>
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
                     <h3>هیچ خدمتی یافت نشد</h3>
                     <p>در حال حاضر خدمتی برای نمایش وجود ندارد.</p>
                 </div>
             @endif
+
         </div>
     </section>
 
-    <!-- ============================================================
-    CTA
-    ============================================================ -->
-    <section class="cta" id="cta">
+    <!-- ===== CTA ===== -->
+    <section class="cta">
         <div class="container">
-            <span class="gradient-badge" style="background:rgba(212,163,115,0.12);color:var(--gold);">شروع کنید</span>
-            <h2 class="section-title">فضای کاری <span style="color:var(--gold);">خود را امروز رزرو کنید</span></h2>
-            <p class="section-subtitle">به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.</p>
-            <div class="btn-group">
-                <a href="{{ route('services') }}" class="btn btn-gold">رزرو خدمت <i class="fas fa-arrow-left"></i></a>
-                <a href="{{ route('contact') }}" class="btn btn-white">تماس با ما</a>
+            <h2>
+                فضای کاری <span class="gold-line">خود را امروز رزرو کنید</span>
+            </h2>
+            <p>
+                به جامعه طراحان حرفه‌ای بپیوندید و از امکانات ممتاز گرافیوم لذت ببرید.
+            </p>
+            <div class="cta-buttons">
+                <a href="{{ route('services') }}" class="cta-btn gold">
+                    <i class="fas fa-rocket"></i>
+                    <span>رزرو خدمت</span>
+                </a>
+                <a href="{{ route('contact') }}" class="cta-btn white">
+                    <i class="fas fa-headset"></i>
+                    <span>تماس با ما</span>
+                </a>
             </div>
         </div>
     </section>
-
-    <!-- ============================================================
-    FOOTER
-    ============================================================ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('images/Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-                    </a>
-                    <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
-                    <div class="footer-social">
-                        <a href="#"><i class="fas fa-comment"></i></a>
-                        <a href="#"><i class="fas fa-check-circle"></i></a>
-                        <a href="#"><i class="fas fa-video"></i></a>
-                        <a href="#"><i class="fas fa-share-alt"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="{{ route('home') }}">خانه</a></li>
-                        <li><a href="{{ route('about') }}">درباره ما</a></li>
-                        <li><a href="{{ route('services') }}">خدمات</a></li>
-                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                        <li><a href="{{ route('contact') }}">تماس</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>اطلاعات تماس</h4>
-                    <ul>
-                        <li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li>
-                        <li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li>
-                        <li><i class="fas fa-envelope"></i> info@grafium.ir</li>
-                    </ul>
-                </div>
-                <div class="footer-trust">
-                    <h4>نمادهای اعتماد</h4>
-                    <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; {{ date('Y') }} تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
-    <script>
-        // ============================================================
-        // 1. THEME TOGGLE
-        // ============================================================
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle?.querySelector('i');
-        let darkMode = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : true;
-
-        function applyTheme() {
-            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-            if (themeIcon) themeIcon.className = darkMode ? 'fas fa-moon' : 'fas fa-sun';
-            localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-        }
-        applyTheme();
-
-        themeToggle?.addEventListener('click', () => {
-            darkMode = !darkMode;
-            applyTheme();
-        });
-
-        // ============================================================
-        // 2. MOBILE MENU
-        // ============================================================
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        menuToggle?.addEventListener('click', () => {
-            mobileMenu?.classList.toggle('open');
-            const icon = menuToggle.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-bars');
-                icon.classList.toggle('fa-times');
-            }
-        });
-
-        document.querySelectorAll('.mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu?.classList.remove('open');
-                const icon = menuToggle?.querySelector('i');
-                if (icon) {
-                    icon.classList.add('fa-bars');
-                    icon.classList.remove('fa-times');
-                }
-            });
-        });
-
-        // ============================================================
-        // 3. HEADER SHADOW
-        // ============================================================
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (!header) return;
-            if (window.scrollY > 50) header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
-            else header.style.boxShadow = 'none';
-        });
-
-        // ============================================================
-        // 4. MODAL
-        // ============================================================
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const openModalBtns = document.querySelectorAll('#openModalBtn, #openModalBtnMobile');
-        const modalTabs = document.querySelectorAll('.modal-tab');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-
-        function openModal(tab = 'login') {
-            modalOverlay?.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchTab(tab);
-        }
-
-        function closeModal() {
-            modalOverlay?.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function switchTab(tab) {
-            modalTabs.forEach(t => t.classList.remove('active'));
-            document.querySelector(`.modal-tab[data-tab="${tab}"]`)?.classList.add('active');
-            loginForm?.classList.toggle('hidden', tab !== 'login');
-            registerForm?.classList.toggle('hidden', tab !== 'register');
-        }
-
-        openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal('login');
-        }));
-
-        modalClose?.addEventListener('click', closeModal);
-        modalOverlay?.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeModal();
-        });
-
-        modalTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        console.log('✅ Services page loaded successfully!');
-    </script>
 
 </body>
 </html>

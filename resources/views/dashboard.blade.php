@@ -2,50 +2,57 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>داشبورد کاربر | GRAFIUM</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>پنل کاربری | GRAFIUM</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --deep-navy: #0a1628;
-            --deep-navy-light: #132238;
+            --navy-800: #0f1f33;
+            --navy-700: #132238;
+            --navy-600: #1a2f4a;
             --gold: #d4a373;
             --gold-dark: #b8874a;
             --gold-light: #f0d5b0;
             --gold-gradient: linear-gradient(135deg, #d4a373, #b8874a);
-            --navy-gradient: linear-gradient(135deg, #0a1628, #1a2f4a);
+            --gold-glow: 0 0 40px rgba(212, 163, 115, 0.35);
             --bg-body: #f5f7fa;
             --bg-card: #ffffff;
+            --bg-soft: #fafbfc;
             --text: #0a1628;
             --text-muted: #6b7a8a;
+            --text-light: #94a3b8;
             --border: #e4e7ec;
-            --shadow: 0 4px 30px rgba(10, 22, 40, 0.08);
-            --radius: 16px;
-            --radius-sm: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: "Vazirmatn", "Inter", sans-serif;
+            --border-light: #f0f2f5;
+            --shadow-sm: 0 2px 8px rgba(10, 22, 40, 0.04);
+            --shadow: 0 4px 24px rgba(10, 22, 40, 0.08);
+            --shadow-lg: 0 20px 60px rgba(10, 22, 40, 0.12);
+            --radius: 20px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+            --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: "Vazirmatn", sans-serif;
         }
 
         [data-theme="dark"] {
             --bg-body: #0a1628;
-            --bg-card: #132238;
+            --bg-card: #0f1f33;
+            --bg-soft: #132238;
             --text: #f0f0f0;
-            --text-muted: #a0a0a0;
+            --text-muted: #94a3b8;
+            --text-light: #64748b;
             --border: #1a2f4a;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            --border-light: #162b42;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         html { scroll-behavior: smooth; }
@@ -55,1267 +62,1420 @@
             background: var(--bg-body);
             color: var(--text);
             direction: rtl;
-            transition: background 0.4s, color 0.4s;
             line-height: 1.7;
+            min-height: 100vh;
+            transition: background 0.4s, color 0.4s;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-
-        ::selection { background: var(--gold); color: #fff; }
 
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
-        img { max-width: 100%; display: block; }
+        button { font-family: var(--font); cursor: pointer; border: none; background: none; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .container { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+
+        /* ============================================================
+        HEADER (Glass)
+        ============================================================ */
+        .header {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(10, 22, 40, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(212, 163, 115, 0.12);
+            padding: 12px 0;
+            transition: all 0.4s;
+        }
+        [data-theme="light"] .header {
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 48px; transition: transform 0.4s; }
+        .logo:hover .logo-img { transform: scale(1.05); }
+
+        .nav-desktop ul { display: flex; gap: 6px; }
+        .nav-desktop a {
+            font-weight: 500; font-size: 14px;
+            color: rgba(255, 255, 255, 0.65);
+            padding: 8px 16px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        [data-theme="light"] .nav-desktop a { color: var(--text-muted); }
+        .nav-desktop a:hover {
+            color: var(--gold);
+            background: rgba(212, 163, 115, 0.08);
+        }
+        .nav-desktop a.active {
+            color: #fff;
+            background: var(--gold-gradient);
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.3);
         }
 
-        /* ===== TEXT & BADGE ===== */
-        .gold-text {
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .theme-toggle {
+            width: 42px; height: 42px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        [data-theme="light"] .theme-toggle {
+            border-color: var(--border);
+            background: rgba(10, 22, 40, 0.03);
+            color: var(--text);
+        }
+        .theme-toggle:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: rotate(20deg) scale(1.05);
+        }
+
+        /* ===== User Dropdown ===== */
+        .user-dropdown { position: relative; }
+        .user-avatar-btn {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.3);
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        .user-avatar-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.5);
+        }
+        .dropdown-menu {
+            position: absolute; top: calc(100% + 14px); left: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 8px;
+            min-width: 250px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0; visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transform-origin: top left;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+        }
+        .dropdown-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .dropdown-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 6px;
+        }
+        .dropdown-header .user-name {
+            font-weight: 700; font-size: 15px;
+            display: block; margin-bottom: 3px;
+        }
+        .dropdown-header .user-phone {
+            font-size: 12px; color: var(--text-muted);
+            direction: ltr; display: block;
+            font-family: monospace;
+        }
+        .dropdown-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-size: 14px; font-weight: 600;
+            color: var(--text);
+            transition: all 0.25s;
+            width: 100%; text-align: right;
+        }
+        .dropdown-item:hover {
+            background: rgba(212, 163, 115, 0.1);
+            color: var(--gold-dark);
+            padding-right: 18px;
+        }
+        [data-theme="dark"] .dropdown-item:hover { color: var(--gold); }
+        .dropdown-item i { width: 20px; text-align: center; color: var(--gold); }
+        .dropdown-divider { height: 1px; background: var(--border); margin: 6px 10px; }
+        .logout-item:hover { background: rgba(244, 63, 94, 0.1); color: #fb7185; }
+        .logout-item:hover i { color: #fb7185; }
+
+        /* ============================================================
+        HERO SECTION
+        ============================================================ */
+        .hero {
+            background: var(--deep-navy);
+            padding: 60px 0 140px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 90% 20%, rgba(212, 163, 115, 0.15), transparent 45%),
+                radial-gradient(circle at 10% 80%, rgba(212, 163, 115, 0.08), transparent 50%);
+        }
+        .hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 163, 115, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 163, 115, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+        }
+        .hero-content {
+            position: relative; z-index: 1;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            gap: 30px; flex-wrap: wrap;
+        }
+        .hero-greeting {
+            display: flex; align-items: center; gap: 20px;
+        }
+        .hero-avatar {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            background: var(--gold-gradient);
+            color: #fff; font-size: 28px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--gold-glow);
+            border: 3px solid rgba(255,255,255,0.15);
+            flex-shrink: 0;
+        }
+        .hero-text h1 {
+            font-size: 30px; font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .hero-text h1 .gold-name {
             background: var(--gold-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        .purple-text {
-            color: var(--deep-navy);
-        }
-        [data-theme="dark"] .purple-text {
-            color: #f0f0f0;
-        }
-
-        .gradient-badge {
-            display: inline-block;
-            background: var(--gold-gradient);
-            color: #fff;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
+        .hero-text p {
+            color: rgba(255,255,255,0.55);
             font-size: 14px;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-            background: var(--gold-gradient);
-            color: #fff;
+            display: flex; align-items: center; gap: 8px;
         }
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.3);
-        }
-        .btn-gold {
-            background: var(--gold-gradient);
-            border-color: var(--gold);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.2);
-        }
-        .btn-gold:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 8px 35px rgba(212, 163, 115, 0.35);
-        }
-        .btn-gold-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 2px solid var(--gold);
-        }
-        .btn-gold-outline:hover {
-            background: var(--gold-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-        .btn-white {
-            background: #fff;
-            color: var(--deep-navy);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-        .btn-white:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-        }
-        .btn-sm {
-            padding: 6px 16px;
-            font-size: 12px;
-        }
+        .hero-text p i { color: var(--gold); font-size: 12px; }
 
-        /* ===== HEADER ===== */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(212, 163, 115, 0.15);
-            padding: 8px 0;
-            transition: background 0.4s, border-color 0.4s;
-        }
-        [data-theme="dark"] .header {
-            background: rgba(10, 22, 40, 0.95);
-        }
-        [data-theme="light"] .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border);
-        }
+        .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .logo-img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .nav-desktop ul {
-            display: flex;
-            gap: 28px;
-        }
-        .nav-desktop a {
-            font-weight: 500;
-            font-size: 15px;
+        /* ============================================================
+        STATS (Overlapping Cards)
+        ============================================================ */
+        .stats-wrapper {
+            margin-top: -80px;
             position: relative;
-            transition: color 0.3s;
-            color: rgba(255, 255, 255, 0.7);
+            z-index: 2;
+            margin-bottom: 50px;
         }
-        [data-theme="light"] .nav-desktop a {
-            color: var(--deep-navy);
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
         }
-        .nav-desktop a::after {
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 26px 22px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+        .stat-card::before {
             content: '';
             position: absolute;
-            bottom: -4px;
-            right: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold-gradient);
-            transition: width 0.3s;
+            top: 0; right: 0;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            opacity: 0.08;
+            transition: transform 0.6s, opacity 0.4s;
         }
-        .nav-desktop a:hover::after {
-            width: 100%;
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 4px; height: 40px;
+            background: var(--accent);
+            border-radius: 0 0 0 4px;
+            opacity: 0.6;
+            transition: all 0.4s;
         }
-        .nav-desktop a:hover {
-            color: var(--gold);
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
         }
-        .nav-desktop a.active {
-            color: var(--gold);
-        }
-        .nav-desktop a.active::after {
-            width: 100%;
-        }
+        .stat-card:hover::before { transform: scale(1.5); opacity: 0.15; }
+        .stat-card:hover::after { height: 100%; opacity: 1; }
+        .stat-card.blue { --accent: #60a5fa; }
+        .stat-card.green { --accent: #34d399; }
+        .stat-card.amber { --accent: #fbbf24; }
+        .stat-card.purple { --accent: #a78bfa; }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .stat-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            background: color-mix(in srgb, var(--accent) 15%, transparent);
+            color: var(--accent);
+            margin-bottom: 18px;
+            transition: all 0.4s;
         }
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: transparent;
-            color: #fff;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(-6deg);
+            box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 30%, transparent);
         }
-        [data-theme="light"] .theme-toggle {
-            border-color: var(--border);
-            color: var(--deep-navy);
+        .stat-value {
+            font-size: 28px; font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 4px;
+            color: var(--text);
         }
-        .theme-toggle:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 24px;
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-        }
-        [data-theme="light"] .menu-toggle {
-            color: var(--deep-navy);
-        }
-
-        /* ===== MOBILE MENU ===== */
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-        }
-        .mobile-menu.open {
-            display: flex;
-        }
-        .mobile-menu ul {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .mobile-menu a {
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
             font-weight: 500;
-            font-size: 16px;
         }
-        .mobile-auth {
-            display: flex;
-            gap: 12px;
+        .stat-trend {
+            position: absolute;
+            top: 22px; left: 22px;
+            font-size: 11px; font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            background: rgba(52, 211, 153, 0.12);
+            color: #34d399;
         }
 
         /* ============================================================
-           DASHBOARD
-           ============================================================ */
-        .dashboard-page {
-            padding: 40px 0 60px;
+        SECTION CARD
+        ============================================================ */
+        .section-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: box-shadow 0.4s;
         }
+        .section-card:hover { box-shadow: var(--shadow); }
+        .section-header {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 22px 26px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-soft);
+        }
+        .section-header h3 {
+            font-size: 16px; font-weight: 800;
+            display: flex; align-items: center; gap: 12px;
+            color: var(--text);
+        }
+        .section-header h3 .icon-badge {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 6px 16px rgba(212, 163, 115, 0.3);
+        }
+        .section-header a {
+            font-size: 13px; font-weight: 700;
+            color: var(--gold);
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            transition: all 0.3s;
+        }
+        .section-header a:hover {
+            background: rgba(212, 163, 115, 0.1);
+            gap: 10px;
+        }
+        .section-body { padding: 22px 26px; }
 
+        /* ============================================================
+        LAYOUT GRID
+        ============================================================ */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 30px;
-            margin-top: 20px;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .dashboard-sidebar {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            padding: 24px 20px;
-            box-shadow: var(--shadow);
-            height: fit-content;
-            transition: all 0.3s ease;
-        }
-        .dashboard-sidebar:hover {
-            border-color: var(--gold);
-            box-shadow: 0 8px 30px rgba(212, 163, 115, 0.08);
-        }
-
-        .user-info {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-        .user-info .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--gold);
-            margin: 0 auto 12px;
-        }
-        .user-info h3 {
-            font-size: 18px;
-            font-weight: 700;
-        }
-        .user-info p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .dashboard-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .dashboard-nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            color: var(--text-muted);
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .dashboard-nav a i {
-            width: 20px;
-            color: var(--gold);
-        }
-        .dashboard-nav a:hover {
-            background: rgba(212, 163, 115, 0.08);
-            color: var(--text);
-        }
-        .dashboard-nav a.active {
-            background: rgba(212, 163, 115, 0.12);
-            color: var(--gold);
-        }
-        .dashboard-nav .logout-btn {
-            background: none;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            color: #ef4444;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
-            width: 100%;
-            cursor: pointer;
-            font-family: var(--font);
-        }
-        .dashboard-nav .logout-btn i {
-            width: 20px;
-            color: #ef4444;
-        }
-        .dashboard-nav .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.08);
-        }
-
-        /* ===== CONTENT ===== */
-        .dashboard-content {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            padding: 30px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-        .dashboard-content:hover {
-            border-color: var(--gold);
-            box-shadow: 0 8px 30px rgba(212, 163, 115, 0.08);
-        }
-
-        .dashboard-content .page-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        .dashboard-content .page-subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        /* ===== TAB CONTENT ===== */
-        .tab-content {
-            display: none;
-            animation: fadeSlideIn 0.4s ease forwards;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeSlideIn {
-            0% { opacity: 0; transform: translateY(12px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== STATS ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
             margin-bottom: 30px;
         }
-        .stat-card {
-            background: var(--bg-body);
-            border-radius: var(--radius-sm);
-            padding: 18px 20px;
-            text-align: center;
+        .dashboard-main { display: flex; flex-direction: column; gap: 24px; }
+        .dashboard-side { display: flex; flex-direction: column; gap: 24px; }
+
+        /* ============================================================
+        QUICK ACTIONS
+        ============================================================ */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+        .quick-action {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover {
-            border-color: var(--gold);
-            transform: translateY(-4px);
-            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.06);
-        }
-        .stat-card .number {
-            display: block;
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--gold);
-        }
-        .stat-card .label {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        /* ===== TABLE ===== */
-        .table-wrap {
-            overflow-x: auto;
-        }
-        .table-wrap table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        .table-wrap thead {
-            background: var(--bg-body);
-        }
-        .table-wrap th {
-            padding: 12px 16px;
-            text-align: right;
-            font-weight: 700;
-            color: var(--text-muted);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .table-wrap td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-        }
-        .table-wrap tr:hover td {
-            background: rgba(212, 163, 115, 0.03);
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-pending {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-cancelled {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-active {
-            background: #dcfce7;
-            color: #166534;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-expired {
-            background: #f3f4f6;
-            color: #4b5563;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* ===== FILTER ===== */
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        .filter-bar select,
-        .filter-bar input {
-            padding: 8px 14px;
-            border: 2px solid var(--border);
             border-radius: var(--radius-sm);
-            background: var(--bg-body);
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 13px;
-            outline: none;
-            transition: all 0.3s ease;
+            padding: 22px 16px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 10px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .filter-bar select:focus,
-        .filter-bar input:focus {
+        .quick-action::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: var(--gold-gradient);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .quick-action:hover {
+            transform: translateY(-6px);
             border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.1);
+            box-shadow: var(--shadow-lg);
+        }
+        .quick-action:hover::before { opacity: 0.05; }
+        .quick-action > * { position: relative; z-index: 1; }
+        .quick-action-icon {
+            width: 50px; height: 50px;
+            border-radius: 14px;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.3);
+            transition: transform 0.4s;
+        }
+        .quick-action:hover .quick-action-icon {
+            transform: scale(1.12) rotate(-8deg);
+        }
+        .quick-action span {
+            font-weight: 700; font-size: 14px;
+            color: var(--text);
+        }
+        .quick-action small {
+            font-size: 11px;
+            color: var(--text-muted);
         }
 
-        /* ===== PROFILE FORM ===== */
-        .profile-form .form-group {
+        /* ============================================================
+        NOTIFICATIONS
+        ============================================================ */
+        .notifications-list {
+            display: flex; flex-direction: column; gap: 10px;
+            margin-bottom: 30px;
+        }
+        .notification-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .notification-item::before {
+            content: '';
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--notif-color);
+        }
+        .notification-item:hover {
+            transform: translateX(-8px);
+            box-shadow: var(--shadow);
+            border-color: var(--notif-color);
+        }
+        .notification-item.warning { --notif-color: #fbbf24; }
+        .notification-item.info { --notif-color: #60a5fa; }
+        .notification-item.success { --notif-color: #34d399; }
+        .notification-item.error { --notif-color: #fb7185; }
+
+        .notification-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px; flex-shrink: 0;
+            background: color-mix(in srgb, var(--notif-color) 15%, transparent);
+            color: var(--notif-color);
+        }
+        .notification-body { flex: 1; min-width: 0; }
+        .notification-title {
+            font-weight: 700; font-size: 14px;
+            margin-bottom: 3px;
+            color: var(--text);
+        }
+        .notification-message {
+            font-size: 13px; color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .notification-link {
+            color: var(--gold);
+            font-weight: 700; font-size: 12px;
+            margin-top: 6px;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: gap 0.3s;
+        }
+        .notification-link:hover { gap: 9px; }
+
+        /* ============================================================
+        RESERVATION CARD (Redesigned)
+        ============================================================ */
+        .reservation-list {
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .reservation-card {
+            display: flex; align-items: stretch;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .reservation-card:hover {
+            transform: translateX(-6px);
+            border-color: var(--gold);
+            box-shadow: 0 12px 36px rgba(212, 163, 115, 0.15);
+        }
+        .res-side-bar {
+            width: 6px;
+            background: var(--status-color, #60a5fa);
+            flex-shrink: 0;
+        }
+        .res-body {
+            flex: 1; padding: 18px 20px;
+            display: flex; align-items: center;
+            gap: 16px;
+        }
+        .res-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: var(--gold-gradient);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.25);
+            flex-shrink: 0;
+        }
+        .res-info { flex: 1; min-width: 0; }
+        .res-title {
+            font-size: 15px; font-weight: 800;
+            color: var(--text);
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .res-meta {
+            display: flex; flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .res-meta span {
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .res-meta i { color: var(--gold); font-size: 11px; }
+
+        .res-actions {
+            display: flex; flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .res-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px; font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-pending { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .badge-active { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .badge-completed { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+        .badge-cancelled { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+        .badge-expired { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+
+        .res-price {
+            font-weight: 800; font-size: 14px;
+            color: var(--gold-dark);
+            direction: rtl;
+        }
+        [data-theme="dark"] .res-price { color: var(--gold); }
+
+        .btn-cancel {
+            padding: 6px 14px;
+            border-radius: 9px;
+            background: rgba(244, 63, 94, 0.08);
+            color: #fb7185;
+            font-size: 11px; font-weight: 700;
+            transition: all 0.25s;
+            display: inline-flex; align-items: center; gap: 5px;
+            cursor: pointer;
+            border: 1px solid rgba(244, 63, 94, 0.15);
+        }
+        .btn-cancel:hover {
+            background: rgba(244, 63, 94, 0.15);
+            transform: scale(1.03);
+        }
+
+        /* ============================================================
+        PROFILE CARD (Redesigned)
+        ============================================================ */
+        .profile-card-v2 {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            position: relative;
+        }
+        .profile-cover {
+            height: 90px;
+            background: linear-gradient(135deg, #0a1628, #1a2f4a);
+            position: relative;
+        }
+        .profile-cover::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(212, 163, 115, 0.15), transparent 60%);
+        }
+        .profile-cover::after {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 163, 115, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 163, 115, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .profile-avatar-wrap {
+            position: relative;
+            margin-top: -45px;
+            text-align: center;
+            padding: 0 24px;
+        }
+        .profile-avatar-v2 {
+            width: 90px; height: 90px;
+            border-radius: 24px;
+            background: var(--gold-gradient);
+            color: #fff; font-size: 34px;
+            display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 15px 40px rgba(212, 163, 115, 0.4);
+            border: 5px solid var(--bg-card);
+            transition: transform 0.4s;
+        }
+        .profile-avatar-v2:hover { transform: scale(1.05) rotate(-3deg); }
+        .profile-name-v2 {
+            text-align: center;
+            font-size: 20px; font-weight: 800;
+            margin: 16px 0 4px;
+            color: var(--text);
+        }
+        .profile-phone-v2 {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            direction: ltr;
+            display: block;
+            font-family: monospace;
+            margin-bottom: 20px;
+        }
+        .profile-info-v2 {
+            padding: 0 24px 20px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .profile-info-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+        .profile-info-row:hover { background: var(--bg-soft); }
+        .profile-info-row .icon {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: rgba(212, 163, 115, 0.1);
+            color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .profile-info-row .label {
+            color: var(--text-muted);
+            flex: 1;
+        }
+        .profile-info-row .value {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 12px;
+            text-align: left;
+            direction: ltr;
+        }
+        .profile-info-row .value.rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        .btn-edit-profile-v2 {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px;
+            margin: 0 24px 24px;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--gold-gradient);
+            color: #fff;
+            font-weight: 700; font-size: 13px;
+            transition: all 0.35s;
+            box-shadow: 0 8px 22px rgba(212, 163, 115, 0.3);
+        }
+        .btn-edit-profile-v2:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(212, 163, 115, 0.45);
+        }
+
+        /* ============================================================
+        CHART SECTION
+        ============================================================ */
+        .chart-section {
+            margin-bottom: 30px;
+        }
+        .chart-wrapper {
+            padding: 26px;
+            height: 300px;
+            position: relative;
+        }
+        .chart-legend {
+            display: flex; gap: 20px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--gold);
+        }
+
+        /* ============================================================
+        INVOICES (Redesigned Table-like)
+        ============================================================ */
+        .invoice-list { display: flex; flex-direction: column; gap: 10px; }
+        .invoice-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 18px;
+            border-radius: 14px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+        .invoice-row:hover {
+            transform: translateX(-6px);
+            border-color: var(--gold);
+            background: var(--bg-card);
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.12);
+        }
+        .invoice-icon-wrap {
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            background: rgba(212, 163, 115, 0.1);
+            color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .invoice-info { flex: 1; min-width: 0; }
+        .invoice-title {
+            font-weight: 700; font-size: 14px;
+            color: var(--text);
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .invoice-num {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: monospace;
+            direction: ltr;
+        }
+        .invoice-amount {
+            font-weight: 800;
+            color: var(--gold-dark);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .invoice-amount { color: var(--gold); }
+        .invoice-arrow {
+            color: var(--text-muted);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .invoice-row:hover .invoice-arrow {
+            color: var(--gold);
+            transform: translateX(-4px);
+        }
+
+        /* ============================================================
+        PAST RESERVATIONS (Compact)
+        ============================================================ */
+        .past-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+        .past-row:hover {
+            background: var(--bg-soft);
+            border-color: var(--border-light);
+        }
+        .past-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--status-color, #60a5fa);
+            flex-shrink: 0;
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-color) 20%, transparent);
+        }
+        .past-title {
+            flex: 1; min-width: 0;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .past-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            direction: ltr;
+        }
+
+        /* ============================================================
+        EMPTY STATE
+        ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 44px 20px;
+            color: var(--text-muted);
+        }
+        .empty-icon {
+            width: 80px; height: 80px;
+            border-radius: 24px;
+            background: var(--bg-soft);
+            color: var(--text-light);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 34px;
             margin-bottom: 18px;
         }
-        .profile-form label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
-            color: var(--text);
-        }
-        .profile-form input,
-        .profile-form textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--bg-body);
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 14px;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-        .profile-form input:focus,
-        .profile-form textarea:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.1);
-        }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--deep-navy);
-            color: #c8c8d4;
-            padding: 40px 0 20px;
-            margin-top: 40px;
-            border-top: 2px solid var(--gold);
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            text-align: center;
-        }
-        .footer-brand .logo { justify-content: center; }
-        .footer-brand p {
-            font-size: 14px;
-            max-width: 300px;
-            margin: 0 auto 16px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .footer-social {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .footer-social a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c8c8d4;
-            transition: var(--transition);
-        }
-        .footer-social a:hover {
-            background: var(--gold);
-            color: #fff;
-        }
-        .footer-links h4,
-        .footer-contact h4 {
-            color: #fff;
+        .empty-state h4 {
             font-size: 16px;
-            margin-bottom: 16px;
+            color: var(--text);
+            margin-bottom: 6px;
+            font-weight: 700;
         }
-        .footer-links ul,
-        .footer-contact ul {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
+        .empty-state p {
+            font-size: 13px;
+            margin-bottom: 18px;
         }
-        .footer-links a,
-        .footer-contact li {
-            font-size: 14px;
-            color: #94a3b8;
+        .empty-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 26px;
+            border-radius: 9999px;
+            background: var(--gold-gradient);
+            color: #fff;
+            font-weight: 700; font-size: 13px;
+            transition: all 0.35s;
+            box-shadow: 0 8px 22px rgba(212, 163, 115, 0.3);
         }
-        .footer-links a:hover { color: var(--gold); }
-        .footer-contact li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .footer-contact li i {
-            color: var(--gold);
-            width: 20px;
-        }
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            font-size: 14px;
-            color: #64748b;
+        .empty-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(212, 163, 115, 0.45);
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* ============================================================
+        TOAST
+        ============================================================ */
+        .toast-container {
+            position: fixed; bottom: 30px; left: 30px;
+            z-index: 99999;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .toast-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            min-width: 300px; max-width: 420px;
+            font-size: 14px; font-weight: 600;
+            color: var(--text);
+            animation: toastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .toast-item::before {
+            content: '';
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--toast-color);
+        }
+        .toast-item i {
+            font-size: 20px;
+            color: var(--toast-color);
+            flex-shrink: 0;
+        }
+        .toast-success { --toast-color: #34d399; }
+        .toast-error { --toast-color: #fb7185; }
+        .toast-info { --toast-color: #60a5fa; }
+        .toast-warning { --toast-color: #fbbf24; }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ============================================================
+        RESPONSIVE
+        ============================================================ */
+        @media (max-width: 1200px) {
+            .dashboard-grid { grid-template-columns: 1fr 340px; }
+        }
         @media (max-width: 992px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+            .dashboard-grid { grid-template-columns: 1fr; }
             .nav-desktop { display: none; }
-            .menu-toggle { display: block; }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .dashboard-sidebar {
-                order: 2;
-            }
-            .dashboard-content {
-                order: 1;
-                padding: 16px;
-            }
-            .dashboard-sidebar {
-                padding: 16px;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
-            .filter-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-bar select,
-            .filter-bar input {
-                width: 100%;
-            }
+            .hero-text h1 { font-size: 24px; }
         }
-
-        @media (max-width: 480px) {
-            .dashboard-content {
-                padding: 12px;
-            }
-            .dashboard-sidebar {
-                padding: 12px;
-            }
-            .stat-card .number {
-                font-size: 24px;
-            }
-            .table-wrap table {
-                font-size: 12px;
-            }
-            .table-wrap th,
-            .table-wrap td {
-                padding: 8px 10px;
-            }
-            .page-title {
-                font-size: 20px;
-            }
+        @media (max-width: 576px) {
+            .container { padding: 0 16px; }
+            .hero { padding: 40px 0 120px; }
+            .hero-avatar { width: 60px; height: 60px; font-size: 22px; }
+            .hero-text h1 { font-size: 20px; }
+            .hero-text p { font-size: 12px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-actions-grid { grid-template-columns: 1fr 1fr; }
+            .stat-value { font-size: 22px; }
+            .res-body { flex-wrap: wrap; padding: 14px; gap: 10px; }
+            .res-actions { width: 100%; align-items: stretch; }
+            .dropdown-menu { left: auto; right: 0; }
         }
     </style>
 </head>
 <body>
 
+        @include('partials.header')
     <!-- ============================================================
-    HEADER
+    HERO
     ============================================================ -->
-    <header class="header" id="header">
-        <div class="container header-inner">
-            <a href="{{ route('home') }}" class="logo">
-                <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-            </a>
-            <nav class="nav-desktop">
-                <ul>
-                    <li><a href="{{ route('home') }}">خانه</a></li>
-                    <li><a href="{{ route('about') }}">درباره ما</a></li>
-                    <li><a href="{{ route('services') }}">خدمات</a></li>
-                    <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                    <li><a href="{{ route('contact') }}">تماس</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                @auth
-                    <span class="btn btn-gold" style="cursor:default;">
-                        <i class="fas fa-user"></i> {{ Auth::user()->name ?? 'کاربر' }}
-                    </span>
-                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-gold-outline">خروج</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-greeting">
+                <div class="hero-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="hero-text">
+                    <h1>سلام، <span class="gold-name">{{ $user->display_name }}</span>!</h1>
+                    <p>
+                        <i class="fas fa-circle"></i>
+                        خوش آمدید به پنل کاربری GRAFIUM
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="{{ route('home') }}">خانه</a></li>
-                <li><a href="{{ route('about') }}">درباره ما</a></li>
-                <li><a href="{{ route('services') }}">خدمات</a></li>
-                <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                <li><a href="{{ route('contact') }}">تماس</a></li>
-            </ul>
-            <div class="mobile-auth">
-                @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-gold">داشبورد</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-gold">ورود</a>
-                @endauth
-            </div>
-        </div>
-    </header>
-
-    <!-- ============================================================
-    DASHBOARD
-    ============================================================ -->
-    <section class="dashboard-page">
-        <div class="container">
-            <div class="dashboard-grid">
-
-                <!-- ===== SIDEBAR ===== -->
-                <aside class="dashboard-sidebar">
-                    <div class="user-info">
-                        <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'کاربر' }}&background=d4a373&color=fff&bold=true&size=80"
-                             alt="avatar" class="avatar" />
-                        <h3 class="purple-text">{{ Auth::user()->name ?? 'کاربر مهمان' }}</h3>
-                        <p>{{ Auth::user()->email ?? 'email@example.com' }}</p>
-                    </div>
-
-                    <nav class="dashboard-nav">
-                        <a class="active" data-tab="dashboard-tab">
-                            <i class="fas fa-home"></i> داشبورد
-                        </a>
-                        <a data-tab="reservations-tab">
-                            <i class="fas fa-calendar-check"></i> رزروهای من
-                        </a>
-                        <a data-tab="invoices-tab">
-                            <i class="fas fa-file-invoice"></i> فاکتورها
-                        </a>
-                        <a data-tab="profile-tab">
-                            <i class="fas fa-user-edit"></i> ویرایش پروفایل
-                        </a>
-                        <form action="{{ route('logout') }}" method="POST" style="margin-top:8px;">
-                            @csrf
-                            <button type="submit" class="logout-btn">
-                                <i class="fas fa-sign-out-alt"></i> خروج از حساب
-                            </button>
-                        </form>
-                    </nav>
-                </aside>
-
-                <!-- ===== CONTENT ===== -->
-                <main class="dashboard-content">
-
-                    <!-- ====== TAB 1: DASHBOARD ====== -->
-                    <div id="dashboard-tab" class="tab-content active">
-                        <h2 class="page-title purple-text">
-                            <i class="fas fa-hand-peace"></i> خوش آمدید، {{ Auth::user()->name ?? 'کاربر' }}!
-                        </h2>
-                        <p class="page-subtitle">از آخرین وضعیت رزروها و فعالیت‌های خود مطلع شوید.</p>
-
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <span class="number">۳</span>
-                                <span class="label">رزرو فعال</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="number">۱۲</span>
-                                <span class="label">کل رزروها</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="number">۵</span>
-                                <span class="label">فاکتور</span>
-                            </div>
-                        </div>
-
-                        <h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">
-                            <i class="fas fa-clock"></i> آخرین رزروها
-                        </h3>
-
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>میز</th>
-                                        <th>تاریخ</th>
-                                        <th>شیفت</th>
-                                        <th>وضعیت</th>
-                                        <th>عملیات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $recentReservations = [
-                                            ['desk' => 3, 'date' => '۱۴۰۵/۰۵/۲۰', 'shift' => 'شیفت ۱ (۸-۱۴)', 'status' => 'active', 'status_text' => 'فعال'],
-                                            ['desk' => 7, 'date' => '۱۴۰۵/۰۵/۲۲', 'shift' => 'شیفت ۲ (۱۵-۲۱)', 'status' => 'pending', 'status_text' => 'در انتظار'],
-                                            ['desk' => 1, 'date' => '۱۴۰۵/۰۵/۱۸', 'shift' => 'روز کامل', 'status' => 'cancelled', 'status_text' => 'لغو شده'],
-                                        ];
-                                    @endphp
-
-                                    @forelse($recentReservations as $res)
-                                    <tr>
-                                        <td><strong>میز {{ $res['desk'] }}</strong></td>
-                                        <td>{{ $res['date'] }}</td>
-                                        <td>{{ $res['shift'] }}</td>
-                                        <td>
-                                            <span class="badge-{{ $res['status'] }}">
-                                                {{ $res['status_text'] }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="gold-link" style="font-size:13px;color:var(--gold);">
-                                                <i class="fas fa-eye"></i> مشاهده
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="5" style="text-align:center;color:var(--text-muted);padding:30px 0;">
-                                            <i class="fas fa-calendar-times" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                                            هیچ رزروی یافت نشد.
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div style="margin-top:20px;text-align:left;">
-                            <a href="{{ route('services') }}" class="btn btn-gold">
-                                <i class="fas fa-plus"></i> رزرو جدید
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- ====== TAB 2: RESERVATIONS ====== -->
-                    <div id="reservations-tab" class="tab-content">
-                        <h2 class="page-title purple-text">
-                            <i class="fas fa-calendar-check"></i> رزروهای من
-                        </h2>
-                        <p class="page-subtitle">لیست کامل رزروهای شما با قابلیت فیلتر</p>
-
-                        <div class="filter-bar">
-                            <select id="reservationFilter">
-                                <option value="all">همه</option>
-                                <option value="active">فعال</option>
-                                <option value="pending">در انتظار</option>
-                                <option value="cancelled">لغو شده</option>
-                                <option value="expired">منقضی</option>
-                            </select>
-                            <input type="text" id="reservationSearch" placeholder="جستجو در رزروها..." />
-                            <button class="btn btn-gold btn-sm" onclick="filterReservations()">
-                                <i class="fas fa-search"></i> جستجو
-                            </button>
-                        </div>
-
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>میز</th>
-                                        <th>تاریخ</th>
-                                        <th>شیفت</th>
-                                        <th>وضعیت</th>
-                                        <th>تاریخ رزرو</th>
-                                        <th>عملیات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reservationsTableBody">
-                                    @php
-                                        $allReservations = [
-                                            ['desk' => 3, 'date' => '۱۴۰۵/۰۵/۲۰', 'shift' => 'شیفت ۱ (۸-۱۴)', 'status' => 'active', 'status_text' => 'فعال', 'created_at' => '۱۴۰۵/۰۵/۰۱'],
-                                            ['desk' => 7, 'date' => '۱۴۰۵/۰۵/۲۲', 'shift' => 'شیفت ۲ (۱۵-۲۱)', 'status' => 'pending', 'status_text' => 'در انتظار', 'created_at' => '۱۴۰۵/۰۵/۰۲'],
-                                            ['desk' => 1, 'date' => '۱۴۰۵/۰۵/۱۸', 'shift' => 'روز کامل', 'status' => 'cancelled', 'status_text' => 'لغو شده', 'created_at' => '۱۴۰۵/۰۴/۲۸'],
-                                            ['desk' => 5, 'date' => '۱۴۰۵/۰۵/۲۵', 'shift' => 'شیفت ۱ (۸-۱۴)', 'status' => 'active', 'status_text' => 'فعال', 'created_at' => '۱۴۰۵/۰۵/۰۳'],
-                                            ['desk' => 2, 'date' => '۱۴۰۵/۰۴/۱۵', 'shift' => 'شیفت ۲ (۱۵-۲۱)', 'status' => 'expired', 'status_text' => 'منقضی', 'created_at' => '۱۴۰۵/۰۳/۲۰'],
-                                            ['desk' => 8, 'date' => '۱۴۰۵/۰۵/۲۸', 'shift' => 'روز کامل', 'status' => 'pending', 'status_text' => 'در انتظار', 'created_at' => '۱۴۰۵/۰۵/۰۴'],
-                                            ['desk' => 4, 'date' => '۱۴۰۵/۰۴/۲۵', 'shift' => 'شیفت ۱ (۸-۱۴)', 'status' => 'cancelled', 'status_text' => 'لغو شده', 'created_at' => '۱۴۰۵/۰۴/۱۰'],
-                                            ['desk' => 9, 'date' => '۱۴۰۵/۰۶/۰۱', 'shift' => 'شیفت ۲ (۱۵-۲۱)', 'status' => 'active', 'status_text' => 'فعال', 'created_at' => '۱۴۰۵/۰۵/۰۵'],
-                                            ['desk' => 6, 'date' => '۱۴۰۵/۰۴/۱۰', 'shift' => 'روز کامل', 'status' => 'expired', 'status_text' => 'منقضی', 'created_at' => '۱۴۰۵/۰۳/۰۱'],
-                                            ['desk' => 10, 'date' => '۱۴۰۵/۰۶/۰۵', 'shift' => 'شیفت ۱ (۸-۱۴)', 'status' => 'pending', 'status_text' => 'در انتظار', 'created_at' => '۱۴۰۵/۰۵/۰۶'],
-                                            ['desk' => 11, 'date' => '۱۴۰۵/۰۵/۳۰', 'shift' => 'شیفت ۲ (۱۵-۲۱)', 'status' => 'active', 'status_text' => 'فعال', 'created_at' => '۱۴۰۵/۰۵/۰۷'],
-                                            ['desk' => 12, 'date' => '۱۴۰۵/۰۴/۰۵', 'shift' => 'روز کامل', 'status' => 'expired', 'status_text' => 'منقضی', 'created_at' => '۱۴۰۵/۰۲/۲۵'],
-                                        ];
-                                    @endphp
-
-                                    @forelse($allReservations as $res)
-                                    <tr class="reservation-row" data-status="{{ $res['status'] }}" data-search="{{ $res['desk'] }} {{ $res['date'] }}">
-                                        <td><strong>میز {{ $res['desk'] }}</strong></td>
-                                        <td>{{ $res['date'] }}</td>
-                                        <td>{{ $res['shift'] }}</td>
-                                        <td>
-                                            <span class="badge-{{ $res['status'] }}">
-                                                {{ $res['status_text'] }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $res['created_at'] }}</td>
-                                        <td>
-                                            <a href="#" class="gold-link" style="font-size:13px;color:var(--gold);">
-                                                <i class="fas fa-eye"></i> مشاهده
-                                            </a>
-                                            @if($res['status'] == 'pending' || $res['status'] == 'active')
-                                            <a href="#" class="gold-link" style="font-size:13px;color:#ef4444;margin-right:8px;" onclick="return confirm('آیا از لغو این رزرو اطمینان دارید؟')">
-                                                <i class="fas fa-times"></i> لغو
-                                            </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="6" style="text-align:center;color:var(--text-muted);padding:30px 0;">
-                                            <i class="fas fa-calendar-times" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                                            هیچ رزروی یافت نشد.
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- ====== TAB 3: INVOICES ====== -->
-                    <div id="invoices-tab" class="tab-content">
-                        <h2 class="page-title purple-text">
-                            <i class="fas fa-file-invoice"></i> فاکتورها
-                        </h2>
-                        <p class="page-subtitle">لیست فاکتورهای شما</p>
-
-                        <div class="filter-bar">
-                            <select id="invoiceFilter">
-                                <option value="all">همه</option>
-                                <option value="paid">پرداخت شده</option>
-                                <option value="pending">در انتظار پرداخت</option>
-                                <option value="cancelled">لغو شده</option>
-                            </select>
-                        </div>
-
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>شماره فاکتور</th>
-                                        <th>تاریخ</th>
-                                        <th>مبلغ</th>
-                                        <th>وضعیت</th>
-                                        <th>عملیات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $invoices = [
-                                            ['id' => 'INV-001', 'date' => '۱۴۰۵/۰۵/۲۰', 'amount' => '۱,۵۰۰,۰۰۰', 'status' => 'paid', 'status_text' => 'پرداخت شده'],
-                                            ['id' => 'INV-002', 'date' => '۱۴۰۵/۰۵/۱۵', 'amount' => '۲,۰۰۰,۰۰۰', 'status' => 'pending', 'status_text' => 'در انتظار پرداخت'],
-                                            ['id' => 'INV-003', 'date' => '۱۴۰۵/۰۴/۲۸', 'amount' => '۷۵۰,۰۰۰', 'status' => 'paid', 'status_text' => 'پرداخت شده'],
-                                            ['id' => 'INV-004', 'date' => '۱۴۰۵/۰۴/۱۰', 'amount' => '۱,۲۰۰,۰۰۰', 'status' => 'cancelled', 'status_text' => 'لغو شده'],
-                                            ['id' => 'INV-005', 'date' => '۱۴۰۵/۰۵/۰۱', 'amount' => '۳,۰۰۰,۰۰۰', 'status' => 'pending', 'status_text' => 'در انتظار پرداخت'],
-                                        ];
-                                    @endphp
-
-                                    @forelse($invoices as $inv)
-                                    <tr>
-                                        <td><strong>{{ $inv['id'] }}</strong></td>
-                                        <td>{{ $inv['date'] }}</td>
-                                        <td>{{ $inv['amount'] }} تومان</td>
-                                        <td>
-                                            <span class="badge-{{ $inv['status'] }}">
-                                                {{ $inv['status_text'] }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('invoice') }}" class="gold-link" style="font-size:13px;color:var(--gold);">
-                                                <i class="fas fa-download"></i> دانلود
-                                            </a>
-                                            @if($inv['status'] == 'pending')
-                                            <a href="#" class="gold-link" style="font-size:13px;color:#22c55e;margin-right:8px;">
-                                                <i class="fas fa-credit-card"></i> پرداخت
-                                            </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="5" style="text-align:center;color:var(--text-muted);padding:30px 0;">
-                                            <i class="fas fa-file-invoice" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                                            هیچ فاکتوری یافت نشد.
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- ====== TAB 4: PROFILE ====== -->
-                    <div id="profile-tab" class="tab-content">
-                        <h2 class="page-title purple-text">
-                            <i class="fas fa-user-edit"></i> ویرایش پروفایل
-                        </h2>
-                        <p class="page-subtitle">اطلاعات شخصی خود را به‌روزرسانی کنید</p>
-
-                        <form class="profile-form" id="profileForm">
-                            @csrf
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="form-group">
-                                    <label for="fullName"><i class="fas fa-user"></i> نام کامل</label>
-                                    <input type="text" id="fullName" value="{{ Auth::user()->name ?? 'کاربر' }}" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="email"><i class="fas fa-envelope"></i> ایمیل</label>
-                                    <input type="email" id="email" value="{{ Auth::user()->email ?? 'email@example.com' }}" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="phone"><i class="fas fa-phone"></i> شماره تماس</label>
-                                    <input type="text" id="phone" value="۰۹۱۲-۳۴۵-۶۷۸۹" />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="password"><i class="fas fa-lock"></i> رمز عبور جدید</label>
-                                    <input type="password" id="password" placeholder="برای تغییر وارد کنید" />
-                                </div>
-
-                                <div class="form-group md:col-span-2">
-                                    <label for="address"><i class="fas fa-map-pin"></i> آدرس</label>
-                                    <textarea id="address" rows="3">تهران، خیابان اصلی، پلاک ۱۲۳</textarea>
-                                </div>
-                            </div>
-
-                            <div style="margin-top:20px;text-align:left;">
-                                <button type="submit" class="btn btn-gold">
-                                    <i class="fas fa-save"></i> ذخیره تغییرات
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                </main>
+            <div class="hero-actions">
+                <a href="{{ route('services') }}" class="btn" style="display:inline-flex;align-items:center;gap:10px;padding:13px 26px;border-radius:9999px;background:var(--gold-gradient);color:#fff;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(212,163,115,0.35);transition:all 0.35s;">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>رزرو جدید</span>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- ============================================================
-    FOOTER
+    STATS (Overlapping)
     ============================================================ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="{{ route('home') }}" class="logo">
-                        <img src="{{ asset('Aug 2, 2026, 03_28_58 PM.png') }}" alt="Grafium Logo" class="logo-img" />
-                    </a>
-                    <p>اولین سالن کار اشتراکی گرافیکی در شهر</p>
-                    <div class="footer-social">
-                        <a href="#"><i class="fas fa-comment"></i></a>
-                        <a href="#"><i class="fas fa-check-circle"></i></a>
-                        <a href="#"><i class="fas fa-video"></i></a>
-                        <a href="#"><i class="fas fa-share-alt"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>لینک‌های مفید</h4>
-                    <ul>
-                        <li><a href="{{ route('home') }}">خانه</a></li>
-                        <li><a href="{{ route('about') }}">درباره ما</a></li>
-                        <li><a href="{{ route('services') }}">خدمات</a></li>
-                        <li><a href="{{ route('blog') }}">بلاگ</a></li>
-                        <li><a href="{{ route('contact') }}">تماس</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>اطلاعات تماس</h4>
-                    <ul>
-                        <li><i class="fas fa-map-pin"></i> خیابان اصلی، پلاک ۱۲۳</li>
-                        <li><i class="fas fa-phone"></i> ۰۲۱-۱۲۳۴-۵۶۷۸</li>
-                        <li><i class="fas fa-envelope"></i> info@grafium.ir</li>
-                    </ul>
-                </div>
-                <div class="footer-trust">
-                    <h4>نمادهای اعتماد</h4>
-                    <div class="trust-icons"><span>نماد ۱</span><span>نماد ۲</span><span>نماد ۳</span></div>
-                </div>
+    <div class="container stats-wrapper">
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-value">{{ $stats['active_reservations'] }}</div>
+                <div class="stat-label">رزرو فعال</div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; ۲۰۲۶ تمامی حقوق برای <span class="gold-text">GRAFIUM</span> محفوظ است.</p>
+            <div class="stat-card green">
+                <div class="stat-icon"><i class="fas fa-check-double"></i></div>
+                <div class="stat-value">{{ $stats['completed_reservations'] }}</div>
+                <div class="stat-label">تکمیل شده</div>
+            </div>
+            <div class="stat-card amber">
+                <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div class="stat-value">{{ $stats['pending_invoices'] }}</div>
+                <div class="stat-label">فاکتور در انتظار</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                <div class="stat-value">{{ number_format($stats['total_paid']) }}</div>
+                <div class="stat-label">مجموع پرداخت (تومان)</div>
             </div>
         </div>
-    </footer>
+    </div>
+
+    <div class="container">
+
+        <!-- ============================================================
+        QUICK ACTIONS
+        ============================================================ -->
+        <div class="quick-actions-grid">
+            <a href="{{ route('services') }}" class="quick-action">
+                <div class="quick-action-icon"><i class="fas fa-plus"></i></div>
+                <span>رزرو جدید</span>
+                <small>خدمات موجود</small>
+            </a>
+            <a href="{{ route('reservations.index') }}" class="quick-action">
+                <div class="quick-action-icon"><i class="fas fa-calendar-alt"></i></div>
+                <span>رزروها</span>
+                <small>مشاهده همه</small>
+            </a>
+            <a href="{{ route('invoices.index') }}" class="quick-action">
+                <div class="quick-action-icon"><i class="fas fa-file-invoice"></i></div>
+                <span>فاکتورها</span>
+                <small>مالی</small>
+            </a>
+            <a href="{{ route('profile.edit') }}" class="quick-action">
+                <div class="quick-action-icon"><i class="fas fa-user-cog"></i></div>
+                <span>تنظیمات</span>
+                <small>ویرایش پروفایل</small>
+            </a>
+        </div>
+
+        <!-- ============================================================
+        NOTIFICATIONS
+        ============================================================ -->
+        @if(!empty($notifications))
+            <div class="notifications-list">
+                @foreach($notifications as $notif)
+                    <div class="notification-item {{ $notif['type'] }}">
+                        <div class="notification-icon">
+                            <i class="fas {{ $notif['icon'] }}"></i>
+                        </div>
+                        <div class="notification-body">
+                            <div class="notification-title">{{ $notif['title'] }}</div>
+                            <div class="notification-message">{{ $notif['message'] }}</div>
+                            @if(!empty($notif['link']))
+                                <a href="{{ $notif['link'] }}" class="notification-link">
+                                    مشاهده <i class="fas fa-arrow-left"></i>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <!-- ============================================================
+        MAIN GRID
+        ============================================================ -->
+        <div class="dashboard-grid">
+
+            <!-- ===== MAIN COLUMN ===== -->
+            <div class="dashboard-main">
+
+                <!-- Active Reservations -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>
+                            <span class="icon-badge"><i class="fas fa-calendar-check"></i></span>
+                            رزروهای فعال
+                        </h3>
+                        <a href="{{ route('reservations.index') }}">
+                            مشاهده همه <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                    <div class="section-body">
+                        @forelse($activeReservations as $res)
+                            @php
+                                $statusColors = [
+                                    'pending' => '#fbbf24',
+                                    'active' => '#34d399',
+                                    'completed' => '#60a5fa',
+                                    'cancelled' => '#fb7185',
+                                ];
+                                $color = $statusColors[$res->status] ?? '#60a5fa';
+                            @endphp
+                            <div class="reservation-card" data-id="{{ $res->id }}">
+                                <div class="res-side-bar" style="--status-color: {{ $color }}; background: {{ $color }};"></div>
+                                <div class="res-body">
+                                    <div class="res-icon">
+                                        <i class="fas fa-desktop"></i>
+                                    </div>
+                                    <div class="res-info">
+                                        <div class="res-title">{{ $res->service->title ?? 'خدمت' }}</div>
+                                        <div class="res-meta">
+                                            <span><i class="fas fa-calendar"></i> {{ $res->reservation_date ? $res->reservation_date->format('Y/m/d') : '-' }}</span>
+                                            <span><i class="fas fa-clock"></i> {{ $res->shift_persian ?? '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="res-actions">
+                                        <span class="res-badge badge-{{ $res->status }}">
+                                            {{ $res->status_persian ?? $res->status }}
+                                        </span>
+                                        <span class="res-price">{{ number_format($res->total_price) }} ت</span>
+                                        <button type="button" class="btn-cancel" onclick="cancelReservation({{ $res->id }})">
+                                            <i class="fas fa-times"></i> لغو
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
+                                <h4>هنوز رزروی نداری!</h4>
+                                <p>برای شروع، یه خدمت رزرو کن</p>
+                                <a href="{{ route('services') }}" class="empty-btn">
+                                    <i class="fas fa-plus"></i> مشاهده خدمات
+                                </a>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="section-card chart-section">
+                    <div class="section-header">
+                        <h3>
+                            <span class="icon-badge"><i class="fas fa-chart-line"></i></span>
+                            نمودار رزروها
+                        </h3>
+                        <span style="font-size: 12px; color: var(--text-muted);">۶ ماه اخیر</span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Past Reservations -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>
+                            <span class="icon-badge"><i class="fas fa-history"></i></span>
+                            رزروهای گذشته
+                        </h3>
+                        <a href="{{ route('reservations.index') }}">
+                            مشاهده همه <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                    <div class="section-body">
+                        @forelse($pastReservations as $res)
+                            @php
+                                $pastColors = [
+                                    'completed' => '#34d399',
+                                    'cancelled' => '#fb7185',
+                                    'expired' => '#94a3b8',
+                                ];
+                                $pcolor = $pastColors[$res->status] ?? '#60a5fa';
+                            @endphp
+                            <div class="past-row">
+                                <span class="past-dot" style="--status-color: {{ $pcolor }}; background: {{ $pcolor }};"></span>
+                                <span class="past-title">{{ $res->service->title ?? 'خدمت' }}</span>
+                                <span class="past-date">{{ $res->reservation_date ? $res->reservation_date->format('Y/m/d') : '-' }}</span>
+                                <span class="res-badge badge-{{ $res->status }}">
+                                    {{ $res->status_persian ?? $res->status }}
+                                </span>
+                            </div>
+                        @empty
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                                <p>رزرو گذشته‌ای نداری</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== SIDE COLUMN ===== -->
+            <div class="dashboard-side">
+
+                <!-- Profile -->
+                <div class="profile-card-v2">
+                    <div class="profile-cover"></div>
+                    <div class="profile-avatar-wrap">
+                        <div class="profile-avatar-v2">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="profile-name-v2">{{ $user->display_name }}</div>
+                    <span class="profile-phone-v2">{{ $user->phone }}</span>
+
+                    <div class="profile-info-v2">
+                        <div class="profile-info-row">
+                            <div class="icon"><i class="fas fa-envelope"></i></div>
+                            <span class="label">ایمیل</span>
+                            <span class="value">{{ $user->email ?: '—' }}</span>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <span class="label">آدرس</span>
+                            <span class="value rtl">{{ $user->address ? \Str::limit($user->address, 18) : '—' }}</span>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="icon"><i class="fas fa-clock"></i></div>
+                            <span class="label">آخرین ورود</span>
+                            <span class="value rtl">{{ $user->last_login ? $user->last_login->diffForHumans() : 'الان' }}</span>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('profile.edit') }}" class="btn-edit-profile-v2">
+                        <i class="fas fa-user-edit"></i>
+                        ویرایش اطلاعات
+                    </a>
+                </div>
+
+                <!-- Invoices -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3>
+                            <span class="icon-badge"><i class="fas fa-file-invoice-dollar"></i></span>
+                            فاکتورها
+                        </h3>
+                        <a href="{{ route('invoices.index') }}">
+                            همه <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                    <div class="section-body">
+                        <div class="invoice-list">
+                            @forelse($invoices as $inv)
+                                <a href="{{ route('invoices.show', $inv->id) }}" class="invoice-row">
+                                    <div class="invoice-icon-wrap">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </div>
+                                    <div class="invoice-info">
+                                        <div class="invoice-title">{{ $inv->title ?? 'فاکتور' }}</div>
+                                        <div class="invoice-num">{{ $inv->invoice_number }}</div>
+                                    </div>
+                                    <div class="invoice-amount">{{ number_format($inv->final_amount) }} ت</div>
+                                    <i class="fas fa-arrow-left invoice-arrow"></i>
+                                </a>
+                            @empty
+                                <div class="empty-state" style="padding: 24px 10px;">
+                                    <div class="empty-icon" style="width: 60px; height: 60px; font-size: 24px;"><i class="fas fa-receipt"></i></div>
+                                    <p style="font-size: 12px;">فاکتوری نداری</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div style="height: 40px;"></div>
+
+    </div>
 
     <!-- ============================================================
-    JAVASCRIPT
+    TOAST
     ============================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script>
         // ============================================================
-        // 1. THEME TOGGLE
+        // THEME
         // ============================================================
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle?.querySelector('i');
         let darkMode = localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : true;
-
         function applyTheme() {
             document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
             if (themeIcon) themeIcon.className = darkMode ? 'fas fa-moon' : 'fas fa-sun';
             localStorage.setItem('theme', darkMode ? 'dark' : 'light');
         }
         applyTheme();
+        themeToggle?.addEventListener('click', () => { darkMode = !darkMode; applyTheme(); });
 
-        themeToggle?.addEventListener('click', () => {
-            darkMode = !darkMode;
-            applyTheme();
+        // ============================================================
+        // USER DROPDOWN
+        // ============================================================
+        const avatarBtn = document.getElementById('avatarBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        avatarBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu?.classList.toggle('open');
         });
-
-        // ============================================================
-        // 2. MOBILE MENU
-        // ============================================================
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        menuToggle?.addEventListener('click', () => {
-            mobileMenu?.classList.toggle('open');
-            const icon = menuToggle.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-bars');
-                icon.classList.toggle('fa-times');
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-dropdown')) {
+                dropdownMenu?.classList.remove('open');
             }
         });
 
-        document.querySelectorAll('.mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu?.classList.remove('open');
-                const icon = menuToggle?.querySelector('i');
-                if (icon) {
-                    icon.classList.add('fa-bars');
-                    icon.classList.remove('fa-times');
-                }
-            });
-        });
-
         // ============================================================
-        // 3. HEADER SHADOW
+        // LOGOUT
         // ============================================================
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (!header) return;
-            if (window.scrollY > 50) header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.4)';
-            else header.style.boxShadow = 'none';
-        });
-
-        // ============================================================
-        // 4. TAB NAVIGATION
-        // ============================================================
-        const navLinks = document.querySelectorAll('.dashboard-nav a[data-tab]');
-        const tabContents = {
-            'dashboard-tab': document.getElementById('dashboard-tab'),
-            'reservations-tab': document.getElementById('reservations-tab'),
-            'invoices-tab': document.getElementById('invoices-tab'),
-            'profile-tab': document.getElementById('profile-tab'),
-        };
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // Active class on nav
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-
-                // Show tab content
-                const tabId = this.dataset.tab;
-                Object.keys(tabContents).forEach(key => {
-                    tabContents[key].classList.remove('active');
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            if (!confirm('آیا از خروج اطمینان دارید؟')) return;
+            try {
+                await fetch('{{ route("logout") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
                 });
-                if (tabContents[tabId]) {
-                    tabContents[tabId].classList.add('active');
-                }
-            });
+                window.location.href = '{{ route("home") }}';
+            } catch (e) {
+                window.location.href = '{{ route("home") }}';
+            }
         });
 
         // ============================================================
-        // 5. RESERVATION FILTER
+        // TOAST
         // ============================================================
-        function filterReservations() {
-            const filter = document.getElementById('reservationFilter').value;
-            const search = document.getElementById('reservationSearch').value.toLowerCase();
-            const rows = document.querySelectorAll('.reservation-row');
-
-            rows.forEach(row => {
-                const status = row.dataset.status;
-                const searchData = row.dataset.search.toLowerCase();
-                let show = true;
-
-                if (filter !== 'all' && status !== filter) {
-                    show = false;
-                }
-                if (search && !searchData.includes(search)) {
-                    show = false;
-                }
-
-                row.style.display = show ? '' : 'none';
-            });
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
+            const toast = document.createElement('div');
+            toast.className = `toast-item toast-${type}`;
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-100px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
         }
 
-        // Event listeners for filter
-        document.getElementById('reservationFilter')?.addEventListener('change', filterReservations);
-        document.getElementById('reservationSearch')?.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') filterReservations();
-        });
-
         // ============================================================
-        // 6. PROFILE FORM
+        // CANCEL RESERVATION
         // ============================================================
-        document.getElementById('profileForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('اطلاعات شما با موفقیت به‌روزرسانی شد!');
-        });
-
-        // ============================================================
-        // 7. INVOICE FILTER
-        // ============================================================
-        document.getElementById('invoiceFilter')?.addEventListener('change', function() {
-            const filter = this.value;
-            const rows = document.querySelectorAll('#invoices-tab tbody tr');
-            rows.forEach(row => {
-                const status = row.querySelector('.badge')?.textContent.trim() || '';
-                let show = true;
-                if (filter !== 'all') {
-                    const statusMap = {
-                        'paid': 'پرداخت شده',
-                        'pending': 'در انتظار پرداخت',
-                        'cancelled': 'لغو شده'
-                    };
-                    show = status === statusMap[filter];
+        async function cancelReservation(id) {
+            if (!confirm('آیا از لغو این رزرو اطمینان دارید؟')) return;
+            try {
+                const res = await fetch(`/dashboard/reservations/${id}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast(data.message || 'خطا در لغو', 'error');
                 }
-                row.style.display = show ? '' : 'none';
-            });
-        });
+            } catch (err) {
+                showToast('خطا در ارتباط با سرور', 'error');
+            }
+        }
 
-        console.log('Dashboard page loaded successfully!');
+        // ============================================================
+        // CHART
+        // ============================================================
+        const chartData = @json($chartData);
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        if (document.getElementById('monthlyChart')) {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(212, 163, 115, 0.5)');
+            gradient.addColorStop(1, 'rgba(212, 163, 115, 0.02)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'تعداد رزرو',
+                        data: chartData.counts,
+                        borderColor: '#d4a373',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.45,
+                        pointBackgroundColor: '#d4a373',
+                        pointBorderColor: isDark ? '#0f1f33' : '#fff',
+                        pointBorderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 9,
+                        pointHoverBackgroundColor: '#b8874a',
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: isDark ? '#0f1f33' : '#fff',
+                            titleColor: isDark ? '#fff' : '#0a1628',
+                            bodyColor: '#d4a373',
+                            borderColor: '#d4a373',
+                            borderWidth: 2,
+                            padding: 14,
+                            cornerRadius: 12,
+                            displayColors: false,
+                            titleFont: { family: 'Vazirmatn', size: 13, weight: '700' },
+                            bodyFont: { family: 'Vazirmatn', size: 13, weight: '600' },
+                            callbacks: {
+                                label: (ctx) => `${ctx.parsed.y} رزرو`,
+                            },
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                color: isDark ? '#94a3b8' : '#6b7a8a',
+                                font: { family: 'Vazirmatn', size: 11 },
+                            },
+                            grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', drawBorder: false },
+                        },
+                        x: {
+                            ticks: {
+                                color: isDark ? '#94a3b8' : '#6b7a8a',
+                                font: { family: 'Vazirmatn', size: 12 },
+                            },
+                            grid: { display: false },
+                        },
+                    },
+                },
+            });
+        }
     </script>
 
 </body>
